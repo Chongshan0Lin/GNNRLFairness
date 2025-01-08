@@ -13,6 +13,7 @@ def normalize_adjacency(adj):
     # Add self-connections
     print(adj)
     print(type(adj))
+    adj = torch.Tensor.to_dense(adj)
     adj = np.add(adj, torch.eye(len(adj[0])))
     # Compute degree matrix
     rowsum = adj.sum(1)

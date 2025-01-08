@@ -5,6 +5,8 @@ import numpy as np
 
 class GCNLayer(nn.Module):
     def __init__(self, in_features, out_features, bias = True):
+        print("in feature:", in_features)
+        print("out feature:", out_features)
         super(GCNLayer, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
@@ -21,20 +23,17 @@ class GCNLayer(nn.Module):
             nn.init.zeros_(self.bias)
 
     def forward(self, x, adj_norm):
+
+        # print(x.size())
+        adj_norm = torch.from_numpy(adj_norm).to(torch.float32)
         
-        print("Type of x: ", type(x))
         if isinstance(x, torch.Tensor) :
-            print("Type!!! of x: ", type(x))
             x = x.detach().cpu().numpy()
         xnp = np.vstack(x).astype(np.float32)
         x = torch.from_numpy(xnp)
-        # x.detach().cpu().numpy()
         support = torch.matmul(x, self.weight)
-        # adj_norm = adj_norm.float()
-        print(adj_norm)
-        print(support)
 
-        out = torch.matmul(torch.from_numpy(adj_norm).to(torch.float32), support)
+        out = torch.matmul(adj_norm, support)
 
         if self.bias is not None:
             out = out + self.bias
