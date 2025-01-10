@@ -3,9 +3,9 @@ import networkx as nx
 import pandas as pd
 import numpy as np
 import torch
-from utils import graph_to_adj
 from model import GCN
 from utils import normalize_adjacency
+from utils import demographic_parity, conditional_demographic_parity, equality_of_odds
 import torch.nn.functional as F
 
 
@@ -87,3 +87,12 @@ with torch.no_grad():
     acc_test  = pred_test.eq(labels[idx_test]).sum().item() / idx_test.size(0)
 
 print(f"Test Loss: {loss_test.item():.4f}, Test Accuracy: {acc_test:.4f}")
+
+"""
+Fairness Evauation
+"""
+
+DP = demographic_parity(predictions=pred_test, sens=sens[idx_test])
+EOd = equality_of_odds(predictions=pred_test, labels=labels[idx_test], sens=sens[idx_test])
+CDP = conditional_demographic_parity(predictions=pred_test, labels=labels[idx_test], sens=sens[idx_test])
+print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}, Conditional DP: {CDP:.4f}")

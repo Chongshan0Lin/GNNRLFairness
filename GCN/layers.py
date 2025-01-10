@@ -24,9 +24,8 @@ class GCNLayer(nn.Module):
 
     def forward(self, x, adj_norm):
 
-        # print(x.size())
         adj_norm = torch.from_numpy(adj_norm).to(torch.float32)
-        
+
         if isinstance(x, torch.Tensor) :
             x = x.detach().cpu().numpy()
         xnp = np.vstack(x).astype(np.float32)
