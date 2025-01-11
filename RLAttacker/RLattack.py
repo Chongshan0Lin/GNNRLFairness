@@ -6,6 +6,11 @@ import random
 import numpy as np
 from graph_embedding import s2v_embedding
 from collections import deque
+import torch.optim as optim
+
+ENV_NAME = "CartPole-v1"
+env = gym.make(ENV_NAME)
+
 
 class DQN(nn.Module):
     def __init__(self, state_size, action_size, hidden_layer_size = 128):
@@ -38,9 +43,7 @@ class replay_buffer:
 
     def length(self):
         return len(self.buffer)
-    
 
-    
 
 class agent:
     def __init__(self, graph, feature_matrix, labels, state_dim, idx_test, idx_train, epsilon, min_memory_step, buffer_capacity = 200000):
@@ -71,11 +74,12 @@ class agent:
         # Exploration rate
         self.epsilon = epsilon
         self.min_memory_step = min_memory_step
-        self.embedding = s2v_embedding(graph=self.graph, feature_matrix=self.feature_matrix, output_dim=self.state_size)
+        # self.embedding = 
+        self.optimizer = optim.Adam(self.policy_network.parameters(), lr=1e-3, weight_decay=0)
 
         # Create deeq q network
         self.build_Q_network()
-        
+
     def build_Q_network(self):
         """
         Initialize the two networks: policy network and target network
@@ -83,13 +87,11 @@ class agent:
         self.policy_network = DQN(self.state_size, self.action_size)
         self.target_network = DQN(self.state_size, self.action_size)
     
-    def select_action(self):
+    def select_action(self, state_t):
         if random.random() < self.epsilon:
             return random.randrange(self.action_size)
         else:
             with torch.no_grad():
-
-                state_t = self.embedding
                 q_values = self.policy_network(state_t)
                 return q_values.argmax(dim = 1).item()
     
@@ -118,7 +120,42 @@ class agent:
         loss = loss_fn(q_values, q_targets)
 
         # Backprop
-        optimizer.zero_grad()
+        self.optimizer.zero_grad()
         loss.backward()
-        optimizer.step()
-        
+        self.optimizer.step()
+
+    def train(self):
+
+        for episode in range(MAX_EPISODES):
+            state = env.reset()
+            episode_reward = 0
+            done = False
+
+            while not done:
+                action = self.select_action(state)
+                next_state, reward, done, _ = env.step(action)
+
+                # Store transition in replay buffer
+                self.replay_buffer.push(state, action, reward, next_state, done)
+
+                # Update state
+                state = next_state
+                episode_reward += reward
+                
+                # Training step
+                self.train_step()
+                
+                # Decay epsilon
+                epsilon = EPS_END + (EPS_START - EPS_END) * \
+                        np.exp(-1.0 * episode / EPS_DECAY)
+
+        all_rewards.append(episode_reward)
+
+        # Update the target network periodically
+        if episode % TARGET_UPDATE_FREQ == 0:
+            target_net.load_state_dict(policy_net.state_dict())
+
+        if (episode + 1) % 10 == 0:
+            avg_reward = np.mean(all_rewards[-10:])
+            print(f"Episode {episode+1}, Average Reward: {avg_reward:.2f}, Epsilon: {epsilon:.3f}")
+
