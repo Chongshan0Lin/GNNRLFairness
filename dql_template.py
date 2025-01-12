@@ -165,7 +165,7 @@ for episode in range(MAX_EPISODES):
     # Update the target network periodically
     if episode % TARGET_UPDATE_FREQ == 0:
         target_net.load_state_dict(policy_net.state_dict())
-    
+
     if (episode + 1) % 10 == 0:
         avg_reward = np.mean(all_rewards[-10:])
         print(f"Episode {episode+1}, Average Reward: {avg_reward:.2f}, Epsilon: {epsilon:.3f}")

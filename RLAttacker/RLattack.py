@@ -10,10 +10,18 @@ import torch.optim as optim
 
 ENV_NAME = "CartPole-v1"
 env = gym.make(ENV_NAME)
+loss_fn = nn.MSELoss()
+
 
 
 class DQN(nn.Module):
-    def __init__(self, state_size, action_size, hidden_layer_size = 128):
+    """
+    The basic structure of one deep q network
+    Argument: state_size, action_size, hidden_layer_size
+    It has three layers, one state_size * hidden_layer_size, one hidden_layer_size * hidden_layer_size, one hidden_layer_size * action_size
+    The forwarding uses relu as non-linear layer
+    """
+    def __init__(self, state_size, action_size, hidden_layer_size):
         super(DQN, self).__init__()
         self.fc1 = nn.Linear(state_size, hidden_layer_size)
         self.fc2 = nn.Linear(hidden_layer_size, hidden_layer_size)
@@ -25,13 +33,85 @@ class DQN(nn.Module):
 
         return self.fc3(x)
 
+class Q_function:
+    """
+    A Q function that serves as a component the hierarchical Q network
+    Argument: order, state_size, action_size, hidden_layer_size (optional), buffer_capacity
+    Components: policy network, target network, order, replay_buffer
+    """
+    def __init__(self, order, state_size, action_size, buffer_capacity, exploration_rate, hidden_layer_size = 128):
+        self.order = order
+        self.policy_network = DQN(state_size, action_size, hidden_layer_size)
+        self.target_network = DQN(state_size, action_size, hidden_layer_size)
+        self.replay_buffer = replay_buffer(capacity=buffer_capacity)
+
+        self.build_Q_network()
+        self.optimizer = optim.Adam(self.policy_network.parameters(), lr=1e-3, weight_decay=0)
+        self.exploration_rate = exploration_rate
+
+
+    def build_Q_network(self):
+        """
+        Initialize the two networks: policy network and target network
+        """
+        self.policy_network = DQN(self.state_size, self.action_size)
+        self.target_network = DQN(self.state_size, self.action_size)
+
+
+
+    def select_action(self, state_t):
+        """
+        Based on the calculation of network, select the proper Q network
+        """
+        if random.random() < self.epsilon:
+            return random.randrange(self.action_size)
+        else:
+            with torch.no_grad():
+                q_values = self.policy_network.forward(state_t)
+                return q_values.argmax(dim = 1).item()
+
+    def train_step(self):
+        if len(self.replay_buffer.length()) < self.min_memory_step:
+            return
+
+        BATCH_SIZE = 100
+        states, actions, rewards, next_states, dones = self.replay_buffer.sample(BATCH_SIZE)
+        states_t = torch.FloatTensor(states)
+        actions_t = torch.LongTensor(actions).unsqueeze(1)
+        rewards_t = torch.FloatTensor(rewards).unsqueeze(1)
+        next_states_t = torch.FloatTensor(next_states)
+        dones_t = torch.FloatTensor(dones).unsqueeze(1)
+
+        
+        q_values = self.policy_network.forward(states_t).gather(1, actions_t)
+
+        # Next Q values (target network)
+        with torch.no_grad():
+            max_next_q_values = self.target_network(next_states_t).max(dim=1, keepdim=True)[0]
+
+        # Q target = reward + (gamma * max_next_q_value * (1 - done))
+        q_targets = rewards_t + (max_next_q_values * (1 - dones_t))
+        loss = loss_fn(q_values, q_targets)
+
+        # Backprop
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+    
+    def update_network(self):
+        self.target_network.load_state_dict(self.policy_network.state_dict())
+
+
+
 class replay_buffer:
 
     """
-    Replay buffer data structure for agent to 
+    Replay buffer data structure for agent to play memory buffer
+    Argument: capacity: max size of replay buffer
     """
     def __init__(self, capacity):
         self.buffer = deque(maxlen=capacity)
+    
     def push(self, state, action, reward, next_state, done):
         self.buffer.append(state, action, reward, next_state, done)
     
@@ -46,7 +126,7 @@ class replay_buffer:
 
 
 class agent:
-    def __init__(self, graph, feature_matrix, labels, state_dim, idx_test, idx_train, epsilon, min_memory_step, buffer_capacity = 200000):
+    def __init__(self, graph, feature_matrix, labels, state_dim, idx_test, idx_train, epsilon, min_memory_step, budget, buffer_capacity = 200000):
         """
         graph: networkx graph
         feature_matrix: tensor matrix that store the features of nodes
@@ -65,89 +145,43 @@ class agent:
         self.idx_test = idx_test
         self.idx_train = idx_train
 
-        self.replay_buffer = replay_buffer(capacity=buffer_capacity)
+        action_size = graph.number_of_nodes()
 
-        # This serves as the output dimension of q deep network
-        self.action_size = graph.number_of_nodes()
-        # This serves as the input dimension of q deep network
-        self.state_size = state_dim
-        # Exploration rate
-        self.epsilon = epsilon
+        self.Q_function1 = Q_function(state_size=state_dim, action_size=action_size, order=1, buffer_capacity=buffer_capacity, exploration_rate=epsilon)
+        self.Q_function2 = Q_function(state_size=state_dim, action_size=action_size, order=2, buffer_capacity=buffer_capacity, exploration_rate=epsilon)
+
         self.min_memory_step = min_memory_step
-        # self.embedding = 
-        self.optimizer = optim.Adam(self.policy_network.parameters(), lr=1e-3, weight_decay=0)
+        self.budegt = budget
 
-        # Create deeq q network
-        self.build_Q_network()
+        self.embedding = s2v_embedding()
 
-    def build_Q_network(self):
-        """
-        Initialize the two networks: policy network and target network
-        """
-        self.policy_network = DQN(self.state_size, self.action_size)
-        self.target_network = DQN(self.state_size, self.action_size)
-    
-    def select_action(self, state_t):
-        if random.random() < self.epsilon:
-            return random.randrange(self.action_size)
-        else:
-            with torch.no_grad():
-                q_values = self.policy_network(state_t)
-                return q_values.argmax(dim = 1).item()
-    
-    def train_setp(self):
-        if len(self.replay_buffer.length()) < self.min_memory_step:
-            return
-        
-        BATCH_SIZE = 100
-        states, actions, rewards, next_states, dones = self.replay_buffer.sample(BATCH_SIZE)
-        states_t = torch.FloatTensor(states)
-        actions_t = torch.LongTensor(actions).unsqueeze(1)
-        rewards_t = torch.FloatTensor(rewards).unsqueeze(1)
-        next_states_t = torch.FloatTensor(next_states)
-        dones_t = torch.FloatTensor(dones).unsqueeze(1)
-
-        # Current Q values (policy network)
-        q_values = self.policy_network(states_t).gather(1, actions_t)
-
-        # Next Q values (target network)
-        with torch.no_grad():
-            max_next_q_values = self.target_network(next_states_t).max(dim=1, keepdim=True)[0]
-
-        # Q target = reward + (gamma * max_next_q_value * (1 - done))
-        q_targets = rewards_t + (max_next_q_values * (1 - dones_t))
-
-        loss = loss_fn(q_values, q_targets)
-
-        # Backprop
-        self.optimizer.zero_grad()
-        loss.backward()
-        self.optimizer.step()
 
     def train(self):
-
+        """
+        Train the two agent hierarchically.
+        First Q function gives the first node, second Q function gives the second node.
+        The reward is based on the difference of fairness after the node is removed.
+        The agent runs until it runs out of the budget or successfully achieves the goal
+        """
         for episode in range(MAX_EPISODES):
-            state = env.reset()
+
             episode_reward = 0
             done = False
 
+            # Launch a cycle of attack
             while not done:
-                action = self.select_action(state)
-                next_state, reward, done, _ = env.step(action)
+                # Get the current state embedding
+                state_embedding = self.embedding.g2v(self.graph)
+                # Select the first node:
+                first_node = self.Q_function1.select_action(state_embedding)
+                second_node = self.Q_function1.select_action(state_embedding)
 
-                # Store transition in replay buffer
-                self.replay_buffer.push(state, action, reward, next_state, done)
+                # How shall I make sure that the first node is different from the second node?
+                
+                # If there exist an edge between the two nodes, remove it.
+                # Otherwise, connect the two nodes
+        
 
-                # Update state
-                state = next_state
-                episode_reward += reward
-                
-                # Training step
-                self.train_step()
-                
-                # Decay epsilon
-                epsilon = EPS_END + (EPS_START - EPS_END) * \
-                        np.exp(-1.0 * episode / EPS_DECAY)
 
         all_rewards.append(episode_reward)
 
