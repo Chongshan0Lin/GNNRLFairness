@@ -6,6 +6,7 @@ import random
 import numpy as np
 from graph_embedding import s2v_embedding
 from collections import deque
+from ..GCN.model import GCN
 import torch.optim as optim
 
 ENV_NAME = "CartPole-v1"
@@ -164,6 +165,9 @@ class agent:
         The agent runs until it runs out of the budget or successfully achieves the goal
         """
         for episode in range(MAX_EPISODES):
+
+            # Create a GNN model
+
 
             episode_reward = 0
             done = False

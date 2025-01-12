@@ -12,7 +12,7 @@ class GCN(nn.Module):
 
         self.gc2 = GCNLayer(in_features=hidden_features, out_features=out_features)
         self.dropout = dropout
-
+    
     def forward(self, x, adj_norm):
         # First layer
         # print(x.size())
