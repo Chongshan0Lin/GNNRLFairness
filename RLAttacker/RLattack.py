@@ -4,9 +4,10 @@ import torch
 import gym
 import random
 import numpy as np
-from graph_embedding import s2v_embedding
+from .graph_embedding import s2v_embedding
 from collections import deque
-from ..GCN.model import GCN
+# from ..GCN.model import GCN
+from GCN.victim import victim
 import torch.optim as optim
 
 ENV_NAME = "CartPole-v1"
@@ -45,7 +46,8 @@ class Q_function:
         self.policy_network = DQN(state_size, action_size, hidden_layer_size)
         self.target_network = DQN(state_size, action_size, hidden_layer_size)
         self.replay_buffer = replay_buffer(capacity=buffer_capacity)
-
+        self.state_size = state_size
+        self.action_size = action_size
         self.build_Q_network()
         self.optimizer = optim.Adam(self.policy_network.parameters(), lr=1e-3, weight_decay=0)
         self.exploration_rate = exploration_rate
@@ -55,8 +57,8 @@ class Q_function:
         """
         Initialize the two networks: policy network and target network
         """
-        self.policy_network = DQN(self.state_size, self.action_size)
-        self.target_network = DQN(self.state_size, self.action_size)
+        self.policy_network = DQN(self.state_size, self.action_size, hidden_layer_size=(self.state_size * 2) // 3 + self.action_size)
+        self.target_network = DQN(self.state_size, self.action_size, hidden_layer_size=(self.state_size * 2) // 3 + self.action_size)
 
 
 
@@ -141,10 +143,12 @@ class agent:
         """
         # super().__init__()
         self.graph = graph
+        self.nnodes = graph.number_of_nodes()
         self.feature_matrix = feature_matrix
         self.labels = labels
         self.idx_test = idx_test
         self.idx_train = idx_train
+        self.state_dim = state_dim
 
         action_size = graph.number_of_nodes()
 
@@ -154,7 +158,13 @@ class agent:
         self.min_memory_step = min_memory_step
         self.budegt = budget
 
-        self.embedding = s2v_embedding()
+        self.embedding = s2v_embedding(nnodes=self.nnodes, feature_matrix=self.feature_matrix, output_dim=self.state_dim)
+
+    def change_edge(self, node1, node2):
+        if self.graph.has_edge(node1, node2):
+            self.graph.remove_edge(node1, node2)
+        else:
+            self.graph.add_edge(node1, node2)
 
 
     def train(self):
@@ -164,36 +174,55 @@ class agent:
         The reward is based on the difference of fairness after the node is removed.
         The agent runs until it runs out of the budget or successfully achieves the goal
         """
-        for episode in range(MAX_EPISODES):
+        n_episodes = 20
+        for episode in range(n_episodes):
+            all_rewards = []
+            cumulative_reward = 0
 
-            # Create a GNN model
+            # Create a victim model and train
+            victim_model = victim()
+            victim_model.train()
+            fairness_loss = victim_model.evaluate()
 
-
-            episode_reward = 0
-            done = False
-
+            state_embedding = self.embedding.g2v(self.graph)
             # Launch a cycle of attack
-            while not done:
+            for _ in range(self.budegt):
                 # Get the current state embedding
-                state_embedding = self.embedding.g2v(self.graph)
                 # Select the first node:
+                # How shall I make sure that the first node is different from the second node?
                 first_node = self.Q_function1.select_action(state_embedding)
                 second_node = self.Q_function1.select_action(state_embedding)
 
-                # How shall I make sure that the first node is different from the second node?
-                
-                # If there exist an edge between the two nodes, remove it.
-                # Otherwise, connect the two nodes
-        
+                victim_model.change_edge(first_node, second_node)
+                self.change_edge(first_node, second_node)
 
+                # After changing the model, retrain the victim model and calculate the new fairness value
+                victim_model.train()
+                new_loss = victim_model.evaluate()
+                # Determine the difference of fairness, which is the reward
+                reward = new_loss - fairness_loss
+                cumulative_reward += reward
+                fairness_loss = new_loss
 
-        all_rewards.append(episode_reward)
+                # Update the embedding correspondingly as the new state
+                new_state_embedding = self.embedding.g2v(self.graph)
+                self.Q_function1.replay_buffer.push(state=state_embedding, action=first_node, reward=reward,next_state=new_state_embedding)
+                self.Q_function1.replay_buffer.push(state=state_embedding, action=second_node, reward=reward,next_state=new_state_embedding)
+                state_embedding = new_state_embedding
 
-        # Update the target network periodically
-        if episode % TARGET_UPDATE_FREQ == 0:
-            target_net.load_state_dict(policy_net.state_dict())
+            all_rewards.append(cumulative_reward)
+            # Update the target network periodically
+            if episode % 2 == 0:
+                self.Q_function1.target_network.load_state_dict(self.Q_function1.policy_network_network.state_dict())
+                self.Q_function2.target_network.load_state_dict(self.Q_function2.policy_network_network.state_dict())
 
-        if (episode + 1) % 10 == 0:
-            avg_reward = np.mean(all_rewards[-10:])
-            print(f"Episode {episode+1}, Average Reward: {avg_reward:.2f}, Epsilon: {epsilon:.3f}")
+            if (episode + 1) % 2 == 0:
+                avg_reward = np.mean(all_rewards[-10:])
+                print(f"Episode {episode+1}, Average Reward: {avg_reward:.2f}")
 
+    def train_step(self):
+        """
+        Train Q network periodically and minimize loss
+        """
+        self.Q_function1.train_step()
+        self.Q_function2.train_step()

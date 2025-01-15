@@ -5,7 +5,11 @@ import numpy as np
 import torch
 import scipy.sparse as sp
 
-PATH = "../Data/cora"
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+data_path_fnames = os.path.join(current_dir,  'Data', 'facebook', '107.featnames')
+data_path_edges = os.path.join(current_dir,  'Data', 'facebook', '107.edges')
+data_path_features = os.path.join(current_dir,  'Data', 'facebook', '107.feat')
 
 def mx_to_torch_sparse_tensor(sparse_mx, is_sparse=False, return_tensor_sparse=True):
     """Convert a scipy sparse matrix to a torch sparse tensor."""
@@ -34,7 +38,7 @@ def graph_loading(path = "../Data/cora"):
 
     return Graphnx
 
-def feature_loading(path = PATH):
+def feature_loading(path = "../Data/cora"):
     """
     Convert paper features into matrix in {0, 1}
     """    
@@ -60,17 +64,17 @@ def label_loading(path = "../Data/cora"):
 
 
 def loading_facebook_dataset(return_tensor_sparse=True):
-    edges_file = open('Data/facebook/107.edges')
+    edges_file = open(data_path_edges)
     edges=[]
     for line in edges_file:
         edges.append([int(one) for one in line.strip('\n').split(' ')])
 
-    feat_file=open('Data/facebook/107.feat')
+    feat_file=open(data_path_features)
     feats=[]
     for line in feat_file:
         feats.append([int(one) for one in line.strip('\n').split(' ')])
 
-    feat_name_file = open('Data/facebook/107.featnames')
+    feat_name_file = open(data_path_fnames)
     feat_name = []
     for line in feat_name_file:
         feat_name.append(line.strip('\n').split(' '))

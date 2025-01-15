@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
-from layers import GCNLayer
+from .layers import GCNLayer
 
 class GCN(nn.Module):
 
