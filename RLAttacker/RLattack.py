@@ -129,7 +129,7 @@ class replay_buffer:
 
 
 class agent:
-    def __init__(self, graph, feature_matrix, labels, state_dim, idx_test, idx_train, epsilon, min_memory_step, budget, buffer_capacity = 200000):
+    def __init__(self, graph, feature_matrix, labels, state_dim, idx_test, idx_train, epsilon, min_memory_step, budget, buffer_capacity = 20000000):
         """
         graph: networkx graph
         feature_matrix: tensor matrix that store the features of nodes
@@ -188,7 +188,7 @@ class agent:
             fairness_loss = victim_model.evaluate()
             emb_matrix = self.embedding.n2v(self.graph)
             state_embedding = self.embedding.g2v(emb_matrix)
-            # Launch a cycle of attac
+            # Launch a cycle of attack
             for i in range(self.budegt):
 
                 print(i,"th iteration")
@@ -220,13 +220,13 @@ class agent:
             all_rewards.append(cumulative_reward)
             # Update the target network periodically
             if episode % 2 == 0:
-                self.Q_function1.target_network.load_state_dict(self.Q_function1.policy_network_network.state_dict())
-                self.Q_function2.target_network.load_state_dict(self.Q_function2.policy_network_network.state_dict())
+                self.Q_function1.target_network.load_state_dict(self.Q_function1.policy_network.state_dict())
+                self.Q_function2.target_network.load_state_dict(self.Q_function2.policy_network.state_dict())
 
             print(episode, "th episode")
-            if (episode + 1) % 2 == 0:
+            if (episode) % 1 == 0:
                 avg_reward = np.mean(all_rewards[-10:])
-                print(f"Episode {episode+1}, Average Reward: {avg_reward:.2f}")
+                print(f"Episode {episode}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
 
     def train_step(self):
         """
