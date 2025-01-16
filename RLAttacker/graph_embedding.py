@@ -29,12 +29,12 @@ class s2v_embedding(nn.Module):
         # For here
         # print("nfeatures:", self.nfeatures)
         # print("output_dim:", self.output_dim)
-        # self.W1 = nn.Linear(in_features=self.nfeatures, out_features=self.output_dim, bias=True)
-        # self.W2 = nn.Linear(in_features=self.output_dim, out_features=self.output_dim, bias=True)
-        self.W1 = nn.Parameter(torch.randn(self.output_dim, self.nfeatures))
-        self.W2 = nn.Parameter(torch.randn(self.output_dim, self.output_dim))
+        self.W1 = nn.Linear(in_features=self.nfeatures, out_features=self.output_dim, bias=True)
+        self.W2 = nn.Linear(in_features=self.output_dim, out_features=self.output_dim, bias=True)
+        # self.W1 = nn.Parameter(torch.randn(self.output_dim, self.nfeatures))
+        # self.W2 = nn.Parameter(torch.randn(self.output_dim, self.output_dim))
 
-        self.relu = True
+        self.relu = nn.ReLU()
         # The result embedding matrix we are looking for
         
 
@@ -44,8 +44,8 @@ class s2v_embedding(nn.Module):
         """
         Reset two weights using xavier uniform
         """
-        nn.init.xavier_uniform_(self.W1)
-        nn.init.xavier_uniform_(self.W2)
+        nn.init.xavier_uniform_(self.W1.weight)
+        nn.init.xavier_uniform_(self.W2.weight)
 
     def n2v(self, graph, T = 10):
         """
@@ -61,14 +61,22 @@ class s2v_embedding(nn.Module):
                 neighbors = [n for n in graph[node]]
                 # print("Neighbours:", neighbors)
                 nbr_emb_sum = sum(emb_matrix[neighbors])
+                print("neighbourhood:", neighbors)
+                print("nbr_emb_sum:", nbr_emb_sum)
                 # print("feature_matrix[node]:",self.feature_matrix[node].shape())
                 # print("nbr_emb_sum:",nbr_emb_sum.shape())
-                print(self.W1.size())
-                print(self.feature_matrix[node].size())
-                a = torch.matmul(self.W1, self.feature_matrix[node])
-                b = torch.matmul(self.W2, nbr_emb_sum)
-                exit()
-                new_embeddings[node] = nn.ReLU(torch.matmul(self.W1, self.feature_matrix[node]) + torch.matmul(self.W2, nbr_emb_sum))
+                # print(self.W1.size())
+                # print(self.feature_matrix[node].size())
+                a = self.W1(self.feature_matrix[node])
+
+                b = self.W2(nbr_emb_sum)
+                # a = torch.matmul(self.W1, self.feature_matrix[node])
+                # b = torch.matmul(self.W2, nbr_emb_sum)
+                # exit()
+                # new_embeddings[node] = nn.ReLU(torch.matmul(self.W1, self.feature_matrix[node]) + torch.matmul(self.W2, nbr_emb_sum))
+                new_embeddings[node] = self.relu(a+b)
+
+
 
             emb_matrix = new_embeddings
 

@@ -174,8 +174,12 @@ class agent:
         The reward is based on the difference of fairness after the node is removed.
         The agent runs until it runs out of the budget or successfully achieves the goal
         """
+
         n_episodes = 20
+        print("Number of episodes", n_episodes)
         for episode in range(n_episodes):
+
+            print(episode, "th iteration")
             all_rewards = []
             cumulative_reward = 0
 
@@ -185,8 +189,10 @@ class agent:
             fairness_loss = victim_model.evaluate()
             emb_matrix = self.embedding.n2v(self.graph)
             state_embedding = self.embedding.g2v(emb_matrix)
-            # Launch a cycle of attack
-            for _ in range(self.budegt):
+            # Launch a cycle of attac
+            for i in range(self.budegt):
+
+                print(i,"th iteration")
                 # Get the current state embedding
                 # Select the first node:
                 # How shall I make sure that the first node is different from the second node?

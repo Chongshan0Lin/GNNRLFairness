@@ -17,24 +17,24 @@ tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
        values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
        size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
 <class 'torch.Tensor'>
-Epoch: 000, Train Loss: 0.6821, Val Loss: 0.6227, Val Acc: 0.7847
-Epoch: 010, Train Loss: 0.5003, Val Loss: 0.5372, Val Acc: 0.7847
-Epoch: 020, Train Loss: 0.4855, Val Loss: 0.5129, Val Acc: 0.7847
-Epoch: 030, Train Loss: 0.4762, Val Loss: 0.5000, Val Acc: 0.7847
-Epoch: 040, Train Loss: 0.4711, Val Loss: 0.4974, Val Acc: 0.7847
-Epoch: 050, Train Loss: 0.4686, Val Loss: 0.4959, Val Acc: 0.7847
-Epoch: 060, Train Loss: 0.4658, Val Loss: 0.4927, Val Acc: 0.7847
-Epoch: 070, Train Loss: 0.4639, Val Loss: 0.4926, Val Acc: 0.7847
-Epoch: 080, Train Loss: 0.4617, Val Loss: 0.4913, Val Acc: 0.7847
-Epoch: 090, Train Loss: 0.4599, Val Loss: 0.4904, Val Acc: 0.7895
-Test Loss: 0.4886, Test Accuracy: 0.7994
+Epoch: 000, Train Loss: 0.7464, Val Loss: 0.6761, Val Acc: 0.6364
+Epoch: 010, Train Loss: 0.4943, Val Loss: 0.5276, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4950, Val Loss: 0.5228, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4759, Val Loss: 0.4994, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4708, Val Loss: 0.4974, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4678, Val Loss: 0.4977, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4658, Val Loss: 0.4956, Val Acc: 0.7799
+Epoch: 070, Train Loss: 0.4637, Val Loss: 0.4946, Val Acc: 0.7799
+Epoch: 080, Train Loss: 0.4634, Val Loss: 0.4940, Val Acc: 0.7799
+Epoch: 090, Train Loss: 0.4613, Val Loss: 0.4929, Val Acc: 0.7799
+Test Loss: 0.4896, Test Accuracy: 0.7930
 ma_pos_true: tensor(173)
 mi_pos_true: tensor(74)
 ma_neg_true: tensor(0)
 mi_neg_true: tensor(0)
 CDP_pos: tensor(0.)
 CDP_neg: tensor(0.)
-Demographic Parity: 0.0400, Equality of Odds: 0.1538, Conditional DP: 0.0000
+Demographic Parity: 0.0053, Equality of Odds: 0.0141, Conditional DP: 0.0000
 ['264', 'gender;anonymized', 'feature', '77']
 ['265', 'gender;anonymized', 'feature', '78']
 (1045, 576)
@@ -68,23 +68,832 @@ tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
        values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
        size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
 <class 'torch.Tensor'>
-Epoch: 000, Train Loss: 0.6862, Val Loss: 0.6279, Val Acc: 0.7847
-Epoch: 010, Train Loss: 0.5028, Val Loss: 0.5312, Val Acc: 0.7847
-Epoch: 020, Train Loss: 0.4860, Val Loss: 0.5096, Val Acc: 0.7847
-Epoch: 030, Train Loss: 0.4772, Val Loss: 0.4993, Val Acc: 0.7847
-Epoch: 040, Train Loss: 0.4691, Val Loss: 0.4968, Val Acc: 0.7847
-Epoch: 050, Train Loss: 0.4685, Val Loss: 0.4965, Val Acc: 0.7847
-Epoch: 060, Train Loss: 0.4649, Val Loss: 0.4937, Val Acc: 0.7847
-Epoch: 070, Train Loss: 0.4636, Val Loss: 0.4924, Val Acc: 0.7847
-Epoch: 080, Train Loss: 0.4601, Val Loss: 0.4912, Val Acc: 0.7847
-Epoch: 090, Train Loss: 0.4578, Val Loss: 0.4902, Val Acc: 0.7799
-Test Loss: 0.4869, Test Accuracy: 0.7994
+Epoch: 000, Train Loss: 0.6524, Val Loss: 0.5940, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.5038, Val Loss: 0.5330, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4784, Val Loss: 0.5015, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4758, Val Loss: 0.4998, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4695, Val Loss: 0.5008, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4652, Val Loss: 0.4972, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4636, Val Loss: 0.4960, Val Acc: 0.7847
+Epoch: 070, Train Loss: 0.4627, Val Loss: 0.4949, Val Acc: 0.7847
+Epoch: 080, Train Loss: 0.4607, Val Loss: 0.4935, Val Acc: 0.7847
+Epoch: 090, Train Loss: 0.4585, Val Loss: 0.4929, Val Acc: 0.7847
+Test Loss: 0.4904, Test Accuracy: 0.8057
 ma_pos_true: tensor(173)
 mi_pos_true: tensor(74)
 ma_neg_true: tensor(0)
 mi_neg_true: tensor(0)
 CDP_pos: tensor(0.)
 CDP_neg: tensor(0.)
-Demographic Parity: 0.0253, Equality of Odds: 0.0910, Conditional DP: 0.0000
+Demographic Parity: 0.0307, Equality of Odds: 0.1051, Conditional DP: 0.0000
 torch.Size([1045, 574])
 torch.Size([574])
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+Epoch: 000, Train Loss: 0.6702, Val Loss: 0.6146, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.5026, Val Loss: 0.5359, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4856, Val Loss: 0.5111, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4784, Val Loss: 0.5012, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4707, Val Loss: 0.4999, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4681, Val Loss: 0.4986, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4657, Val Loss: 0.4957, Val Acc: 0.7847
+Epoch: 070, Train Loss: 0.4638, Val Loss: 0.4949, Val Acc: 0.7847
+Epoch: 080, Train Loss: 0.4607, Val Loss: 0.4934, Val Acc: 0.7847
+Epoch: 090, Train Loss: 0.4597, Val Loss: 0.4926, Val Acc: 0.7847
+Test Loss: 0.4907, Test Accuracy: 0.7898
+ma_pos_true: tensor(173)
+mi_pos_true: tensor(74)
+ma_neg_true: tensor(0)
+mi_neg_true: tensor(0)
+CDP_pos: tensor(0.)
+CDP_neg: tensor(0.)
+Demographic Parity: 0.0100, Equality of Odds: 0.0385, Conditional DP: 0.0000
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+feature matrix shape: torch.Size([1045, 574])
+Number of episodes 20
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+Epoch: 000, Train Loss: 0.6551, Val Loss: 0.5961, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.5020, Val Loss: 0.5316, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4794, Val Loss: 0.5007, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4759, Val Loss: 0.4968, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4682, Val Loss: 0.4971, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4660, Val Loss: 0.4938, Val Acc: 0.7799
+Epoch: 060, Train Loss: 0.4630, Val Loss: 0.4925, Val Acc: 0.7847
+Epoch: 070, Train Loss: 0.4606, Val Loss: 0.4917, Val Acc: 0.7799
+Epoch: 080, Train Loss: 0.4596, Val Loss: 0.4899, Val Acc: 0.7943
+Epoch: 090, Train Loss: 0.4580, Val Loss: 0.4893, Val Acc: 0.7943
+Test Loss: 0.4855, Test Accuracy: 0.7994
+ma_pos_true: tensor(172)
+mi_pos_true: tensor(74)
+ma_neg_true: tensor(1)
+mi_neg_true: tensor(0)
+CDP_pos: tensor(0.0058)
+CDP_neg: tensor(0.0058)
+Demographic Parity: 0.0307, Equality of Odds: 0.1352, Conditional DP: 0.0116
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+feature matrix shape: torch.Size([1045, 574])
+Number of episodes 20
+0 th iteration
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+Epoch: 000, Train Loss: 0.7207, Val Loss: 0.6506, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.4992, Val Loss: 0.5356, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4911, Val Loss: 0.5194, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4766, Val Loss: 0.5000, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4707, Val Loss: 0.4968, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4699, Val Loss: 0.4977, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4656, Val Loss: 0.4948, Val Acc: 0.7799
+Epoch: 070, Train Loss: 0.4642, Val Loss: 0.4942, Val Acc: 0.7799
+Epoch: 080, Train Loss: 0.4628, Val Loss: 0.4938, Val Acc: 0.7799
+Epoch: 090, Train Loss: 0.4624, Val Loss: 0.4927, Val Acc: 0.7799
+Test Loss: 0.4877, Test Accuracy: 0.7962
+ma_pos_true: tensor(173)
+mi_pos_true: tensor(74)
+ma_neg_true: tensor(0)
+mi_neg_true: tensor(0)
+CDP_pos: tensor(0.)
+CDP_neg: tensor(0.)
+Demographic Parity: 0.0300, Equality of Odds: 0.1154, Conditional DP: 0.0000
+torch.Size([1045, 574])
+torch.Size([574])
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+Epoch: 000, Train Loss: 0.7120, Val Loss: 0.6333, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.5007, Val Loss: 0.5353, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4861, Val Loss: 0.5112, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4780, Val Loss: 0.5004, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4705, Val Loss: 0.4993, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4681, Val Loss: 0.4990, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4669, Val Loss: 0.4962, Val Acc: 0.7847
+Epoch: 070, Train Loss: 0.4657, Val Loss: 0.4960, Val Acc: 0.7847
+Epoch: 080, Train Loss: 0.4614, Val Loss: 0.4946, Val Acc: 0.7847
+Epoch: 090, Train Loss: 0.4607, Val Loss: 0.4936, Val Acc: 0.7847
+Test Loss: 0.4926, Test Accuracy: 0.7898
+ma_pos_true: tensor(173)
+mi_pos_true: tensor(74)
+ma_neg_true: tensor(0)
+mi_neg_true: tensor(0)
+CDP_pos: tensor(0.)
+CDP_neg: tensor(0.)
+Demographic Parity: 0.0047, Equality of Odds: 0.0244, Conditional DP: 0.0000
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+feature matrix shape: torch.Size([1045, 574])
+Number of episodes 20
+0 th iteration
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+Epoch: 000, Train Loss: 0.6411, Val Loss: 0.5891, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.5044, Val Loss: 0.5363, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4769, Val Loss: 0.4986, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4728, Val Loss: 0.4943, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4688, Val Loss: 0.4958, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4646, Val Loss: 0.4917, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4598, Val Loss: 0.4909, Val Acc: 0.7799
+Epoch: 070, Train Loss: 0.4581, Val Loss: 0.4901, Val Acc: 0.7799
+Epoch: 080, Train Loss: 0.4578, Val Loss: 0.4891, Val Acc: 0.7943
+Epoch: 090, Train Loss: 0.4555, Val Loss: 0.4888, Val Acc: 0.7943
+Test Loss: 0.4867, Test Accuracy: 0.8025
+ma_pos_true: tensor(172)
+mi_pos_true: tensor(74)
+ma_neg_true: tensor(1)
+mi_neg_true: tensor(0)
+CDP_pos: tensor(0.0058)
+CDP_neg: tensor(0.0058)
+Demographic Parity: 0.0260, Equality of Odds: 0.1108, Conditional DP: 0.0116
+torch.Size([1045, 574])
+torch.Size([574])
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+Epoch: 000, Train Loss: 0.7165, Val Loss: 0.6433, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.5038, Val Loss: 0.5332, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4902, Val Loss: 0.5092, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4784, Val Loss: 0.4979, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4699, Val Loss: 0.4955, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4685, Val Loss: 0.4958, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4651, Val Loss: 0.4934, Val Acc: 0.7847
+Epoch: 070, Train Loss: 0.4636, Val Loss: 0.4932, Val Acc: 0.7847
+Epoch: 080, Train Loss: 0.4605, Val Loss: 0.4922, Val Acc: 0.7799
+Epoch: 090, Train Loss: 0.4598, Val Loss: 0.4914, Val Acc: 0.7799
+Test Loss: 0.4873, Test Accuracy: 0.7994
+ma_pos_true: tensor(173)
+mi_pos_true: tensor(74)
+ma_neg_true: tensor(0)
+mi_neg_true: tensor(0)
+CDP_pos: tensor(0.)
+CDP_neg: tensor(0.)
+Demographic Parity: 0.0400, Equality of Odds: 0.1538, Conditional DP: 0.0000
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+feature matrix shape: torch.Size([1045, 574])
+Number of episodes 20
+0 th iteration
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+Epoch: 000, Train Loss: 0.6567, Val Loss: 0.5979, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.5028, Val Loss: 0.5359, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4795, Val Loss: 0.5025, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4772, Val Loss: 0.4984, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4713, Val Loss: 0.4996, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4656, Val Loss: 0.4964, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4639, Val Loss: 0.4952, Val Acc: 0.7847
+Epoch: 070, Train Loss: 0.4627, Val Loss: 0.4945, Val Acc: 0.7847
+Epoch: 080, Train Loss: 0.4606, Val Loss: 0.4925, Val Acc: 0.7799
+Epoch: 090, Train Loss: 0.4607, Val Loss: 0.4921, Val Acc: 0.7847
+Test Loss: 0.4907, Test Accuracy: 0.7962
+ma_pos_true: tensor(173)
+mi_pos_true: tensor(74)
+ma_neg_true: tensor(0)
+mi_neg_true: tensor(0)
+CDP_pos: tensor(0.)
+CDP_neg: tensor(0.)
+Demographic Parity: 0.0007, Equality of Odds: 0.0103, Conditional DP: 0.0000
+torch.Size([1045, 574])
+torch.Size([574])
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+Epoch: 000, Train Loss: 0.7142, Val Loss: 0.6438, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.4974, Val Loss: 0.5320, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4886, Val Loss: 0.5136, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4773, Val Loss: 0.4990, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4723, Val Loss: 0.4971, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4699, Val Loss: 0.4982, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4662, Val Loss: 0.4953, Val Acc: 0.7847
+Epoch: 070, Train Loss: 0.4638, Val Loss: 0.4949, Val Acc: 0.7847
+Epoch: 080, Train Loss: 0.4615, Val Loss: 0.4944, Val Acc: 0.7847
+Epoch: 090, Train Loss: 0.4596, Val Loss: 0.4935, Val Acc: 0.7847
+Test Loss: 0.4904, Test Accuracy: 0.7930
+ma_pos_true: tensor(173)
+mi_pos_true: tensor(74)
+ma_neg_true: tensor(0)
+mi_neg_true: tensor(0)
+CDP_pos: tensor(0.)
+CDP_neg: tensor(0.)
+Demographic Parity: 0.0053, Equality of Odds: 0.0141, Conditional DP: 0.0000
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+feature matrix shape: torch.Size([1045, 574])
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+Epoch: 000, Train Loss: 0.6880, Val Loss: 0.6148, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.5106, Val Loss: 0.5400, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4825, Val Loss: 0.5013, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4783, Val Loss: 0.4950, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4689, Val Loss: 0.4960, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4672, Val Loss: 0.4924, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4662, Val Loss: 0.4912, Val Acc: 0.7799
+Epoch: 070, Train Loss: 0.4621, Val Loss: 0.4911, Val Acc: 0.7799
+Epoch: 080, Train Loss: 0.4607, Val Loss: 0.4897, Val Acc: 0.7847
+Epoch: 090, Train Loss: 0.4585, Val Loss: 0.4895, Val Acc: 0.7799
+Test Loss: 0.4869, Test Accuracy: 0.8025
+ma_pos_true: tensor(173)
+mi_pos_true: tensor(74)
+ma_neg_true: tensor(0)
+mi_neg_true: tensor(0)
+CDP_pos: tensor(0.)
+CDP_neg: tensor(0.)
+Demographic Parity: 0.0353, Equality of Odds: 0.1295, Conditional DP: 0.0000
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+feature matrix shape: torch.Size([1045, 574])
+Number of episodes 20
+0 th iteration
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+Epoch: 000, Train Loss: 0.6924, Val Loss: 0.6276, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.4969, Val Loss: 0.5293, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4856, Val Loss: 0.5073, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4740, Val Loss: 0.4946, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4671, Val Loss: 0.4928, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4660, Val Loss: 0.4935, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4629, Val Loss: 0.4909, Val Acc: 0.7847
+Epoch: 070, Train Loss: 0.4613, Val Loss: 0.4906, Val Acc: 0.7847
+Epoch: 080, Train Loss: 0.4592, Val Loss: 0.4898, Val Acc: 0.7799
+Epoch: 090, Train Loss: 0.4578, Val Loss: 0.4889, Val Acc: 0.7799
+Test Loss: 0.4880, Test Accuracy: 0.8025
+ma_pos_true: tensor(173)
+mi_pos_true: tensor(74)
+ma_neg_true: tensor(0)
+mi_neg_true: tensor(0)
+CDP_pos: tensor(0.)
+CDP_neg: tensor(0.)
+Demographic Parity: 0.0207, Equality of Odds: 0.0666, Conditional DP: 0.0000
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+Epoch: 000, Train Loss: 0.6532, Val Loss: 0.6015, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.5007, Val Loss: 0.5310, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4845, Val Loss: 0.5085, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4781, Val Loss: 0.5018, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4711, Val Loss: 0.5007, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4685, Val Loss: 0.4988, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4663, Val Loss: 0.4962, Val Acc: 0.7847
+Epoch: 070, Train Loss: 0.4633, Val Loss: 0.4949, Val Acc: 0.7847
+Epoch: 080, Train Loss: 0.4627, Val Loss: 0.4931, Val Acc: 0.7847
+Epoch: 090, Train Loss: 0.4594, Val Loss: 0.4922, Val Acc: 0.7847
+Test Loss: 0.4905, Test Accuracy: 0.7898
+ma_pos_true: tensor(173)
+mi_pos_true: tensor(74)
+ma_neg_true: tensor(0)
+mi_neg_true: tensor(0)
+CDP_pos: tensor(0.)
+CDP_neg: tensor(0.)
+Demographic Parity: 0.0100, Equality of Odds: 0.0385, Conditional DP: 0.0000
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+feature matrix shape: torch.Size([1045, 574])
+Number of episodes 20
+0 th iteration
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+Epoch: 000, Train Loss: 0.7490, Val Loss: 0.6653, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.5025, Val Loss: 0.5325, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4937, Val Loss: 0.5172, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4780, Val Loss: 0.4977, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4717, Val Loss: 0.4953, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4682, Val Loss: 0.4970, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4656, Val Loss: 0.4937, Val Acc: 0.7847
+Epoch: 070, Train Loss: 0.4661, Val Loss: 0.4931, Val Acc: 0.7847
+Epoch: 080, Train Loss: 0.4628, Val Loss: 0.4928, Val Acc: 0.7847
+Epoch: 090, Train Loss: 0.4605, Val Loss: 0.4917, Val Acc: 0.7847
+Test Loss: 0.4911, Test Accuracy: 0.7930
+ma_pos_true: tensor(173)
+mi_pos_true: tensor(74)
+ma_neg_true: tensor(0)
+mi_neg_true: tensor(0)
+CDP_pos: tensor(0.)
+CDP_neg: tensor(0.)
+Demographic Parity: 0.0053, Equality of Odds: 0.0141, Conditional DP: 0.0000
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: 0
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+Epoch: 000, Train Loss: 0.6678, Val Loss: 0.5991, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.5064, Val Loss: 0.5381, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4796, Val Loss: 0.4986, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4768, Val Loss: 0.4940, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4701, Val Loss: 0.4956, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4685, Val Loss: 0.4915, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4647, Val Loss: 0.4912, Val Acc: 0.7847
+Epoch: 070, Train Loss: 0.4629, Val Loss: 0.4910, Val Acc: 0.7847
+Epoch: 080, Train Loss: 0.4619, Val Loss: 0.4897, Val Acc: 0.7799
+Epoch: 090, Train Loss: 0.4605, Val Loss: 0.4893, Val Acc: 0.7895
+Test Loss: 0.4880, Test Accuracy: 0.7930
+ma_pos_true: tensor(173)
+mi_pos_true: tensor(74)
+ma_neg_true: tensor(0)
+mi_neg_true: tensor(0)
+CDP_pos: tensor(0.)
+CDP_neg: tensor(0.)
+Demographic Parity: 0.0200, Equality of Odds: 0.0769, Conditional DP: 0.0000
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+feature matrix shape: torch.Size([1045, 574])
+Number of episodes 20
+0 th iteration
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+Epoch: 000, Train Loss: 0.7155, Val Loss: 0.6414, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.5034, Val Loss: 0.5381, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4864, Val Loss: 0.5097, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4787, Val Loss: 0.5006, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4703, Val Loss: 0.4986, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4692, Val Loss: 0.4973, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4654, Val Loss: 0.4947, Val Acc: 0.7847
+Epoch: 070, Train Loss: 0.4640, Val Loss: 0.4946, Val Acc: 0.7847
+Epoch: 080, Train Loss: 0.4622, Val Loss: 0.4935, Val Acc: 0.7847
+Epoch: 090, Train Loss: 0.4611, Val Loss: 0.4929, Val Acc: 0.7847
+Test Loss: 0.4909, Test Accuracy: 0.7898
+ma_pos_true: tensor(173)
+mi_pos_true: tensor(74)
+ma_neg_true: tensor(0)
+mi_neg_true: tensor(0)
+CDP_pos: tensor(0.)
+CDP_neg: tensor(0.)
+Demographic Parity: 0.0100, Equality of Odds: 0.0385, Conditional DP: 0.0000
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+nbr_emb_sum: 0
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+Epoch: 000, Train Loss: 0.7158, Val Loss: 0.6423, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.5061, Val Loss: 0.5353, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4913, Val Loss: 0.5118, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4806, Val Loss: 0.4993, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4725, Val Loss: 0.4967, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4720, Val Loss: 0.4969, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4694, Val Loss: 0.4945, Val Acc: 0.7847
+Epoch: 070, Train Loss: 0.4663, Val Loss: 0.4943, Val Acc: 0.7847
+Epoch: 080, Train Loss: 0.4618, Val Loss: 0.4934, Val Acc: 0.7847
+Epoch: 090, Train Loss: 0.4641, Val Loss: 0.4924, Val Acc: 0.7847
+Test Loss: 0.4901, Test Accuracy: 0.7898
+ma_pos_true: tensor(173)
+mi_pos_true: tensor(74)
+ma_neg_true: tensor(0)
+mi_neg_true: tensor(0)
+CDP_pos: tensor(0.)
+CDP_neg: tensor(0.)
+Demographic Parity: 0.0100, Equality of Odds: 0.0385, Conditional DP: 0.0000
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+feature matrix shape: torch.Size([1045, 574])
+Number of episodes 20
+0 th iteration
+['264', 'gender;anonymized', 'feature', '77']
+['265', 'gender;anonymized', 'feature', '78']
+(1045, 576)
+feature_matrix.shape:  torch.Size([1045, 574])
+nnodes:  1045
+nclasses:  2
+hfeatures:  384
+in feature: 574
+out feature: 384
+in feature: 384
+out feature: 2
+tensor(indices=tensor([[   0,    0,    0,  ..., 1044, 1044, 1044],
+                       [   6,   58,   61,  ...,  997, 1035, 1042]]),
+       values=tensor([1., 1., 1.,  ..., 1., 1., 1.]),
+       size=(1045, 1045), nnz=53498, layout=torch.sparse_coo)
+<class 'torch.Tensor'>
+Epoch: 000, Train Loss: 0.6992, Val Loss: 0.6351, Val Acc: 0.7847
+Epoch: 010, Train Loss: 0.4994, Val Loss: 0.5267, Val Acc: 0.7847
+Epoch: 020, Train Loss: 0.4887, Val Loss: 0.5083, Val Acc: 0.7847
+Epoch: 030, Train Loss: 0.4777, Val Loss: 0.4984, Val Acc: 0.7847
+Epoch: 040, Train Loss: 0.4700, Val Loss: 0.4957, Val Acc: 0.7847
+Epoch: 050, Train Loss: 0.4675, Val Loss: 0.4959, Val Acc: 0.7847
+Epoch: 060, Train Loss: 0.4644, Val Loss: 0.4934, Val Acc: 0.7799
+Epoch: 070, Train Loss: 0.4648, Val Loss: 0.4927, Val Acc: 0.7799
+Epoch: 080, Train Loss: 0.4609, Val Loss: 0.4918, Val Acc: 0.7799
+Epoch: 090, Train Loss: 0.4584, Val Loss: 0.4910, Val Acc: 0.7751
+Test Loss: 0.4861, Test Accuracy: 0.7962
+ma_pos_true: tensor(173)
+mi_pos_true: tensor(74)
+ma_neg_true: tensor(0)
+mi_neg_true: tensor(0)
+CDP_pos: tensor(0.)
+CDP_neg: tensor(0.)
+Demographic Parity: 0.0300, Equality of Odds: 0.1154, Conditional DP: 0.0000
+neighbourhood: [6, 58, 61, 79, 85, 88, 92, 93, 98, 111, 113, 118, 119, 122, 123, 125, 136, 141, 149, 165, 172, 179, 187, 188, 206, 208, 210, 214, 221, 226, 235, 256, 268, 280, 300, 302, 315, 326, 332, 339, 341, 343, 347, 351, 370, 374, 386, 390, 395, 398, 400, 408, 414, 419, 431, 438, 440, 462, 464, 467, 491, 497, 499, 510, 514, 522, 531, 535, 541, 544, 550, 556, 566, 572, 577, 580, 593, 597, 614, 621, 634, 671, 696, 699, 701, 706, 710, 714, 718, 719, 735, 752, 759, 760, 762, 772, 786, 807, 818, 833, 842, 843, 847, 856, 860, 871, 880, 893, 913, 916, 920, 942, 954, 971, 982, 989, 991, 994, 1003, 1004, 1005, 1007, 1025, 1032, 1036]
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+neighbourhood: [26, 31, 51, 57, 71, 95, 99, 133, 163, 180, 189, 190, 229, 270, 283, 301, 316, 325, 330, 369, 393, 421, 428, 439, 445, 447, 478, 494, 506, 516, 527, 538, 565, 567, 576, 578, 585, 588, 598, 602, 632, 639, 642, 650, 655, 674, 693, 713, 736, 744, 763, 870, 894, 898, 899, 912, 921, 929, 935, 965, 972, 977, 993, 995, 1020]
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+neighbourhood: [21, 23, 46, 73, 75, 118, 124, 171, 187, 205, 208, 214, 276, 374, 386, 390, 395, 425, 432, 491, 500, 514, 524, 572, 634, 718, 857, 860, 871, 880, 913, 916, 950, 954, 979, 1003, 1007]
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+neighbourhood: [240, 560]
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+neighbourhood: [12, 23, 118, 243, 374, 423, 613, 674, 739, 814, 825, 955]
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+neighbourhood: [7, 42, 62, 67, 96, 203, 224, 244, 296, 327, 344, 430, 435, 449, 480, 489, 496, 570, 586, 612, 653, 669, 691, 724, 753, 773, 861, 917, 928, 967, 1012, 1024, 1027]
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+neighbourhood: [0, 61, 79, 85, 123, 141, 172, 188, 206, 210, 235, 256, 268, 300, 302, 315, 339, 347, 370, 390, 392, 414, 438, 462, 464, 497, 544, 556, 566, 577, 580, 597, 696, 699, 714, 719, 735, 752, 760, 807, 818, 989, 1004, 1005, 1032]
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+neighbourhood: [5, 21, 67, 96, 203, 224, 244, 296, 327, 344, 430, 435, 449, 480, 489, 496, 570, 586, 612, 653, 669, 691, 724, 753, 773, 861, 876, 917, 928, 967, 1012, 1024, 1027]
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+neighbourhood: [335, 456]
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+neighbourhood: [105, 201, 220, 313, 328, 338, 349, 376, 526, 540, 606, 656, 685, 783, 819, 976]
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+neighbourhood: [29, 70, 107, 153, 154, 159, 164, 181, 184, 216, 222, 232, 234, 285, 294, 309, 316, 320, 333, 355, 356, 363, 369, 382, 391, 396, 439, 461, 469, 485, 493, 494, 495, 508, 525, 549, 589, 598, 640, 648, 668, 672, 675, 678, 693, 695, 723, 733, 744, 746, 747, 768, 777, 778, 784, 789, 815, 816, 851, 858, 865, 875, 886, 898, 901, 925, 926, 930, 934, 941, 946, 957, 993, 999, 1009, 1020, 1023]
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+neighbourhood: [52, 84, 152, 263, 282, 538, 582, 804, 812, 858, 862, 975]
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+neighbourhood: [4, 54, 137, 183, 243, 252, 297, 314, 387, 423, 441, 443, 453, 477, 539, 551, 583, 630, 638, 657, 676, 690, 711, 716, 739, 814, 825, 846, 936, 955, 998]
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+neighbourhood: [59, 134, 148, 150, 217, 307, 486, 502, 554, 918, 1021]
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+neighbourhood: [16, 782, 906, 938]
+nbr_emb_sum: tensor([0., 0., 0.,  ..., 0., 0., 0.])
+neighbourhood: []
+nbr_emb_sum: 0
