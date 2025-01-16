@@ -20,11 +20,19 @@ class s2v_embedding(nn.Module):
         super(s2v_embedding, self).__init__()
         self.feature_matrix = feature_matrix
         self.output_dim = output_dim
-        self.nfeatures = feature_matrix.shape[0]
+        self.nfeatures = feature_matrix.shape[1]
         self.nnodes = nnodes
 
-        self.W1 = nn.Linear(in_features=self.nfeatures, out_features=self.output_dim, bias=True)
-        self.W2 = nn.Linear(in_features=self.output_dim, out_features=self.output_dim, bias=True)
+        print("feature matrix shape:", feature_matrix.shape)
+
+        # TODO
+        # For here
+        # print("nfeatures:", self.nfeatures)
+        # print("output_dim:", self.output_dim)
+        # self.W1 = nn.Linear(in_features=self.nfeatures, out_features=self.output_dim, bias=True)
+        # self.W2 = nn.Linear(in_features=self.output_dim, out_features=self.output_dim, bias=True)
+        self.W1 = nn.Parameter(torch.randn(self.output_dim, self.nfeatures))
+        self.W2 = nn.Parameter(torch.randn(self.output_dim, self.output_dim))
 
         self.relu = True
         # The result embedding matrix we are looking for
@@ -44,20 +52,26 @@ class s2v_embedding(nn.Module):
         Loop through nodes and create their new embeddings
         """
         emb_matrix = torch.zeros(self.output_dim, self.nnodes)
-        
 
         for _ in range(T):
 
             new_embeddings = torch.zeros(self.output_dim, self.nnodes)
 
             for node in range(self.nnodes):
-                neighbors = graph.neighbors(node)
-                nbr_emb_sum = sum(self.emb_matrix[neighbors])
-
+                neighbors = [n for n in graph[node]]
+                # print("Neighbours:", neighbors)
+                nbr_emb_sum = sum(emb_matrix[neighbors])
+                # print("feature_matrix[node]:",self.feature_matrix[node].shape())
+                # print("nbr_emb_sum:",nbr_emb_sum.shape())
+                print(self.W1.size())
+                print(self.feature_matrix[node].size())
+                a = torch.matmul(self.W1, self.feature_matrix[node])
+                b = torch.matmul(self.W2, nbr_emb_sum)
+                exit()
                 new_embeddings[node] = nn.ReLU(torch.matmul(self.W1, self.feature_matrix[node]) + torch.matmul(self.W2, nbr_emb_sum))
 
             emb_matrix = new_embeddings
-        
+
         return emb_matrix
 
     def g2v(self, emb_matrix, node_list = None):
@@ -68,8 +82,9 @@ class s2v_embedding(nn.Module):
 
         if node_list == None:
             node_list = [i for i in range(self.nnodes)]
-
-        graph_embedding = sum(emb_matrix[node_list])
+        # print(node_list)
+        # print(emb_matrix)
+        graph_embedding = sum(emb_matrix[i] for i in node_list)
 
         return graph_embedding
 

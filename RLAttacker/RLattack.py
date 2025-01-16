@@ -183,8 +183,8 @@ class agent:
             victim_model = victim()
             victim_model.train()
             fairness_loss = victim_model.evaluate()
-
-            state_embedding = self.embedding.g2v(self.graph)
+            emb_matrix = self.embedding.n2v(self.graph)
+            state_embedding = self.embedding.g2v(emb_matrix)
             # Launch a cycle of attack
             for _ in range(self.budegt):
                 # Get the current state embedding
@@ -205,7 +205,8 @@ class agent:
                 fairness_loss = new_loss
 
                 # Update the embedding correspondingly as the new state
-                new_state_embedding = self.embedding.g2v(self.graph)
+                emb_matrix = self.embedding.n2v(self.graph)
+                new_state_embedding = self.embedding.g2v(emb_matrix)
                 self.Q_function1.replay_buffer.push(state=state_embedding, action=first_node, reward=reward,next_state=new_state_embedding)
                 self.Q_function1.replay_buffer.push(state=state_embedding, action=second_node, reward=reward,next_state=new_state_embedding)
                 state_embedding = new_state_embedding
