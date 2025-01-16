@@ -23,7 +23,7 @@ class s2v_embedding(nn.Module):
         self.nfeatures = feature_matrix.shape[1]
         self.nnodes = nnodes
 
-        print("feature matrix shape:", feature_matrix.shape)
+        # print("feature matrix shape:", feature_matrix.shape)
 
         # TODO
         # For here

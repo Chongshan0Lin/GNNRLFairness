@@ -18,10 +18,10 @@ class victim:
         self.nclasses = int(self.labels.max() + 1)
         self.hfeatures = int((self.nfeatures * 2) // 3 + self.nclasses)
 
-        print("feature_matrix.shape: ",self.feature_matrix.shape)
-        print("nnodes: ",self.nnodes)
-        print("nclasses: ",self.nclasses)
-        print("hfeatures: ",self.hfeatures)
+        # print("feature_matrix.shape: ",self.feature_matrix.shape)
+        # print("nnodes: ",self.nnodes)
+        # print("nclasses: ",self.nclasses)
+        # print("hfeatures: ",self.hfeatures)
 
         self.model = GCN(in_features=self.nfeatures, hidden_features = self.hfeatures, out_features=self.nclasses, dropout=0.5)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01, weight_decay=5e-4)
@@ -31,7 +31,7 @@ class victim:
     def train(self):
 
         self.model.train()
-        for epoch in range(100):
+        for epoch in range(20):
 
             self.optimizer.zero_grad()
             # print(feature_matrix.shape)
@@ -52,7 +52,7 @@ class victim:
                 pred_val = output_val[self.idx_val].max(1)[1]
                 acc_val  = pred_val.eq(self.labels[self.idx_val]).sum().item() / self.idx_val.size(0)
                 self.model.train()
-
+            # print("Episode")
             if epoch % 10 == 0:
                 print(
                     f"Epoch: {epoch:03d}, "

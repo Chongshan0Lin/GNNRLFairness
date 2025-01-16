@@ -91,7 +91,7 @@ def loading_facebook_dataset(return_tensor_sparse=True):
 
     feats=feats[:,1:]
 
-    print(feats.shape)
+    # print(feats.shape)
 
     sens=feats[:,264]
     labels=feats[:,220]

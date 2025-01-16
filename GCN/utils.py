@@ -11,8 +11,8 @@ def normalize_adjacency(adj):
     """
 
     # Add self-connections
-    print(adj)
-    print(type(adj))
+    # print(adj)
+    # print(type(adj))
     adj = torch.Tensor.to_dense(adj)
     adj = np.add(adj, torch.eye(len(adj[0])))
     # Compute degree matrix
@@ -88,15 +88,15 @@ def conditional_demographic_parity(predictions, labels, sens):
     ma_neg_true = ma_neg & ground_truth_true
     mi_pos_true = mi_pos & ground_truth_true
     mi_neg_true = mi_neg & ground_truth_true
-    print("ma_pos_true:", sum(ma_pos_true))
-    print("mi_pos_true:", sum(mi_pos_true))
-    print("ma_neg_true:", sum(ma_neg_true))
-    print("mi_neg_true:", sum(mi_neg_true))
+    # print("ma_pos_true:", sum(ma_pos_true))
+    # print("mi_pos_true:", sum(mi_pos_true))
+    # print("ma_neg_true:", sum(ma_neg_true))
+    # print("mi_neg_true:", sum(mi_neg_true))
     
     CDP_pos = abs(sum(ma_pos_true) / sum(ma_true) - sum(mi_pos_true) / sum(mi_true))
     CDP_neg = abs(sum(ma_neg_true) / sum(ma_true) - sum(mi_neg_true) / sum(mi_true))
-    print("CDP_pos:", CDP_pos)
-    print("CDP_neg:", CDP_neg)
+    # print("CDP_pos:", CDP_pos)
+    # print("CDP_neg:", CDP_neg)
 
     return CDP_pos + CDP_neg
 

@@ -179,7 +179,6 @@ class agent:
         print("Number of episodes", n_episodes)
         for episode in range(n_episodes):
 
-            print(episode, "th iteration")
             all_rewards = []
             cumulative_reward = 0
 
@@ -224,6 +223,7 @@ class agent:
                 self.Q_function1.target_network.load_state_dict(self.Q_function1.policy_network_network.state_dict())
                 self.Q_function2.target_network.load_state_dict(self.Q_function2.policy_network_network.state_dict())
 
+            print(episode, "th episode")
             if (episode + 1) % 2 == 0:
                 avg_reward = np.mean(all_rewards[-10:])
                 print(f"Episode {episode+1}, Average Reward: {avg_reward:.2f}")

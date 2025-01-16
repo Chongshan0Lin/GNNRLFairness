@@ -5,8 +5,8 @@ import numpy as np
 
 class GCNLayer(nn.Module):
     def __init__(self, in_features, out_features, bias = True):
-        print("in feature:", in_features)
-        print("out feature:", out_features)
+        # print("in feature:", in_features)
+        # print("out feature:", out_features)
         super(GCNLayer, self).__init__()
         self.in_features = in_features
         self.out_features = out_features

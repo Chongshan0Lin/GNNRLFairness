@@ -34,10 +34,10 @@ nnodes = feature_matrix.shape[0]
 nfeatures = feature_matrix.shape[1]
 nclasses = int(labels.max() + 1)
 hfeatures = int((nfeatures * 2) // 3 + nclasses)
-print("feature_matrix.shape: ",feature_matrix.shape)
-print("nnodes: ",nnodes)
-print("nclasses: ",nclasses)
-print("hfeatures: ",hfeatures)
+# print("feature_matrix.shape: ",feature_matrix.shape)
+# print("nnodes: ",nnodes)
+# print("nclasses: ",nclasses)
+# print("hfeatures: ",hfeatures)
 
 
 model = GCN(in_features=nfeatures, hidden_features = hfeatures, out_features=nclasses, dropout=0.5)

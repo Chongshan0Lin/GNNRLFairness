@@ -12,6 +12,5 @@ adj = target_model.adj_matrix
 G = nx.from_numpy_array(adj.to_dense().numpy())
 # print(G)
 
-attacker = agent(graph=G, feature_matrix=target_model.feature_matrix, labels=target_model.labels, state_dim=target_model.nnodes, idx_test=target_model.idx_test, idx_train=target_model.idx_train, epsilon=1, min_memory_step=200, budget=2000)
+attacker = agent(graph=G, feature_matrix=target_model.feature_matrix, labels=target_model.labels, state_dim=target_model.nnodes, idx_test=target_model.idx_test, idx_train=target_model.idx_train, epsilon=1, min_memory_step=200, budget=200)
 attacker.train()
-# attacker.
