@@ -86,12 +86,17 @@ class victim:
         If there already exists an connection between these two, remove it.
         Otherwise, connect them.
         """
+        self.adj_matrix = self.adj_matrix.to_dense()
         if self.adj_matrix[node1][node2]:
             self.adj_matrix[node1][node2] = 0
         else:
             self.adj_matrix[node1][node2] = 1
 
         # Update the adj_norm correspondingly
+        self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
+    
+    def update_adj_matrix(self, adj_matrix):
+        self.adj_matrix = adj_matrix
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
 
 s = victim()

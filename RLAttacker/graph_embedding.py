@@ -60,9 +60,12 @@ class s2v_embedding(nn.Module):
             for node in range(self.nnodes):
                 neighbors = [n for n in graph[node]]
                 # print("Neighbours:", neighbors)
-                nbr_emb_sum = sum(emb_matrix[neighbors])
-                print("neighbourhood:", neighbors)
-                print("nbr_emb_sum:", nbr_emb_sum)
+                if neighbors == []:
+                    nbr_emb_sum = torch.zeros(self.nnodes)
+                else:
+                    nbr_emb_sum = sum(emb_matrix[neighbors])
+                # print("neighbourhood:", neighbors)
+                # print("nbr_emb_sum:", nbr_emb_sum)
                 # print("feature_matrix[node]:",self.feature_matrix[node].shape())
                 # print("nbr_emb_sum:",nbr_emb_sum.shape())
                 # print(self.W1.size())

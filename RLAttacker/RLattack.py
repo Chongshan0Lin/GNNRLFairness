@@ -66,7 +66,7 @@ class Q_function:
         """
         Based on the calculation of network, select the proper Q network
         """
-        if random.random() < self.epsilon:
+        if random.random() < self.exploration_rate:
             return random.randrange(self.action_size)
         else:
             with torch.no_grad():
@@ -116,7 +116,7 @@ class replay_buffer:
         self.buffer = deque(maxlen=capacity)
     
     def push(self, state, action, reward, next_state, done):
-        self.buffer.append(state, action, reward, next_state, done)
+        self.buffer.append((state, action, reward, next_state, done))
     
     def sample(self, batch_size):
         batch = random.sample(self.buffer, batch_size)
@@ -199,8 +199,9 @@ class agent:
                 first_node = self.Q_function1.select_action(state_embedding)
                 second_node = self.Q_function1.select_action(state_embedding)
 
-                victim_model.change_edge(first_node, second_node)
+                # victim_model.change_edge(first_node, second_node)
                 self.change_edge(first_node, second_node)
+                victim_model.update_adj_matrix(torch.from_numpy(nx.to_numpy_array(self.graph)))
 
                 # After changing the model, retrain the victim model and calculate the new fairness value
                 victim_model.train()
@@ -213,8 +214,8 @@ class agent:
                 # Update the embedding correspondingly as the new state
                 emb_matrix = self.embedding.n2v(self.graph)
                 new_state_embedding = self.embedding.g2v(emb_matrix)
-                self.Q_function1.replay_buffer.push(state=state_embedding, action=first_node, reward=reward,next_state=new_state_embedding)
-                self.Q_function1.replay_buffer.push(state=state_embedding, action=second_node, reward=reward,next_state=new_state_embedding)
+                self.Q_function1.replay_buffer.push(state=state_embedding, action=first_node, reward=reward,next_state=new_state_embedding, done=False)
+                self.Q_function1.replay_buffer.push(state=state_embedding, action=second_node, reward=reward,next_state=new_state_embedding, done=False)
                 state_embedding = new_state_embedding
 
             all_rewards.append(cumulative_reward)
