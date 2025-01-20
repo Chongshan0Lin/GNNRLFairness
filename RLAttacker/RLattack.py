@@ -67,7 +67,8 @@ class Q_function:
         else:
             with torch.no_grad():
                 q_values = self.policy_network.forward(state_t)
-                return q_values.argmax(dim = 1).item()
+                max_node = torch.argmax(q_values).item()
+                return max_node
 
     def train_step(self):
         if len(self.replay_buffer.length()) < self.min_memory_step:
@@ -192,7 +193,7 @@ class agent:
                 # Select the first node:
                 # How shall I make sure that the first node is different from the second node?
                 first_node = self.Q_function1.select_action(state_embedding)
-                second_node = self.Q_function1.select_action(state_embedding)
+                second_node = self.Q_function2.select_action(state_embedding)
 
                 # victim_model.change_edge(first_node, second_node)
                 self.change_edge(first_node, second_node)
@@ -210,7 +211,7 @@ class agent:
                 emb_matrix = self.embedding.n2v(self.graph)
                 new_state_embedding = self.embedding.g2v(emb_matrix)
                 self.Q_function1.replay_buffer.push(state=state_embedding, action=first_node, reward=reward,next_state=new_state_embedding, done=False)
-                self.Q_function1.replay_buffer.push(state=state_embedding, action=second_node, reward=reward,next_state=new_state_embedding, done=False)
+                self.Q_function2.replay_buffer.push(state=state_embedding, action=second_node, reward=reward,next_state=new_state_embedding, done=False)
                 state_embedding = new_state_embedding
 
             all_rewards.append(cumulative_reward)
