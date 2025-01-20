@@ -1,17 +1,13 @@
 import torch.nn as nn
 import networkx as nx
 import torch
-import gym
 import random
 import numpy as np
 from .graph_embedding import s2v_embedding
 from collections import deque
-# from ..GCN.model import GCN
 from GCN.victim import victim
 import torch.optim as optim
 
-ENV_NAME = "CartPole-v1"
-env = gym.make(ENV_NAME)
 loss_fn = nn.MSELoss()
 
 
