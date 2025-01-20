@@ -8,7 +8,8 @@ from .utils import normalize_adjacency
 from .utils import demographic_parity, conditional_demographic_parity, equality_of_odds
 from .utils import fair_metric
 import torch.nn.functional as F
-
+EPOCH = 100
+# 1000?
 class victim:
 
     def __init__(self):
@@ -42,7 +43,7 @@ class victim:
     def train(self):
 
         self.model.train()
-        for epoch in range(20):
+        for epoch in range(EPOCH):
 
             self.optimizer.zero_grad()
             # print(feature_matrix.shape)
