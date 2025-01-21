@@ -183,6 +183,9 @@ class agent:
 
             self.exploration_rate = min_exploration_rate * (n_episodes / episode)
 
+            print("Episode", episode)
+            print("Exploration rate", self.exploration_rate)
+
             all_rewards = []
             cumulative_reward = 0
 
@@ -229,11 +232,11 @@ class agent:
 
             all_rewards.append(cumulative_reward)
             # Update the target network periodically
-            if episode % 2 == 0:
+            if episode % 1 == 0:
                 self.Q_function1.target_network.load_state_dict(self.Q_function1.policy_network.state_dict())
                 self.Q_function2.target_network.load_state_dict(self.Q_function2.policy_network.state_dict())
 
-            print(episode, "th episode")
+            # print(episode, "th episode")
             if (episode) % 1 == 0:
                 avg_reward = np.mean(all_rewards[-10:])
                 print(f"Episode {episode}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
