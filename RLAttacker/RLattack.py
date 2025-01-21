@@ -177,11 +177,12 @@ class agent:
         n_episodes = 20
         print("Number of episodes", n_episodes)
 
-        min_exploration_rate = self.exploration_rate
+        min_exploration_rate = self.Q_function1.exploration_rate
 
         for episode in range(n_episodes):
 
-            self.exploration_rate = min_exploration_rate * (n_episodes / episode)
+            self.Q_function1.exploration_rate = min_exploration_rate * (n_episodes / episode)
+            self.Q_function2.exploration_rate = min_exploration_rate * (n_episodes / episode)
 
             print("Episode", episode)
             print("Exploration rate", self.exploration_rate)
@@ -241,7 +242,8 @@ class agent:
                 avg_reward = np.mean(all_rewards[-10:])
                 print(f"Episode {episode}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
             
-        self.exploration_rate = min_exploration_rate
+        self.Q_function1.exploration_rate = min_exploration_rate
+        self.Q_function2.exploration_rate = min_exploration_rate
 
     def train_step(self):
         """
