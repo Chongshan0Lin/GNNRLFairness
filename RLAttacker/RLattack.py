@@ -59,9 +59,11 @@ class Q_function:
 
 
     def select_action(self, state_t):
+
         """
         Based on the calculation of network, select the proper Q network
         """
+
         if random.random() < self.exploration_rate:
             return random.randrange(self.action_size)
         else:
@@ -174,7 +176,12 @@ class agent:
 
         n_episodes = 20
         print("Number of episodes", n_episodes)
+
+        min_exploration_rate = self.exploration_rate
+
         for episode in range(n_episodes):
+
+            self.exploration_rate = min_exploration_rate * (n_episodes / episode)
 
             all_rewards = []
             cumulative_reward = 0
@@ -186,12 +193,17 @@ class agent:
             emb_matrix = self.embedding.n2v(self.graph)
             state_embedding = self.embedding.g2v(emb_matrix)
             # Launch a cycle of attack
+
+            # Employ dynamic exploration rate to encourge more exploration during the previous stage
+
             for i in range(self.budegt):
 
+                
                 print(i,"th iteration")
                 # Get the current state embedding
                 # Select the first node:
                 # How shall I make sure that the first node is different from the second node?
+                
                 first_node = self.Q_function1.select_action(state_embedding)
                 second_node = self.Q_function2.select_action(state_embedding)
 
@@ -225,6 +237,8 @@ class agent:
             if (episode) % 1 == 0:
                 avg_reward = np.mean(all_rewards[-10:])
                 print(f"Episode {episode}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
+            
+        self.exploration_rate = min_exploration_rate
 
     def train_step(self):
         """
