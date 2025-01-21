@@ -185,7 +185,7 @@ class agent:
             self.Q_function2.exploration_rate = min_exploration_rate * (n_episodes / (episode + 1))
 
             print("Episode", episode)
-            print("Exploration rate", self.exploration_rate)
+            print("Exploration rate", self.Q_function1.exploration_rate)
 
             all_rewards = []
             cumulative_reward = 0
