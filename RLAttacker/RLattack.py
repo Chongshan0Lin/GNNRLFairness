@@ -196,6 +196,7 @@ class agent:
                 second_node = self.Q_function2.select_action(state_embedding)
 
                 # victim_model.change_edge(first_node, second_node)
+                print("The selected two nodes are:", first_node, second_node)
                 self.change_edge(first_node, second_node)
                 victim_model.update_adj_matrix(torch.from_numpy(nx.to_numpy_array(self.graph)))
 
