@@ -181,8 +181,8 @@ class agent:
 
         for episode in range(n_episodes):
 
-            self.Q_function1.exploration_rate = min_exploration_rate * (n_episodes / episode)
-            self.Q_function2.exploration_rate = min_exploration_rate * (n_episodes / episode)
+            self.Q_function1.exploration_rate = min_exploration_rate * (n_episodes / (episode + 1))
+            self.Q_function2.exploration_rate = min_exploration_rate * (n_episodes / (episode + 1))
 
             print("Episode", episode)
             print("Exploration rate", self.exploration_rate)
