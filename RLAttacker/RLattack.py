@@ -7,6 +7,7 @@ from .graph_embedding import s2v_embedding
 from collections import deque
 from GCN.victim import victim
 import torch.optim as optim
+# import tensor
 
 loss_fn = nn.MSELoss()
 
@@ -37,11 +38,12 @@ class Q_function:
     Argument: order, state_size, action_size, hidden_layer_size (optional), buffer_capacity
     Components: policy network, target network, order, replay_buffer
     """
-    def __init__(self, order, state_size, action_size, buffer_capacity, exploration_rate, hidden_layer_size = 128):
+    def __init__(self, order, state_size, action_size, buffer_capacity, exploration_rate, min_memory_step, hidden_layer_size = 128):
         self.order = order
         self.policy_network = DQN(state_size, action_size, hidden_layer_size)
         self.target_network = DQN(state_size, action_size, hidden_layer_size)
         self.replay_buffer = replay_buffer(capacity=buffer_capacity)
+        self.min_memory_step = min_memory_step
         self.state_size = state_size
         self.action_size = action_size
         self.build_Q_network()
@@ -73,19 +75,45 @@ class Q_function:
                 return max_node
 
     def train_step(self):
-        if len(self.replay_buffer.length()) < self.min_memory_step:
+        print("Hello?")
+        if self.replay_buffer.length() < self.min_memory_step:
+            print("Current memory size:",self.replay_buffer.length())
             return
-
-        BATCH_SIZE = 100
-        states, actions, rewards, next_states, dones = self.replay_buffer.sample(BATCH_SIZE)
-        states_t = torch.FloatTensor(states)
-        actions_t = torch.LongTensor(actions).unsqueeze(1)
-        rewards_t = torch.FloatTensor(rewards).unsqueeze(1)
-        next_states_t = torch.FloatTensor(next_states)
-        dones_t = torch.FloatTensor(dones).unsqueeze(1)
-
         
-        q_values = self.policy_network.forward(states_t).gather(1, actions_t)
+        print("Hi?")
+
+        # Here, we are sampling from the memory buffer and perform minibatch gradient descent.
+        BATCH_SIZE = self.min_memory_step
+        states, actions, rewards, next_states, dones = self.replay_buffer.sample(BATCH_SIZE)
+        # states, actions, rewards, next_states, dones = self.replay_buffer.sample(1)
+
+        # states_t = torch.FloatTensor(states)
+        # actions_t = torch.LongTensor(actions).unsqueeze(1)
+        # rewards_t = torch.FloatTensor(rewards).unsqueeze(1)
+        # next_states_t = torch.FloatTensor(next_states)
+        # dones_t = torch.FloatTensor(dones).unsqueeze(1)
+        print("Action:",actions)
+
+        states_t = torch.FloatTensor(torch.stack(states))
+        actions_t = torch.LongTensor(torch.stack(actions)).unsqueeze(1)
+        rewards_t = torch.FloatTensor(torch.stack(rewards)).unsqueeze(1)
+        next_states_t = torch.FloatTensor(torch.stack(next_states))
+        dones_t = torch.LongTensor(torch.stack(dones)).unsqueeze(1)
+        print(actions_t)
+        print(type(actions))
+
+        # print(f"states_t shape: {states_t.shape}")          # Should be [BATCH_SIZE, state_dim]
+        # print(f"actions_t shape: {actions_t.shape}")        # Should be [BATCH_SIZE, 1]
+        # print(f"rewards_t shape: {rewards_t.shape}")        # Should be [BATCH_SIZE, 1]
+        # print(f"next_states_t shape: {next_states_t.shape}")# Should be [BATCH_SIZE, state_dim]
+        # print(f"dones_t shape: {dones_t.shape}")            # Should be [BATCH_SIZE, 1]
+
+        approximated_q_values = self.policy_network(states_t)
+        print(approximated_q_values)
+        print(actions_t)
+        # q_values = self.policy_network.forward(states_t).gather(1, actions_t)
+        q_values = self.policy_network(states_t).gather(1, actions_t)  # [BATCH_SIZE, 1]
+
 
         # Next Q values (target network)
         with torch.no_grad():
@@ -99,12 +127,14 @@ class Q_function:
         self.optimizer.zero_grad()
         loss.backward()
         # Check if gradient is flowing
-        for name, param in self.policy_network.named_parameters():
-            if param.grad is not None:
-                print(f"Gradient for {name}: {param.grad.abs().sum()}")
-        for name, param in self.embedding.named_parameters():
-            if param.grad is not None:
-                print(f"Gradient for embedding {name}: {param.grad.abs().sum()}")
+        # print("named parameters: ",self.policy_network.named_parameters())
+        # for name, param in self.policy_network.named_parameters():
+        #     print("param.grad:",param.grad)
+        #     if param.grad is not None:
+        #         print(f"Gradient for {name}: {param.grad.abs().sum()}")
+        # for name, param in self.embedding.named_parameters():
+        #     if param.grad is not None:
+        #         print(f"Gradient for embedding {name}: {param.grad.abs().sum()}")
 
         self.optimizer.step()
     
@@ -121,15 +151,34 @@ class replay_buffer:
     """
     def __init__(self, capacity):
         self.buffer = deque(maxlen=capacity)
-    
+
     def push(self, state, action, reward, next_state, done):
-        self.buffer.append((state, action, reward, next_state, done))
+        done = int(done)
+        self.buffer.append((state, torch.tensor(action), torch.tensor([reward]), next_state, torch.tensor([done])))
     
     def sample(self, batch_size):
         batch = random.sample(self.buffer, batch_size)
-        state, action, reward, next_state, done = zip(*batch)
+        states, actions, rewards, next_states, dones = zip(*batch)
 
-        return(np.array(state), np.array(action), np.array(reward, dtype=np.float32), np.array(next_state), np.array(done, dtype=np.float32))
+        # return(torch.from_numpy(np.array(state)),
+        #         torch.from_numpy(np.array(action)),
+        #         torch.from_numpy(np.array(reward, dtype=np.float32)),
+        #         torch.from_numpy(np.array(next_state), np.array(done, dtype=np.float32))
+        #         )
+
+        # return(torch.flatten((states)),
+        #         torch.flatten((actions)),
+        #         torch.flatten((rewards)),
+        #         torch.flatten(next_states), 
+        #         np.array(dones, dtype=np.float32)
+        # )
+        return (states, actions, rewards, next_states, dones)
+
+        # return (np.array(states),
+        #         np.array(actions),
+        #         np.array(rewards, dtype=np.float32),
+        #         np.array(next_states),
+        #         np.array(dones, dtype=np.float32))
 
     def length(self):
         return len(self.buffer)
@@ -159,8 +208,8 @@ class agent:
 
         action_size = graph.number_of_nodes()
 
-        self.Q_function1 = Q_function(state_size=state_dim, action_size=action_size, order=1, buffer_capacity=buffer_capacity, exploration_rate=epsilon)
-        self.Q_function2 = Q_function(state_size=state_dim, action_size=action_size, order=2, buffer_capacity=buffer_capacity, exploration_rate=epsilon)
+        self.Q_function1 = Q_function(state_size=state_dim, action_size=action_size, order=1, buffer_capacity=buffer_capacity, min_memory_step = min_memory_step, exploration_rate=epsilon)
+        self.Q_function2 = Q_function(state_size=state_dim, action_size=action_size, order=2, buffer_capacity=buffer_capacity, min_memory_step = min_memory_step, exploration_rate=epsilon)
 
         self.min_memory_step = min_memory_step
         self.budegt = budget
@@ -246,6 +295,7 @@ class agent:
                 self.Q_function1.replay_buffer.push(state=state_embedding, action=first_node, reward=reward,next_state=new_state_embedding, done=False)
                 self.Q_function2.replay_buffer.push(state=state_embedding, action=second_node, reward=reward,next_state=new_state_embedding, done=False)
                 state_embedding = new_state_embedding
+                self.train_step()
 
             all_rewards.append(cumulative_reward)
             # Update the target network periodically
