@@ -57,36 +57,15 @@ class s2v_embedding(nn.Module):
 
 
         for _ in range(T):
+            nbr_emb_sum = torch.matmul(adjacency, emb_matrix)  # [nnodes, output_dim]
 
-            new_embeddings = torch.zeros(self.output_dim, self.nnodes)
-
-            for node in range(self.nnodes):
-                neighbors = [n for n in graph[node]]
-                # print("Neighbours:", neighbors)
-                if neighbors == []:
-                    nbr_emb_sum = torch.zeros(self.nnodes)
-                else:
-                    nbr_emb_sum = sum(emb_matrix[neighbors])
-                # print("neighbourhood:", neighbors)
-                # print("nbr_emb_sum:", nbr_emb_sum)
-                # print("feature_matrix[node]:",self.feature_matrix[node].shape())
-                # print("nbr_emb_sum:",nbr_emb_sum.shape())
-                # print(self.W1.size())
-                # print(self.feature_matrix[node].size())
-                a = self.W1(self.feature_matrix[node])
-
-                b = self.W2(nbr_emb_sum)
-                # a = torch.matmul(self.W1, self.feature_matrix[node])
-                # b = torch.matmul(self.W2, nbr_emb_sum)
-                # exit()
-                # new_embeddings[node] = nn.ReLU(torch.matmul(self.W1, self.feature_matrix[node]) + torch.matmul(self.W2, nbr_emb_sum))
-                new_embeddings[node] = self.relu(a+b)
-
-
+            a = self.W1(self.feature_matrix)  # [nnodes, output_dim]
+            b = self.W2(nbr_emb_sum)          # [nnodes, output_dim]
+            new_embeddings = self.relu(a + b)  # [nnodes, output_dim]
 
             emb_matrix = new_embeddings
 
-        return emb_matrix
+        return emb_matrix  # [nnodes, output_dim]
 
     def g2v(self, emb_matrix, node_list = None):
         """
@@ -98,11 +77,12 @@ class s2v_embedding(nn.Module):
             node_list = [i for i in range(self.nnodes)]
         # print(node_list)
         # print(emb_matrix)
-        graph_embedding = sum(emb_matrix[i] for i in node_list)
+        graph_embedding = emb_matrix[node_list].sum(dim=0)  # [output_dim]
 
         return graph_embedding
 
     def get_graph_embeding(self, graph):
 
-        embed_matrix = self.n2v(graph)
-        return self.g2v(emb_matrix=embed_matrix)
+        emb_matrix = self.n2v(graph)          # [nnodes, output_dim]
+        graph_embedding = self.g2v(emb_matrix)  # [output_dim]
+        return graph_embedding

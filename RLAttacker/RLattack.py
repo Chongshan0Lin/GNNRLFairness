@@ -98,6 +98,14 @@ class Q_function:
         # Backprop
         self.optimizer.zero_grad()
         loss.backward()
+        # Check if gradient is flowing
+        for name, param in self.policy_network.named_parameters():
+            if param.grad is not None:
+                print(f"Gradient for {name}: {param.grad.abs().sum()}")
+        for name, param in self.embedding.named_parameters():
+            if param.grad is not None:
+                print(f"Gradient for embedding {name}: {param.grad.abs().sum()}")
+
         self.optimizer.step()
     
     def update_network(self):
