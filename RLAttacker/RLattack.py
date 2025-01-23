@@ -158,6 +158,14 @@ class agent:
         self.budegt = budget
 
         self.embedding = s2v_embedding(nnodes=self.nnodes, feature_matrix=self.feature_matrix, output_dim=self.state_dim)
+        self.optimizer = optim.Adam(
+            list(self.Q_function1.policy_network.parameters()) +
+            list(self.Q_function2.policy_network.parameters()) +
+            list(self.embedding.parameters()), 
+            lr=1e-3,
+            weight_decay=0
+        )
+
 
     def change_edge(self, node1, node2):
         if self.graph.has_edge(node1, node2):

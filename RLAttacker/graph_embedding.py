@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch
-import networkx
+import networkx as nx
 
 class s2v_embedding(nn.Module):
 
@@ -18,12 +18,10 @@ class s2v_embedding(nn.Module):
         output_dim: int > 0
         """
         super(s2v_embedding, self).__init__()
-        self.feature_matrix = feature_matrix
+        self.feature_matrix = feature_matrix # nnodes \times nfeatures
         self.output_dim = output_dim
         self.nfeatures = feature_matrix.shape[1]
         self.nnodes = nnodes
-
-        # print("feature matrix shape:", feature_matrix.shape)
 
         # TODO
         # For here
@@ -51,7 +49,12 @@ class s2v_embedding(nn.Module):
         """
         Loop through nodes and create their new embeddings
         """
+        device = self.W1.weight.device
         emb_matrix = torch.zeros(self.output_dim, self.nnodes)
+
+        adjacency = nx.to_numpy_array(graph)  # [nnodes, nnodes]
+        adjacency = torch.from_numpy(adjacency).float().to(device)  # Convert to torch tensor
+
 
         for _ in range(T):
 
