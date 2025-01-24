@@ -8,14 +8,6 @@ from utils import normalize_adjacency
 from utils import demographic_parity, conditional_demographic_parity, equality_of_odds
 import torch.nn.functional as F
 
-if torch.cuda.is_available():
-    print("CUDA is available. PyTorch can use the GPU.")
-    print(f"Number of CUDA devices: {torch.cuda.device_count()}")
-    print(f"Current CUDA device: {torch.cuda.current_device()}")
-    print(f"Device name: {torch.cuda.get_device_name(torch.cuda.current_device())}")
-else:
-    print("CUDA is not available. PyTorch will use the CPU.")
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # graph = graph_loading()

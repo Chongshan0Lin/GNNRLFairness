@@ -75,12 +75,10 @@ class Q_function:
                 return max_node
 
     def train_step(self):
-        print("Hello?")
         if self.replay_buffer.length() < self.min_memory_step:
             print("Current memory size:",self.replay_buffer.length())
             return
         
-        print("Hi?")
 
         # Here, we are sampling from the memory buffer and perform minibatch gradient descent.
         BATCH_SIZE = self.min_memory_step
@@ -92,15 +90,12 @@ class Q_function:
         # rewards_t = torch.FloatTensor(rewards).unsqueeze(1)
         # next_states_t = torch.FloatTensor(next_states)
         # dones_t = torch.FloatTensor(dones).unsqueeze(1)
-        print("Action:",actions)
 
         states_t = torch.FloatTensor(torch.stack(states))
         actions_t = torch.LongTensor(torch.stack(actions)).unsqueeze(1)
         rewards_t = torch.FloatTensor(torch.stack(rewards)).unsqueeze(1)
         next_states_t = torch.FloatTensor(torch.stack(next_states))
         dones_t = torch.LongTensor(torch.stack(dones)).unsqueeze(1)
-        print(actions_t)
-        print(type(actions))
 
         # print(f"states_t shape: {states_t.shape}")          # Should be [BATCH_SIZE, state_dim]
         # print(f"actions_t shape: {actions_t.shape}")        # Should be [BATCH_SIZE, 1]
@@ -108,10 +103,11 @@ class Q_function:
         # print(f"next_states_t shape: {next_states_t.shape}")# Should be [BATCH_SIZE, state_dim]
         # print(f"dones_t shape: {dones_t.shape}")            # Should be [BATCH_SIZE, 1]
 
-        approximated_q_values = self.policy_network(states_t)
-        print(approximated_q_values)
-        print(actions_t)
+        # approximated_q_values = self.policy_network(states_t)
+        # print(approximated_q_values)
+        # print(actions_t)
         # q_values = self.policy_network.forward(states_t).gather(1, actions_t)
+        
         q_values = self.policy_network(states_t).gather(1, actions_t)  # [BATCH_SIZE, 1]
 
 
@@ -120,16 +116,29 @@ class Q_function:
             max_next_q_values = self.target_network(next_states_t).max(dim=1, keepdim=True)[0]
 
         # Q target = reward + (gamma * max_next_q_value * (1 - done))
-        q_targets = rewards_t + (max_next_q_values * (1 - dones_t))
+        # q_targets = rewards_t + (max_next_q_values * (1 - dones_t))
+        # print("Doesn_t", dones_t)
+        # print("Max next q values:", max_next_q_values)
+        # identity = torch.diagonal(torch.eye(dones_t.shape[0]))
+        # dones_t = torch.sub(identity, dones_t)
+        # mnqv = torch.diagonal(torch.mul(max_next_q_values, dones_t))
+        # # q_targets = torch.add(input=rewards_t, other = max_next_q_values, alpha=(1 - dones_t))
+        # q_targets = max_next_q_values
+        q_targets = rewards_t + max_next_q_values
+        # print("Q values and Q targets:")
+        # print(q_values)
+        # print(q_targets)
+        # print("Q values:", q_values)
+        # print("Q targets:", q_targets)
         loss = loss_fn(q_values, q_targets)
 
-        # Backprop
+        # Backdrop
         self.optimizer.zero_grad()
-        loss.backward()
+        loss.backward(retain_graph=True)
         # Check if gradient is flowing
         # print("named parameters: ",self.policy_network.named_parameters())
         # for name, param in self.policy_network.named_parameters():
-        #     print("param.grad:",param.grad)
+        #     # print("param.grad:",param.grad)
         #     if param.grad is not None:
         #         print(f"Gradient for {name}: {param.grad.abs().sum()}")
         # for name, param in self.embedding.named_parameters():
