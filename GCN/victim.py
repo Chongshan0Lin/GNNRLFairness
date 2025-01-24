@@ -9,6 +9,7 @@ from .utils import demographic_parity, conditional_demographic_parity, equality_
 from .utils import fair_metric
 import torch.nn.functional as F
 EPOCH = 100
+gpu_index = 2
 # 1000?
 class victim:
 
@@ -33,7 +34,8 @@ class victim:
             print(f"Device name: {torch.cuda.get_device_name(torch.cuda.current_device())}")
         else:
             print("CUDA is not available. PyTorch will use the CPU.")
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         self.model.to(device)
 
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01, weight_decay=5e-4)
