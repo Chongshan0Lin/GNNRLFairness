@@ -8,6 +8,7 @@ from collections import deque
 from GCN.victim import victim
 import torch.optim as optim
 # import tensor
+gpu_index = 2
 
 loss_fn = nn.MSELoss()
 
@@ -25,7 +26,7 @@ class DQN(nn.Module):
         self.fc1 = nn.Linear(state_size, hidden_layer_size)
         self.fc2 = nn.Linear(hidden_layer_size, hidden_layer_size)
         self.fc3 = nn.Linear(hidden_layer_size, action_size)
-    
+
     def forward(self, x):
         x = torch.relu(self.fc1(x))
         x = torch.relu(self.fc2(x))
@@ -49,6 +50,10 @@ class Q_function:
         self.build_Q_network()
         self.optimizer = optim.Adam(self.policy_network.parameters(), lr=1e-3, weight_decay=0)
         self.exploration_rate = exploration_rate
+        device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
+        self.policy_network.to(device)
+        self.target_network.to(device)
+
 
 
     def build_Q_network(self):
@@ -224,6 +229,9 @@ class agent:
         self.budegt = budget
 
         self.embedding = s2v_embedding(nnodes=self.nnodes, feature_matrix=self.feature_matrix, output_dim=self.state_dim)
+        device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
+        self.embedding.to(device)
+
         self.optimizer = optim.Adam(
             list(self.Q_function1.policy_network.parameters()) +
             list(self.Q_function2.policy_network.parameters()) +
