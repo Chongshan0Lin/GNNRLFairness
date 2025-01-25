@@ -11,7 +11,7 @@ class GCNLayer(nn.Module):
         super(GCNLayer, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
-        self.weight = nn.Parameter(in_features, out_features).to(device)
+        self.weight = nn.Parameter(torch.FloatTensor(in_features, out_features)).to(device)
         # self.weight.to(device)
         # print("weight device:", device)
         
