@@ -12,11 +12,13 @@ class GCNLayer(nn.Module):
         self.in_features = in_features
         self.out_features = out_features
         self.weight = nn.Parameter(torch.FloatTensor(in_features, out_features)).to(device)
+        self.weight.requires_grad = True
         # self.weight.to(device)
         # print("weight device:", device)
         
         if bias:
             self.bias = nn.Parameter(torch.FloatTensor(out_features)).to(device)
+            self.bias.requires_grad = True
         else:
             self.register_parameter('bias', None)
         self.reset_parameters()
