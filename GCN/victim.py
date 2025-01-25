@@ -42,6 +42,8 @@ class victim:
         # self.model.to(device)
         print("parameters:",self.model.parameters())
 
+        print("number of parameter to optimizer",self.model.parameters().__sizeof__())
+
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01, weight_decay=5e-4)
 
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
