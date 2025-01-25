@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch
 import networkx as nx
-
+gpu_index = 2
 class s2v_embedding(nn.Module):
 
     """
@@ -49,7 +49,7 @@ class s2v_embedding(nn.Module):
         """
         Loop through nodes and create their new embeddings
         """
-        device = self.W1.weight.device
+        device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         emb_matrix = torch.zeros(self.output_dim, self.nnodes)
 
         adjacency = nx.to_numpy_array(graph)  # [nnodes, nnodes]
