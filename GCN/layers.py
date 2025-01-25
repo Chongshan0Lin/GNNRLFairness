@@ -20,6 +20,7 @@ class GCNLayer(nn.Module):
         else:
             self.register_parameter('bias', None)
         self.reset_parameters()
+        self.to(device)
 
     def reset_parameters(self):
         nn.init.xavier_uniform_(self.weight)
@@ -31,7 +32,7 @@ class GCNLayer(nn.Module):
         adj_norm = torch.from_numpy(adj_norm).to(torch.float32)
 
         if isinstance(x, torch.Tensor) :
-            x = x.detach().cpu().numpy()
+            x = x.detach().numpy()
         xnp = np.vstack(x).astype(np.float32)
         x = torch.from_numpy(xnp)
         device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
