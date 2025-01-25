@@ -37,6 +37,8 @@ class victim:
         else:
             print("CUDA is not available. PyTorch will use the CPU.")
         # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         self.model.to(device)
         print("parameters:",self.model.parameters())
 
