@@ -13,7 +13,7 @@ class GCNLayer(nn.Module):
         self.out_features = out_features
         self.weight = nn.Parameter(torch.FloatTensor(in_features, out_features)).to(device)
         # self.weight.to(device)
-        print("weight device:", device)
+        # print("weight device:", device)
         
         if bias:
             self.bias = nn.Parameter(torch.FloatTensor(out_features)).to(device)
@@ -39,7 +39,7 @@ class GCNLayer(nn.Module):
         x = torch.from_numpy(xnp).to(device)
         # x.to(device)
 
-        print("x device:", device)
+        # print("x device:", device)
         support = torch.matmul(x, self.weight).to(device)
 
         out = torch.matmul(adj_norm, support).to(device)
