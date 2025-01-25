@@ -1,6 +1,9 @@
 import torch.nn as nn
 import torch.nn.functional as F
 from .layers import GCNLayer
+import torch
+
+gpu_index = 2
 
 class GCN(nn.Module):
 
@@ -9,9 +12,11 @@ class GCN(nn.Module):
         super(GCN, self).__init__()
         self.gc1 = GCNLayer(in_features=in_features, out_features=hidden_features)
         self.with_relu = True
-
         self.gc2 = GCNLayer(in_features=hidden_features, out_features=out_features)
         self.dropout = dropout
+        device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
+        self.gc1.to(device)
+        self.gc2.to(device)
     
     def forward(self, x, adj_norm):
         # First layer
