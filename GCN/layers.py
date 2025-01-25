@@ -11,21 +11,22 @@ class GCNLayer(nn.Module):
         super(GCNLayer, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
-        self.weight = nn.Parameter(torch.FloatTensor(in_features, out_features)).to(device)
+        device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
+        self.weight = nn.Linear(in_features, out_features, bias=bias).to(device)
         # self.weight.to(device)
         # print("weight device:", device)
         
-        if bias:
-            self.bias = nn.Parameter(torch.FloatTensor(out_features)).to(device)
-        else:
-            self.register_parameter('bias', None)
+        # if bias:
+        #     self.bias = nn.Parameter(torch.FloatTensor(out_features)).to(device)
+        # else:
+        #     self.register_parameter('bias', None)
         self.reset_parameters()
         self.to(device)
 
     def reset_parameters(self):
-        nn.init.xavier_uniform_(self.weight)
-        if self.bias is not None:
-            nn.init.zeros_(self.bias)
+        nn.init.xavier_uniform_(self.weight.weight)
+        # if self.bias is not None:
+        #     nn.init.zeros_(self.bias)
 
     def forward(self, x, adj_norm):
 
