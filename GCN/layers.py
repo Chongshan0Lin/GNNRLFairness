@@ -27,7 +27,7 @@ class GCNLayer(nn.Module):
         adj_norm = torch.from_numpy(adj_norm).to(torch.float32)
 
         if isinstance(x, torch.Tensor) :
-            x = x.detach().cpu().numpy()
+            x = x.detach().numpy()
         xnp = np.vstack(x).astype(np.float32)
         x = torch.from_numpy(xnp)
         support = torch.matmul(x, self.weight)
