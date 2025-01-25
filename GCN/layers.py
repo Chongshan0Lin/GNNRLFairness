@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import numpy as np
-
+gpu_index = 2
 
 class GCNLayer(nn.Module):
     def __init__(self, in_features, out_features, bias = True):
@@ -27,9 +27,11 @@ class GCNLayer(nn.Module):
         adj_norm = torch.from_numpy(adj_norm).to(torch.float32)
 
         if isinstance(x, torch.Tensor) :
-            x = x.detach().numpy()
+            x = x.detach().cpu().numpy()
         xnp = np.vstack(x).astype(np.float32)
         x = torch.from_numpy(xnp)
+        device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
+        x.to(device)
         support = torch.matmul(x, self.weight)
 
         out = torch.matmul(adj_norm, support)
