@@ -11,6 +11,9 @@ class GCNLayer(nn.Module):
         self.in_features = in_features
         self.out_features = out_features
         self.weight = nn.Parameter(torch.FloatTensor(in_features, out_features))
+        device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
+        self.weight.to(device)
+        
         if bias:
             self.bias = nn.Parameter(torch.FloatTensor(out_features))
         else:
