@@ -20,7 +20,9 @@ class GCNLayer(nn.Module):
         else:
             self.register_parameter('bias', None)
         self.reset_parameters()
+        print("number of parameter before todevice",self.parameters().__sizeof__())
         self.to(device)
+        print("number of parameter after todevice",self.parameters().__sizeof__())
 
     def reset_parameters(self):
         nn.init.xavier_uniform_(self.weight)
