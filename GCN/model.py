@@ -17,7 +17,7 @@ class GCN(nn.Module):
         device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         self.gc1.to(device)
         self.gc2.to(device)
-        self.to(device)
+        # self.to(device)
     
     def forward(self, x, adj_norm):
         # First layer
