@@ -38,8 +38,8 @@ class victim:
             print("CUDA is not available. PyTorch will use the CPU.")
         # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
-        self.model.to(device)
+        # device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
+        # self.model.to(device)
         print("parameters:",self.model.parameters())
 
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01, weight_decay=5e-4)
