@@ -53,7 +53,7 @@ class s2v_embedding(nn.Module):
         Loop through nodes and create their new embeddings
         """
         device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
-        emb_matrix = torch.zeros(self.output_dim, self.nnodes)
+        emb_matrix = torch.zeros(self.output_dim, self.nnodes).to(device)
 
         adjacency = nx.to_numpy_array(graph)  # [nnodes, nnodes]
         adjacency = torch.from_numpy(adjacency).float().to(device)  # Convert to torch tensor
