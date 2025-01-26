@@ -38,6 +38,9 @@ class s2v_embedding(nn.Module):
 
         self.reset_parameters()
 
+        device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
+        self.to(device)
+
     def reset_parameters(self):
         """
         Reset two weights using xavier uniform
@@ -73,7 +76,7 @@ class s2v_embedding(nn.Module):
         """
         # emb_matrix = self.n2v(graph=graph)
 
-        if node_list == None:
+        if node_list is None:
             node_list = [i for i in range(self.nnodes)]
         # print(node_list)
         # print(emb_matrix)
