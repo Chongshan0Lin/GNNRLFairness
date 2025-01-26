@@ -28,6 +28,7 @@ class victim:
         # print("hfeatures: ",self.hfeatures)
 
         self.model = GCN(in_features=self.nfeatures, hidden_features = self.hfeatures, out_features=self.nclasses, dropout=0.5)
+        self.model.to(device)
 
         if torch.cuda.is_available():
             print("CUDA is available. PyTorch can use the GPU.")
@@ -40,13 +41,20 @@ class victim:
 
         # device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         # self.model.to(device)
-        print("parameters:",self.model.parameters())
+        params = list(self.model.parameters())
+        param_count = len(params)
+        print(f"Total parameters in model: {param_count}")
+        for idx, param in enumerate(params):
+            print(f"Parameter {idx}: Shape {param.shape}, requires_grad={param.requires_grad}")
 
-        print("number of parameter to optimizer",self.model.parameters().__sizeof__())
+        # print("number of parameter to optimizer",self.model.parameters().__sizeof__())
 
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01, weight_decay=5e-4)
+        print("Optimizer initialized with model parameters.")
 
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
+
+
 
     def train(self):
 
