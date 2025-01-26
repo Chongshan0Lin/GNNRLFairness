@@ -34,7 +34,14 @@ class GCNLayer(nn.Module):
 
     def forward(self, x, adj_norm):
 
-        adj_norm = torch.from_numpy(adj_norm).to(torch.float32).to(device)
+        # adj_norm = torch.from_numpy(adj_norm).to(torch.float32).to(device)
+        if isinstance(adj_norm, np.ndarray):
+            adj_norm = torch.from_numpy(adj_norm).float().to(device)
+        elif isinstance(adj_norm, torch.Tensor):
+            adj_norm = adj_norm.to(torch.float32).to(device)
+        else:
+            raise TypeError("adj_norm must be a numpy array or torch tensor")
+
 
         # if isinstance(x, torch.Tensor) :
         #     x = x.detach().cpu().numpy()  # Ensure it's on CPU before converting to NumPy
@@ -47,11 +54,12 @@ class GCNLayer(nn.Module):
             x = torch.from_numpy(x).float().to(device)
         elif isinstance(x, torch.Tensor):
             x = x.to(device)
+        else:
+            raise TypeError("x must be a numpy array or torch tensor")
 
 
         # print("x device:", device)
         support = torch.matmul(x, self.weight)
-
         out = torch.matmul(adj_norm, support)
 
         if self.bias is not None:
