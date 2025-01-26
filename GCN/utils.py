@@ -13,16 +13,33 @@ def normalize_adjacency(adj):
     # Add self-connections
     # print(adj)
     # print(type(adj))
-    adj = torch.Tensor.to_dense(adj)
-    adj = np.add(adj, torch.eye(len(adj[0])))
-    # Compute degree matrix
+    # adj = torch.Tensor.to_dense(adj)
+    # adj = np.add(adj, torch.eye(len(adj[0])))
+    # # Compute degree matrix
+    # rowsum = adj.sum(1)
+    # d_inv_sqrt = rowsum.pow(-0.5)
+    # d_inv_sqrt[torch.isinf(d_inv_sqrt)] = 0.0
+
+    # # Construct D^{-1/2} * A * D^{-1/2}
+    # d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
+    # return d_mat_inv_sqrt @ adj @ d_mat_inv_sqrt
+
+    if adj.is_sparse:
+        adj = adj.to_dense()
+
+    adj = adj + torch.eye(adj.size(0), device=adj.device)
+
     rowsum = adj.sum(1)
-    d_inv_sqrt = rowsum.pow(-0.5)
+    d_inv_sqrt = torch.pow(rowsum, -0.5)
     d_inv_sqrt[torch.isinf(d_inv_sqrt)] = 0.0
 
-    # Construct D^{-1/2} * A * D^{-1/2}
+
     d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
-    return d_mat_inv_sqrt @ adj @ d_mat_inv_sqrt
+
+    adj_normalized = torch.matmul(torch.matmul(d_mat_inv_sqrt, adj), d_mat_inv_sqrt)
+
+    return adj_normalized
+
 
 def graph_to_adj(graph):
 
