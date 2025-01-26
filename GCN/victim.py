@@ -22,6 +22,17 @@ class victim:
         self.nclasses = int(self.labels.max() + 1)
         self.hfeatures = int((self.nfeatures * 2) // 3 + self.nclasses)
 
+
+        self.labels = self.labels.to(device)
+        self.sens = self.sens.to(device)
+        if isinstance(self.idx_train, torch.Tensor):
+            self.idx_train = self.idx_train.to(device)
+        if isinstance(self.idx_val, torch.Tensor):
+            self.idx_val = self.idx_val.to(device)
+        if isinstance(self.idx_test, torch.Tensor):
+            self.idx_test = self.idx_test.to(device)
+
+
         # print("feature_matrix.shape: ",self.feature_matrix.shape)
         # print("nnodes: ",self.nnodes)
         # print("nclasses: ",self.nclasses)

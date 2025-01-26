@@ -36,13 +36,18 @@ class GCNLayer(nn.Module):
 
         adj_norm = torch.from_numpy(adj_norm).to(torch.float32).to(device)
 
-        if isinstance(x, torch.Tensor) :
-            x = x.detach().cpu().numpy()  # Ensure it's on CPU before converting to NumPy
-        xnp = np.vstack(x).astype(np.float32)
+        # if isinstance(x, torch.Tensor) :
+        #     x = x.detach().cpu().numpy()  # Ensure it's on CPU before converting to NumPy
+        # xnp = np.vstack(x).astype(np.float32)
         # device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
 
-        x = torch.from_numpy(xnp).to(device)
+        # x = torch.from_numpy(xnp).to(device)
         # x.to(device)
+        if isinstance(x, np.ndarray):
+            x = torch.from_numpy(x).float().to(device)
+        elif isinstance(x, torch.Tensor):
+            x = x.to(device)
+
 
         # print("x device:", device)
         support = torch.matmul(x, self.weight)
