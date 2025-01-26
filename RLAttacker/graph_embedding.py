@@ -17,10 +17,12 @@ class s2v_embedding(nn.Module):
         feature_matrix: torch tensor
         output_dim: int > 0
         """
+        device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
+
         super(s2v_embedding, self).__init__()
-        self.feature_matrix = feature_matrix # nnodes \times nfeatures
+        self.feature_matrix = feature_matrix.to(device) if isinstance(feature_matrix, torch.Tensor) else torch.tensor(feature_matrix).float().to(device)  # [nnodes, nfeatures]
         self.output_dim = output_dim
-        self.nfeatures = feature_matrix.shape[1]
+        self.nfeatures = self.feature_matrix.shape[1]
         self.nnodes = nnodes
 
         # TODO
@@ -38,7 +40,6 @@ class s2v_embedding(nn.Module):
 
         self.reset_parameters()
 
-        device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         self.to(device)
 
     def reset_parameters(self):
