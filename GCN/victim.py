@@ -6,7 +6,7 @@ import torch
 from .model import GCN
 from .utils import normalize_adjacency
 from .utils import demographic_parity, conditional_demographic_parity, equality_of_odds
-from .utils import fair_metric
+# from .utils import fair_metric
 import torch.nn.functional as F
 EPOCH = 100
 gpu_index = 2
