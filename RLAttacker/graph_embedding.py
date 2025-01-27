@@ -11,7 +11,7 @@ class s2v_embedding(nn.Module):
     We use relu for non linear layer
     """
 
-    def __init__(self, nnodes, feature_matrix, output_dim):
+    def __init__(self, nnodes, feature_matrix, output_dim, max_lv=4):
         """
         graph: networkx graph
         feature_matrix: torch tensor
@@ -24,8 +24,8 @@ class s2v_embedding(nn.Module):
         self.output_dim = output_dim
         self.nfeatures = self.feature_matrix.shape[1]
         self.nnodes = nnodes
+        self.max_lv = max_lv
 
-        # TODO
         # For here
         # print("nfeatures:", self.nfeatures)
         # print("output_dim:", self.output_dim)
@@ -49,7 +49,7 @@ class s2v_embedding(nn.Module):
         nn.init.xavier_uniform_(self.W1.weight)
         nn.init.xavier_uniform_(self.W2.weight)
 
-    def n2v(self, graph, T = 10):
+    def n2v(self, graph, T = None):
         """
         Loop through nodes and create their new embeddings
         """
@@ -59,6 +59,7 @@ class s2v_embedding(nn.Module):
         adjacency = nx.to_numpy_array(graph)  # [nnodes, nnodes]
         adjacency = torch.from_numpy(adjacency).float().to(device)  # Convert to torch tensor
 
+        T = T if T is not None else self.max_lv
 
         for _ in range(T):
             nbr_emb_sum = torch.matmul(adjacency, emb_matrix)  # [nnodes, output_dim]
@@ -71,7 +72,7 @@ class s2v_embedding(nn.Module):
 
         return emb_matrix  # [nnodes, output_dim]
 
-    def g2v(self, emb_matrix, node_list = None):
+    def g2v(self, emb_matrix, node_list = None, pool_type='mean'):
         """
         Following the paper, create graph embedding by summing up the node embedding
         """
@@ -81,9 +82,18 @@ class s2v_embedding(nn.Module):
             node_list = [i for i in range(self.nnodes)]
         # print(node_list)
         # print(emb_matrix)
-        graph_embedding = emb_matrix[node_list].sum(dim=0)  # [output_dim]
-
+        # graph_embedding = emb_matrix[node_list].sum(dim=0)  # [output_dim]
+        if pool_type == 'sum':
+            graph_embedding = emb_matrix[node_list].sum(dim=0)
+        elif pool_type == 'mean':
+            graph_embedding = emb_matrix[node_list].mean(dim=0)
+        elif pool_type == 'max':
+            graph_embedding = emb_matrix[node_list].max(dim=0)[0]
+        else:
+            raise ValueError("Unsupported pool_type")
+        
         return graph_embedding
+
 
     def get_graph_embeding(self, graph):
 

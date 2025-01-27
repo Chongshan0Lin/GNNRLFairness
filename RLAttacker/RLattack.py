@@ -82,6 +82,7 @@ class Q_function:
     def train_step(self):
         if self.replay_buffer.length() < self.min_memory_step:
             print("Current memory size:",self.replay_buffer.length())
+            self.exploration_rate = 1.0
             return
         
 
@@ -129,6 +130,8 @@ class Q_function:
         # mnqv = torch.diagonal(torch.mul(max_next_q_values, dones_t))
         # # q_targets = torch.add(input=rewards_t, other = max_next_q_values, alpha=(1 - dones_t))
         # q_targets = max_next_q_values
+
+        # Make sure the rewards_t has the correct dimension
         q_targets = rewards_t + max_next_q_values
         # print("Q values and Q targets:")
         # print(q_values)
@@ -260,11 +263,13 @@ class agent:
         print("Number of episodes", n_episodes)
 
         min_exploration_rate = self.Q_function1.exploration_rate
+        self.Q_function1.exploration_rate = 1.0
+        self.Q_function2.exploration_rate = 1.0
 
         for episode in range(n_episodes):
 
-            self.Q_function1.exploration_rate = min_exploration_rate * (n_episodes / (episode + 1))
-            self.Q_function2.exploration_rate = min_exploration_rate * (n_episodes / (episode + 1))
+            # self.Q_function1.exploration_rate = min_exploration_rate * (n_episodes / (episode + 1))
+            # self.Q_function2.exploration_rate = min_exploration_rate * (n_episodes / (episode + 1))
 
             print("Episode", episode)
             print("Exploration rate", self.Q_function1.exploration_rate)
@@ -312,11 +317,13 @@ class agent:
                 self.Q_function1.replay_buffer.push(state=state_embedding, action=first_node, reward=reward,next_state=new_state_embedding, done=False)
                 self.Q_function2.replay_buffer.push(state=state_embedding, action=second_node, reward=reward,next_state=new_state_embedding, done=False)
                 state_embedding = new_state_embedding
+                self.Q_function1.exploration_rate = min_exploration_rate
+                self.Q_function2.exploration_rate = min_exploration_rate
                 self.train_step()
 
             all_rewards.append(cumulative_reward)
             # Update the target network periodically
-            if episode % 1 == 0:
+            if episode % 2 == 0:
                 self.Q_function1.target_network.load_state_dict(self.Q_function1.policy_network.state_dict())
                 self.Q_function2.target_network.load_state_dict(self.Q_function2.policy_network.state_dict())
 
@@ -324,7 +331,7 @@ class agent:
             if (episode) % 1 == 0:
                 avg_reward = np.mean(all_rewards[-10:])
                 print(f"Episode {episode}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
-            
+
         self.Q_function1.exploration_rate = min_exploration_rate
         self.Q_function2.exploration_rate = min_exploration_rate
 
