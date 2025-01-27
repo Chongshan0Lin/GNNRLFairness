@@ -128,6 +128,7 @@ class Q_function:
         with torch.no_grad():
             max_next_q_values = self.target_network(next_states_t).max(dim=1, keepdim=True)[0]
 
+            q_targets = rewards_t + max_next_q_values
         # Q target = reward + (gamma * max_next_q_value * (1 - done))
         # q_targets = rewards_t + (max_next_q_values * (1 - dones_t))
         # print("Doesn_t", dones_t)
@@ -139,7 +140,6 @@ class Q_function:
         # q_targets = max_next_q_values
 
         # Make sure the rewards_t has the correct dimension
-            q_targets = rewards_t + max_next_q_values
         # print("Q values and Q targets:")
         # print(q_values)
         # print(q_targets)
@@ -184,11 +184,11 @@ class replay_buffer:
         done = int(done)
         # self.buffer.append((state, torch.tensor(action), torch.tensor([reward]), next_state, torch.tensor([done])))
         self.buffer.append((
-        state.to(device),
-        torch.tensor(action, device=device),
-        torch.tensor([reward], device=device),
-        next_state.to(device),
-        torch.tensor([done], device=device)
+            state.detach(),  
+            torch.tensor(action, device=device, dtype=torch.long),
+            torch.tensor([reward], device=device, dtype=torch.float),
+            next_state.detach(),  
+            torch.tensor([done], device=device, dtype=torch.long)
         ))
     
     def sample(self, batch_size):
@@ -253,13 +253,13 @@ class agent:
         device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         self.embedding.to(device)
 
-        self.optimizer = optim.Adam(
-            list(self.Q_function1.policy_network.parameters()) +
-            list(self.Q_function2.policy_network.parameters()) +
-            list(self.embedding.parameters()), 
-            lr=1e-3,
-            weight_decay=0
-        )
+        # self.optimizer = optim.Adam(
+        #     list(self.Q_function1.policy_network.parameters()) +
+        #     list(self.Q_function2.policy_network.parameters()) +
+        #     list(self.embedding.parameters()), 
+        #     lr=1e-3,
+        #     weight_decay=0
+        # )
 
 
     def change_edge(self, node1, node2):
@@ -331,9 +331,10 @@ class agent:
 
                 # Update the embedding correspondingly as the new state
                 emb_matrix = self.embedding.n2v(self.graph)
-                new_state_embedding = self.embedding.g2v(emb_matrix)
-                self.Q_function1.replay_buffer.push(state=state_embedding, action=first_node, reward=reward,next_state=new_state_embedding, done=False)
-                self.Q_function2.replay_buffer.push(state=state_embedding, action=second_node, reward=reward,next_state=new_state_embedding, done=False)
+                new_state_embedding = self.embedding.g2v(emb_matrix).detach()
+
+                self.Q_function1.replay_buffer.push(state=state_embedding.detach(), action=first_node, reward=reward,next_state=new_state_embedding, done=False)
+                self.Q_function2.replay_buffer.push(state=state_embedding.detach(), action=second_node, reward=reward,next_state=new_state_embedding, done=False)
                 state_embedding = new_state_embedding
                 self.Q_function1.exploration_rate = min_exploration_rate
                 self.Q_function2.exploration_rate = min_exploration_rate
