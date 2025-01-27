@@ -6,7 +6,7 @@ import torch
 from .model import GCN
 from .utils import normalize_adjacency
 from .utils import demographic_parity, conditional_demographic_parity, equality_of_odds
-# from .utils import fair_metric
+from .utils import fair_metric
 import torch.nn.functional as F
 EPOCH = 100
 gpu_index = 2
@@ -121,44 +121,44 @@ class victim:
         print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}, Conditional DP: {CDP:.4f}")
         return surrogate, DP, EOd, CDP
 
-    def fair_metric(pred, labels, sens):
-        # pred = pred.detach().cpu().numpy()
-        # labels = labels.detach().cpu().numpy()
-        # sens = sens.detach().cpu().numpy()
+    # def fair_metric(pred, labels, sens):
+    #     # pred = pred.detach().cpu().numpy()
+    #     # labels = labels.detach().cpu().numpy()
+    #     # sens = sens.detach().cpu().numpy()
         
-        # idx_s0 = sens == 0
-        # idx_s1 = sens == 1
-        # idx_s0_y1 = np.bitwise_and(idx_s0, labels == 1)
-        # idx_s1_y1 = np.bitwise_and(idx_s1, labels == 1)
+    #     # idx_s0 = sens == 0
+    #     # idx_s1 = sens == 1
+    #     # idx_s0_y1 = np.bitwise_and(idx_s0, labels == 1)
+    #     # idx_s1_y1 = np.bitwise_and(idx_s1, labels == 1)
         
-        # epsilon = 1e-8
-        # parity = abs(pred[idx_s0].sum() / (idx_s0.sum() + epsilon) - pred[idx_s1].sum() / (idx_s1.sum() + epsilon))
-        # equality = abs(pred[idx_s0_y1].sum() / (idx_s0_y1.sum() + epsilon) - pred[idx_s1_y1].sum() / (idx_s1_y1.sum() + epsilon))
+    #     # epsilon = 1e-8
+    #     # parity = abs(pred[idx_s0].sum() / (idx_s0.sum() + epsilon) - pred[idx_s1].sum() / (idx_s1.sum() + epsilon))
+    #     # equality = abs(pred[idx_s0_y1].sum() / (idx_s0_y1.sum() + epsilon) - pred[idx_s1_y1].sum() / (idx_s1_y1.sum() + epsilon))
         
-        # return parity, equality
-    # Move tensors to CPU and convert to NumPy arrays
-        pred_np = pred.detach().cpu().numpy()
-        labels_np = labels.detach().cpu().numpy()
-        sens_np = sens.detach().cpu().numpy()
+    #     # return parity, equality
+    # # Move tensors to CPU and convert to NumPy arrays
+    #     pred_np = pred.detach().cpu().numpy()
+    #     labels_np = labels.detach().cpu().numpy()
+    #     sens_np = sens.detach().cpu().numpy()
         
-        # Compute boolean indices
-        idx_s0 = sens_np == 0
-        idx_s1 = sens_np == 1
-        idx_s0_y1 = np.bitwise_and(idx_s0, labels_np == 1)
-        idx_s1_y1 = np.bitwise_and(idx_s1, labels_np == 1)
+    #     # Compute boolean indices
+    #     idx_s0 = sens_np == 0
+    #     idx_s1 = sens_np == 1
+    #     idx_s0_y1 = np.bitwise_and(idx_s0, labels_np == 1)
+    #     idx_s1_y1 = np.bitwise_and(idx_s1, labels_np == 1)
         
-        # Calculate sums with epsilon to avoid division by zero
-        epsilon = 1e-8
-        sum_s0 = np.sum(idx_s0) + epsilon
-        sum_s1 = np.sum(idx_s1) + epsilon
-        sum_s0_y1 = np.sum(idx_s0_y1) + epsilon
-        sum_s1_y1 = np.sum(idx_s1_y1) + epsilon
+    #     # Calculate sums with epsilon to avoid division by zero
+    #     epsilon = 1e-8
+    #     sum_s0 = np.sum(idx_s0) + epsilon
+    #     sum_s1 = np.sum(idx_s1) + epsilon
+    #     sum_s0_y1 = np.sum(idx_s0_y1) + epsilon
+    #     sum_s1_y1 = np.sum(idx_s1_y1) + epsilon
         
-        # Calculate parity and equality using NumPy operations
-        parity = abs(np.sum(pred_np[idx_s0]) / sum_s0 - np.sum(pred_np[idx_s1]) / sum_s1)
-        equality = abs(np.sum(pred_np[idx_s0_y1]) / sum_s0_y1 - np.sum(pred_np[idx_s1_y1]) / sum_s1_y1)
+    #     # Calculate parity and equality using NumPy operations
+    #     parity = abs(np.sum(pred_np[idx_s0]) / sum_s0 - np.sum(pred_np[idx_s1]) / sum_s1)
+    #     equality = abs(np.sum(pred_np[idx_s0_y1]) / sum_s0_y1 - np.sum(pred_np[idx_s1_y1]) / sum_s1_y1)
         
-        return parity, equality
+    #     return parity, equality
 
 
 
