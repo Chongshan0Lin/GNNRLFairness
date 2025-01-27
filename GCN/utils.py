@@ -117,8 +117,7 @@ def conditional_demographic_parity(predictions, labels, sens):
 
     return CDP_pos + CDP_neg
 
-def fair_metric(output, labels, sens):
-    pred = output.max(1)[1]
+def fair_metric(pred, labels, sens):
     idx_s0 = sens==0
     idx_s1 = sens==1
     idx_s0_y1 = np.bitwise_and(idx_s0, labels==1)

@@ -121,8 +121,7 @@ class victim:
         print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}, Conditional DP: {CDP:.4f}")
         return surrogate, DP, EOd, CDP
 
-    def fair_metric(output, labels, sens):
-        pred = output.max(1)[1]
+    def fair_metric(pred, labels, sens):
         idx_s0 = sens==0
         idx_s1 = sens==1
         idx_s0_y1 = np.bitwise_and(idx_s0, labels==1)
