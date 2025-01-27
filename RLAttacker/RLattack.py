@@ -357,8 +357,8 @@ class agent:
                 self.metrics_logger.log_metrics(
                     episode=episode + 1,
                     iteration=i + 1,
-                    accuracy=0,
-                    training_loss=0,
+                    accuracy=0.0,
+                    training_loss=0.0,
                     demographic_parity=dp,
                     equality_of_odds=eod,
                     conditional_dp=cdp,
