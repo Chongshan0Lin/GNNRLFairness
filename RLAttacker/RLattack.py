@@ -353,6 +353,7 @@ class agent:
                 self.Q_function1.exploration_rate = min_exploration_rate
                 self.Q_function2.exploration_rate = min_exploration_rate
                 self.train_step()
+                print("DP:", dp)
 
                 self.metrics_logger.log_metrics(
                     episode=episode + 1,
