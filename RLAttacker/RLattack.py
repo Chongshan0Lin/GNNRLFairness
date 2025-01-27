@@ -96,12 +96,19 @@ class Q_function:
         # rewards_t = torch.FloatTensor(rewards).unsqueeze(1)
         # next_states_t = torch.FloatTensor(next_states)
         # dones_t = torch.FloatTensor(dones).unsqueeze(1)
+        device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
 
-        states_t = torch.FloatTensor(torch.stack(states))
-        actions_t = torch.LongTensor(torch.stack(actions)).unsqueeze(1)
-        rewards_t = torch.FloatTensor(torch.stack(rewards)).unsqueeze(1)
-        next_states_t = torch.FloatTensor(torch.stack(next_states))
-        dones_t = torch.LongTensor(torch.stack(dones)).unsqueeze(1)
+        # states_t = torch.FloatTensor(torch.stack(states))
+        # actions_t = torch.LongTensor(torch.stack(actions)).unsqueeze(1)
+        # rewards_t = torch.FloatTensor(torch.stack(rewards)).unsqueeze(1)
+        # next_states_t = torch.FloatTensor(torch.stack(next_states))
+        # dones_t = torch.LongTensor(torch.stack(dones)).unsqueeze(1)
+        states_t = torch.stack(states).to(device).float()
+        actions_t = torch.stack(actions).to(device).long().unsqueeze(1)
+        rewards_t = torch.stack(rewards).to(device).float().unsqueeze(1)
+        next_states_t = torch.stack(next_states).to(device).float()
+        dones_t = torch.stack(dones).to(device).long().unsqueeze(1)
+
 
         # print(f"states_t shape: {states_t.shape}")          # Should be [BATCH_SIZE, state_dim]
         # print(f"actions_t shape: {actions_t.shape}")        # Should be [BATCH_SIZE, 1]
@@ -132,7 +139,7 @@ class Q_function:
         # q_targets = max_next_q_values
 
         # Make sure the rewards_t has the correct dimension
-        q_targets = rewards_t + max_next_q_values
+            q_targets = rewards_t + max_next_q_values
         # print("Q values and Q targets:")
         # print(q_values)
         # print(q_targets)
@@ -142,7 +149,9 @@ class Q_function:
 
         # Backdrop
         self.optimizer.zero_grad()
-        loss.backward(retain_graph=True)
+        # loss.backward(retain_graph=True)
+        loss.backward()
+
         # Check if gradient is flowing
         # print("named parameters: ",self.policy_network.named_parameters())
         # for name, param in self.policy_network.named_parameters():
@@ -170,8 +179,17 @@ class replay_buffer:
         self.buffer = deque(maxlen=capacity)
 
     def push(self, state, action, reward, next_state, done):
+        device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
+
         done = int(done)
-        self.buffer.append((state, torch.tensor(action), torch.tensor([reward]), next_state, torch.tensor([done])))
+        # self.buffer.append((state, torch.tensor(action), torch.tensor([reward]), next_state, torch.tensor([done])))
+        self.buffer.append((
+        state.to(device),
+        torch.tensor(action, device=device),
+        torch.tensor([reward], device=device),
+        next_state.to(device),
+        torch.tensor([done], device=device)
+        ))
     
     def sample(self, batch_size):
         batch = random.sample(self.buffer, batch_size)
