@@ -35,6 +35,8 @@ class MetricsLogger:
         Insert a new record into the metrics table.
         """
         timestamp = datetime.datetime.now().isoformat()
+
+        print("DP:", demographic_parity)
         self.cursor.execute('''
             INSERT INTO metrics (timestamp, episode, iteration, accuracy, training_loss, demographic_parity, equality_of_odds, conditional_dp, surrogate_loss)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
