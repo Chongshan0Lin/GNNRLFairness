@@ -7,6 +7,7 @@ from .graph_embedding import s2v_embedding
 from collections import deque
 from GCN.victim import victim
 import torch.optim as optim
+from database import MetricsLogger
 # import tensor
 gpu_index = 2
 
@@ -84,10 +85,10 @@ class Q_function:
             print("Current memory size:",self.replay_buffer.length())
             self.exploration_rate = 1.0
             return
-        
+
 
         # Here, we are sampling from the memory buffer and perform minibatch gradient descent.
-        BATCH_SIZE = self.min_memory_step
+        BATCH_SIZE = self.min_memory_step // 10
         states, actions, rewards, next_states, dones = self.replay_buffer.sample(BATCH_SIZE)
         # states, actions, rewards, next_states, dones = self.replay_buffer.sample(1)
 
@@ -253,6 +254,8 @@ class agent:
         device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         self.embedding.to(device)
 
+        self.metrics_logger = MetricsLogger(db_name="training_metrics.db")
+
         # self.optimizer = optim.Adam(
         #     list(self.Q_function1.policy_network.parameters()) +
         #     list(self.Q_function2.policy_network.parameters()) +
@@ -298,9 +301,20 @@ class agent:
             # Create a victim model and train
             victim_model = victim()
             victim_model.train()
-            fairness_loss = victim_model.evaluate()
+            fairness_loss, dp, eod, cdp = victim_model.evaluate()
             emb_matrix = self.embedding.n2v(self.graph)
             state_embedding = self.embedding.g2v(emb_matrix)
+
+            self.metrics_logger.log_metrics(
+                episode=episode + 1,
+                iteration=0,
+                accuracy=0,
+                training_loss=0,
+                demographic_parity=dp,
+                equality_of_odds=eod,
+                conditional_dp=cdp,
+                surrogate_loss=fairness_loss
+            )
             # Launch a cycle of attack
 
             # Employ dynamic exploration rate to encourge more exploration during the previous stage
@@ -323,7 +337,7 @@ class agent:
 
                 # After changing the model, retrain the victim model and calculate the new fairness value
                 victim_model.train()
-                new_loss = victim_model.evaluate()
+                new_loss, dp, eod, cdp = victim_model.evaluate()
                 # Determine the difference of fairness, which is the reward
                 reward = new_loss - fairness_loss
                 cumulative_reward += reward
@@ -339,6 +353,18 @@ class agent:
                 self.Q_function1.exploration_rate = min_exploration_rate
                 self.Q_function2.exploration_rate = min_exploration_rate
                 self.train_step()
+
+                self.metrics_logger.log_metrics(
+                    episode=episode + 1,
+                    iteration=i + 1,
+                    accuracy=0,
+                    training_loss=0,
+                    demographic_parity=dp,
+                    equality_of_odds=eod,
+                    conditional_dp=cdp,
+                    surrogate_loss=fairness_loss
+                )
+
 
             all_rewards.append(cumulative_reward)
             # Update the target network periodically

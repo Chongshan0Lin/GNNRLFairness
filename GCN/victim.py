@@ -99,6 +99,7 @@ class victim:
                     f"Val Loss: {loss_val.item():.4f}, "
                     f"Val Acc: {acc_val:.4f}"
                 )
+    
     def evaluate(self):
         self.model.eval()
         with torch.no_grad():
@@ -116,8 +117,20 @@ class victim:
         DP = demographic_parity(predictions=pred_test, sens=self.sens[self.idx_test])
         EOd = equality_of_odds(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
         CDP = conditional_demographic_parity(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
+        surrogate = fair_metric(pred_test, self.labels[self.idx_test], self.sens[self.idx_test])
         print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}, Conditional DP: {CDP:.4f}")
-        return DP
+        return surrogate, DP, EOd, CDP
+
+    def fair_metric(output, labels, sens):
+        pred = output.max(1)[1]
+        idx_s0 = sens==0
+        idx_s1 = sens==1
+        idx_s0_y1 = np.bitwise_and(idx_s0, labels==1)
+        idx_s1_y1 = np.bitwise_and(idx_s1, labels==1)
+        parity = abs(sum(pred[idx_s0])/sum(idx_s0)-sum(pred[idx_s1])/sum(idx_s1))
+        equality = abs(sum(pred[idx_s0_y1])/sum(idx_s0_y1)-sum(pred[idx_s1_y1])/sum(idx_s1_y1))
+        return parity.item(), equality.item()
+
 
     def change_edge(self, node1, node2):
         """
