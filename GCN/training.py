@@ -68,13 +68,13 @@ for epoch in range(100):
         acc_val  = pred_val.eq(labels[idx_val]).sum().item() / idx_val.size(0)
         model.train()
 
-    if (epoch + 1) % 100 == 0:
-        print(
-            f"Epoch: {epoch:03d}, "
-            f"Train Loss: {loss_train.item():.4f}, "
-            f"Val Loss: {loss_val.item():.4f}, "
-            f"Val Acc: {acc_val:.4f}"
-        )
+    # if (epoch + 1) % 100 == 0:
+print(
+    # f"Epoch: {epoch:03d}, "
+    f"Train Loss: {loss_train.item():.4f}, "
+    f"Val Loss: {loss_val.item():.4f}, "
+    f"Val Acc: {acc_val:.4f}"
+)
 
 # -------------------------
 # 5.5 Testing
