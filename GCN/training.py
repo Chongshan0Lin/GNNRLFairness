@@ -86,7 +86,7 @@ with torch.no_grad():
     pred_test = output_test[idx_test].max(1)[1]
     acc_test  = pred_test.eq(labels[idx_test]).sum().item() / idx_test.size(0)
 
-print(f"Test Loss: {loss_test.item():.4f}, Test Accuracy: {acc_test:.4f}")
+# print(f"Test Loss: {loss_test.item():.4f}, Test Accuracy: {acc_test:.4f}")
 
 """
 Fairness Evauation

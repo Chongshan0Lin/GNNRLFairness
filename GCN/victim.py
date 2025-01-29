@@ -41,18 +41,18 @@ class victim:
         self.model = GCN(in_features=self.nfeatures, hidden_features = self.hfeatures, out_features=self.nclasses, dropout=0.5)
         self.model.to(device)
 
-        if torch.cuda.is_available():
-            print("CUDA is available. PyTorch can use the GPU.")
-            print(f"Number of CUDA devices: {torch.cuda.device_count()}")
-            print(f"Current CUDA device: {torch.cuda.current_device()}")
-            print(f"Device name: {torch.cuda.get_device_name(torch.cuda.current_device())}")
-        else:
-            print("CUDA is not available. PyTorch will use the CPU.")
+        # if torch.cuda.is_available():
+        #     print("CUDA is available. PyTorch can use the GPU.")
+        #     print(f"Number of CUDA devices: {torch.cuda.device_count()}")
+        #     print(f"Current CUDA device: {torch.cuda.current_device()}")
+        #     print(f"Device name: {torch.cuda.get_device_name(torch.cuda.current_device())}")
+        # else:
+        #     print("CUDA is not available. PyTorch will use the CPU.")
         # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         # device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         # self.model.to(device)
-        
+
         # params = list(self.model.parameters())
         # param_count = len(params)
         # print(f"Total parameters in model: {param_count}")
@@ -62,7 +62,7 @@ class victim:
         # print("number of parameter to optimizer",self.model.parameters().__sizeof__())
 
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01, weight_decay=5e-4)
-        print("Optimizer initialized with model parameters.")
+        # print("Optimizer initialized with model parameters.")
 
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
 
