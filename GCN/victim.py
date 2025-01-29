@@ -52,11 +52,12 @@ class victim:
 
         # device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         # self.model.to(device)
-        params = list(self.model.parameters())
-        param_count = len(params)
-        print(f"Total parameters in model: {param_count}")
-        for idx, param in enumerate(params):
-            print(f"Parameter {idx}: Shape {param.shape}, requires_grad={param.requires_grad}")
+        
+        # params = list(self.model.parameters())
+        # param_count = len(params)
+        # print(f"Total parameters in model: {param_count}")
+        # for idx, param in enumerate(params):
+        #     print(f"Parameter {idx}: Shape {param.shape}, requires_grad={param.requires_grad}")
 
         # print("number of parameter to optimizer",self.model.parameters().__sizeof__())
 

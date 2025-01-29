@@ -23,8 +23,8 @@ class GCNLayer(nn.Module):
             self.register_parameter('bias', None)
         self.reset_parameters()
         self.to(device)
-        param_count = sum(p.numel() for p in self.parameters())
-        print(f"GCNLayer initialized on {device}. Number of parameters: {param_count}")
+        # param_count = sum(p.numel() for p in self.parameters())
+        # print(f"GCNLayer initialized on {device}. Number of parameters: {param_count}")
 
 
     def reset_parameters(self):
