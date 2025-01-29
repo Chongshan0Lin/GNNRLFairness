@@ -92,7 +92,7 @@ class victim:
                 acc_val  = pred_val.eq(self.labels[self.idx_val]).sum().item() / self.idx_val.size(0)
                 self.model.train()
             # print("Episode")
-            if epoch % 10 == 0:
+            if (epoch+1) % 100 == 0:
                 print(
                     f"Epoch: {epoch:03d}, "
                     f"Train Loss: {loss_train.item():.4f}, "
