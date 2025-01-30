@@ -337,11 +337,11 @@ class agent:
 
                 # After changing the model, retrain the victim model and calculate the new fairness value
                 victim_model.train()
-                new_loss, dp, eod, cdp = victim_model.evaluate()
+                new_loss, new_dp, eod, cdp = victim_model.evaluate()
                 # Determine the difference of fairness, which is the reward
-                reward = new_loss - fairness_loss
+                reward = new_dp - dp
                 cumulative_reward += reward
-                fairness_loss = new_loss
+                dp = new_dp
 
                 # Update the embedding correspondingly as the new state
                 emb_matrix = self.embedding.n2v(self.graph)
@@ -362,7 +362,7 @@ class agent:
                     demographic_parity=dp,
                     equality_of_odds=eod,
                     conditional_dp=cdp,
-                    surrogate_loss=fairness_loss
+                    surrogate_loss=new_loss
                 )
 
 
