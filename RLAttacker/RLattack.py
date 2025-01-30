@@ -386,3 +386,86 @@ class agent:
         """
         self.Q_function1.train_step()
         self.Q_function2.train_step()
+
+    def evaluate(self, epoch):
+        """
+        Evaluate the trained model by setting exploration rate to be 0
+        """
+
+        # print("Episode", episode)
+        print("Evaluation mode, the", epoch, "th epoch")
+        self.Q_function1.exploration_rate = 0.0
+        self.Q_function2.exploration_rate = 0.0
+        min_exploration_rate = 0.0
+        # print("Exploration rate", self.Q_function1.exploration_rate)
+
+        all_rewards = []
+        cumulative_reward = 0
+
+        # Create a victim model and train
+        victim_model = victim()
+        victim_model.train()
+        fairness_loss, dp, eod, cdp = victim_model.evaluate()
+        emb_matrix = self.embedding.n2v(self.graph)
+        state_embedding = self.embedding.g2v(emb_matrix)
+
+        self.metrics_logger.log_metrics(
+            episode= 1,
+            iteration=0,
+            accuracy=0,
+            training_loss=0,
+            demographic_parity=dp,
+            equality_of_odds=eod,
+            conditional_dp=cdp,
+            surrogate_loss=fairness_loss
+        )
+        # Launch a cycle of attack
+
+        # Employ dynamic exploration rate to encourge more exploration during the previous stage
+
+        for i in range(self.budegt):
+
+            
+            print(i,"th iteration")
+            # Get the current state embedding
+            # Select the first node:
+            # How shall I make sure that the first node is different from the second node?
+            
+            first_node = self.Q_function1.select_action(state_embedding)
+            second_node = self.Q_function2.select_action(state_embedding)
+
+            # victim_model.change_edge(first_node, second_node)
+            print("The selected two nodes are:", first_node, second_node)
+            self.change_edge(first_node, second_node)
+            victim_model.update_adj_matrix(torch.from_numpy(nx.to_numpy_array(self.graph)))
+
+            # After changing the model, retrain the victim model and calculate the new fairness value
+            victim_model.train()
+            new_loss, dp, eod, cdp = victim_model.evaluate()
+            # Determine the difference of fairness, which is the reward
+            reward = new_loss - fairness_loss
+            cumulative_reward += reward
+            fairness_loss = new_loss
+
+            # Update the embedding correspondingly as the new state
+            emb_matrix = self.embedding.n2v(self.graph)
+            new_state_embedding = self.embedding.g2v(emb_matrix).detach()
+
+            # self.Q_function1.replay_buffer.push(state=state_embedding.detach(), action=first_node, reward=reward,next_state=new_state_embedding, done=False)
+            # self.Q_function2.replay_buffer.push(state=state_embedding.detach(), action=second_node, reward=reward,next_state=new_state_embedding, done=False)
+            state_embedding = new_state_embedding
+            self.train_step()
+
+            self.metrics_logger.log_metrics(
+                episode= 1,
+                iteration=i + 1,
+                accuracy=0.0,
+                training_loss=0.0,
+                demographic_parity=dp,
+                equality_of_odds=eod,
+                conditional_dp=cdp,
+                surrogate_loss=fairness_loss
+            )
+
+        avg_reward = np.mean(all_rewards[-10:])
+        print(f"epoch {epoch}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
