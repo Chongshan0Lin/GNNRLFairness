@@ -272,7 +272,7 @@ class agent:
             self.graph.add_edge(node1, node2)
 
 
-    def train(self):
+    def train(self, n_episodes =1000):
         """
         Train the two agent hierarchically.
         First Q function gives the first node, second Q function gives the second node.
@@ -280,7 +280,7 @@ class agent:
         The agent runs until it runs out of the budget or successfully achieves the goal
         """
 
-        n_episodes = 200
+        # n_episodes = 200
         print("Number of episodes", n_episodes)
 
         min_exploration_rate = self.Q_function1.exploration_rate
@@ -301,22 +301,17 @@ class agent:
             # Create a victim model and train
             victim_model = victim()
             victim_model.train()
-            fairness_loss, dp, eod, cdp = victim_model.evaluate()
+            fairness_losses, dp, eod, cdp = victim_model.evaluate()
+            parity = fairness_losses[0]
+            oddity = fairness_losses[1]
             emb_matrix = self.embedding.n2v(self.graph)
             state_embedding = self.embedding.g2v(emb_matrix)
 
-            self.metrics_logger.log_metrics(
-                episode=episode + 1,
-                iteration=0,
-                accuracy=0,
-                training_loss=0,
-                demographic_parity=dp,
-                equality_of_odds=eod,
-                conditional_dp=cdp,
-                surrogate_loss=fairness_loss
-            )
-            # Launch a cycle of attack
+            init_parity = parity
+            init_oddity = oddity
 
+            print("Initial Parity:", parity)
+            print("Initial Oddity:", oddity)
             # Employ dynamic exploration rate to encourge more exploration during the previous stage
 
             for i in range(self.budegt):
@@ -337,11 +332,15 @@ class agent:
 
                 # After changing the model, retrain the victim model and calculate the new fairness value
                 victim_model.train()
-                new_loss, new_dp, eod, cdp = victim_model.evaluate()
+                new_losses, new_dp, eod, cdp = victim_model.evaluate()
+                new_parity = new_losses[0]
+                oddity = new_losses[1]
                 # Determine the difference of fairness, which is the reward
-                reward = new_dp - dp
+                print("Parity:", new_parity)
+                print("Oddity:", new_losses[1])
+                reward = new_parity - parity
                 cumulative_reward += reward
-                dp = new_dp
+                parity = new_parity
                 all_rewards.append(reward)
 
                 # Update the embedding correspondingly as the new state
@@ -354,18 +353,7 @@ class agent:
                 self.Q_function1.exploration_rate = min_exploration_rate
                 self.Q_function2.exploration_rate = min_exploration_rate
                 self.train_step()
-
-                self.metrics_logger.log_metrics(
-                    episode=episode + 1,
-                    iteration=i + 1,
-                    accuracy=0.0,
-                    training_loss=0.0,
-                    demographic_parity=dp,
-                    equality_of_odds=eod,
-                    conditional_dp=cdp,
-                    surrogate_loss=new_loss
-                )
-
+            
 
             all_rewards.append(cumulative_reward)
             # Update the target network periodically
@@ -373,8 +361,8 @@ class agent:
                 self.Q_function1.target_network.load_state_dict(self.Q_function1.policy_network.state_dict())
                 self.Q_function2.target_network.load_state_dict(self.Q_function2.policy_network.state_dict())
 
-            # print(episode, "th episode")
-            # if (episode) % 1 == 0:
+        print("Change of parity:", parity - init_parity)
+        print("Change of oddity:", oddity - init_oddity)
 
         avg_reward = np.mean(all_rewards[-10:])
         print(f"Episode {episode}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
@@ -406,21 +394,17 @@ class agent:
         # Create a victim model and train
         victim_model = victim()
         victim_model.train()
-        fairness_loss, dp, eod, cdp = victim_model.evaluate()
+        fairness_losses, dp, eod, cdp = victim_model.evaluate()
         emb_matrix = self.embedding.n2v(self.graph)
         state_embedding = self.embedding.g2v(emb_matrix)
+        parity = fairness_losses[0]
+        oddity = fairness_losses[1]
 
-        self.metrics_logger.log_metrics(
-            episode= 1,
-            iteration=0,
-            accuracy=0,
-            training_loss=0,
-            demographic_parity=dp,
-            equality_of_odds=eod,
-            conditional_dp=cdp,
-            surrogate_loss=fairness_loss
-        )
-        # Launch a cycle of attack
+        init_parity = parity
+        init_oddity = oddity
+
+        print("Initial Parity:", parity)
+        print("Initial Oddity:", oddity)
 
         # Employ dynamic exploration rate to encourge more exploration during the previous stage
 
@@ -442,11 +426,15 @@ class agent:
 
             # After changing the model, retrain the victim model and calculate the new fairness value
             victim_model.train()
-            new_loss, new_dp, eod, cdp = victim_model.evaluate()
+            new_losses, new_dp, eod, cdp = victim_model.evaluate()
+            new_parity = new_losses[0]
+            oddity = new_losses[1]
             # Determine the difference of fairness, which is the reward
-            reward = new_dp - dp
+            print("Parity:", new_parity)
+            print("Oddity:", new_losses[1])
+            reward = new_parity - parity
             cumulative_reward += reward
-            dp = new_dp
+            parity = new_parity
             all_rewards.append(reward)
 
             # Update the embedding correspondingly as the new state
@@ -458,16 +446,19 @@ class agent:
             state_embedding = new_state_embedding
             self.train_step()
 
-            self.metrics_logger.log_metrics(
-                episode= 1,
-                iteration=i + 1,
-                accuracy=0.0,
-                training_loss=0.0,
-                demographic_parity=dp,
-                equality_of_odds=eod,
-                conditional_dp=cdp,
-                surrogate_loss=fairness_loss
-            )
+            # self.metrics_logger.log_metrics(
+            #     episode= 1,
+            #     iteration=i + 1,
+            #     accuracy=0.0,
+            #     training_loss=0.0,
+            #     demographic_parity=dp,
+            #     equality_of_odds=eod,
+            #     conditional_dp=cdp,
+            #     surrogate_loss=fairness_loss
+            # )
+
+        print("Change of parity:", parity - init_parity)
+        print("Change of oddity:", oddity - init_oddity)
 
         avg_reward = np.mean(all_rewards[:])
         print(f"epoch {epoch}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
