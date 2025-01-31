@@ -259,7 +259,7 @@ class agent:
         # self.optimizer = optim.Adam(
         #     list(self.Q_function1.policy_network.parameters()) +
         #     list(self.Q_function2.policy_network.parameters()) +
-        #     list(self.embedding.parameters()), 
+        #     list(self.embedding.parameters()),
         #     lr=1e-3,
         #     weight_decay=0
         # )
@@ -321,7 +321,7 @@ class agent:
 
             for i in range(self.budegt):
 
-                
+
                 print(i,"th iteration")
                 # Get the current state embedding
                 # Select the first node:
@@ -342,6 +342,7 @@ class agent:
                 reward = new_dp - dp
                 cumulative_reward += reward
                 dp = new_dp
+                all_rewards.append(reward)
 
                 # Update the embedding correspondingly as the new state
                 emb_matrix = self.embedding.n2v(self.graph)
@@ -373,10 +374,10 @@ class agent:
                 self.Q_function2.target_network.load_state_dict(self.Q_function2.policy_network.state_dict())
 
             # print(episode, "th episode")
-            if (episode) % 1 == 0:
-                avg_reward = np.mean(all_rewards[-10:])
-                print(f"Episode {episode}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
+            # if (episode) % 1 == 0:
 
+        avg_reward = np.mean(all_rewards[-10:])
+        print(f"Episode {episode}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
         self.Q_function1.exploration_rate = min_exploration_rate
         self.Q_function2.exploration_rate = min_exploration_rate
 
@@ -446,6 +447,7 @@ class agent:
             reward = new_dp - dp
             cumulative_reward += reward
             dp = new_dp
+            all_rewards.append(reward)
 
             # Update the embedding correspondingly as the new state
             emb_matrix = self.embedding.n2v(self.graph)
@@ -467,5 +469,5 @@ class agent:
                 surrogate_loss=fairness_loss
             )
 
-        avg_reward = np.mean(all_rewards[-10:])
+        avg_reward = np.mean(all_rewards[:])
         print(f"epoch {epoch}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
