@@ -36,36 +36,11 @@ class victim:
             self.idx_test = self.idx_test.to(device)
 
 
-        # print("feature_matrix.shape: ",self.feature_matrix.shape)
-        # print("nnodes: ",self.nnodes)
-        # print("nclasses: ",self.nclasses)
-        # print("hfeatures: ",self.hfeatures)
 
         self.model = GCN(in_features=self.nfeatures, hidden_features = self.hfeatures, out_features=self.nclasses, dropout=0.5)
         self.model.to(device)
 
-        # if torch.cuda.is_available():
-        #     print("CUDA is available. PyTorch can use the GPU.")
-        #     print(f"Number of CUDA devices: {torch.cuda.device_count()}")
-        #     print(f"Current CUDA device: {torch.cuda.current_device()}")
-        #     print(f"Device name: {torch.cuda.get_device_name(torch.cuda.current_device())}")
-        # else:
-        #     print("CUDA is not available. PyTorch will use the CPU.")
-        # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-        # device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
-        # self.model.to(device)
-
-        # params = list(self.model.parameters())
-        # param_count = len(params)
-        # print(f"Total parameters in model: {param_count}")
-        # for idx, param in enumerate(params):
-        #     print(f"Parameter {idx}: Shape {param.shape}, requires_grad={param.requires_grad}")
-
-        # print("number of parameter to optimizer",self.model.parameters().__sizeof__())
-
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01, weight_decay=5e-4)
-        # print("Optimizer initialized with model parameters.")
 
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
 
@@ -103,6 +78,7 @@ class victim:
                     f"Val Loss: {loss_val.item():.4f}, "
                     f"Val Acc: {acc_val:.4f}"
                 )
+        # return 0
     
     def evaluate(self):
         self.model.eval()
@@ -117,52 +93,11 @@ class victim:
         """
         Fairness Evauation
         """
-
-        DP = demographic_parity(predictions=pred_test, sens=self.sens[self.idx_test])
-        EOd = equality_of_odds(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
-        CDP = conditional_demographic_parity(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
-        surrogate = fair_metric(pred_test, self.labels[self.idx_test], self.sens[self.idx_test])
-        print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}, Conditional DP: {CDP:.4f}")
-        return surrogate[0], DP.item(), EOd.item(), CDP.item()
-
-    # def fair_metric(pred, labels, sens):
-    #     # pred = pred.detach().cpu().numpy()
-    #     # labels = labels.detach().cpu().numpy()
-    #     # sens = sens.detach().cpu().numpy()
         
-    #     # idx_s0 = sens == 0
-    #     # idx_s1 = sens == 1
-    #     # idx_s0_y1 = np.bitwise_and(idx_s0, labels == 1)
-    #     # idx_s1_y1 = np.bitwise_and(idx_s1, labels == 1)
-        
-    #     # epsilon = 1e-8
-    #     # parity = abs(pred[idx_s0].sum() / (idx_s0.sum() + epsilon) - pred[idx_s1].sum() / (idx_s1.sum() + epsilon))
-    #     # equality = abs(pred[idx_s0_y1].sum() / (idx_s0_y1.sum() + epsilon) - pred[idx_s1_y1].sum() / (idx_s1_y1.sum() + epsilon))
-        
-    #     # return parity, equality
-    # # Move tensors to CPU and convert to NumPy arrays
-    #     pred_np = pred.detach().cpu().numpy()
-    #     labels_np = labels.detach().cpu().numpy()
-    #     sens_np = sens.detach().cpu().numpy()
-        
-    #     # Compute boolean indices
-    #     idx_s0 = sens_np == 0
-    #     idx_s1 = sens_np == 1
-    #     idx_s0_y1 = np.bitwise_and(idx_s0, labels_np == 1)
-    #     idx_s1_y1 = np.bitwise_and(idx_s1, labels_np == 1)
-        
-    #     # Calculate sums with epsilon to avoid division by zero
-    #     epsilon = 1e-8
-    #     sum_s0 = np.sum(idx_s0) + epsilon
-    #     sum_s1 = np.sum(idx_s1) + epsilon
-    #     sum_s0_y1 = np.sum(idx_s0_y1) + epsilon
-    #     sum_s1_y1 = np.sum(idx_s1_y1) + epsilon
-        
-    #     # Calculate parity and equality using NumPy operations
-    #     parity = abs(np.sum(pred_np[idx_s0]) / sum_s0 - np.sum(pred_np[idx_s1]) / sum_s1)
-    #     equality = abs(np.sum(pred_np[idx_s0_y1]) / sum_s0_y1 - np.sum(pred_np[idx_s1_y1]) / sum_s1_y1)
-        
-    #     return parity, equality
+        losses  = fair_metric(pred_test, self.labels[self.idx_test], self.sens[self.idx_test])
+        DP, EOd = losses[0], losses[1]
+        print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}")
+        return DP, EOd
 
 
 
@@ -178,12 +113,9 @@ class victim:
         else:
             self.adj_matrix[node1][node2] = 1
 
-        # Update the adj_norm correspondingly
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
     
     def update_adj_matrix(self, adj_matrix):
-        # self.adj_matrix = adj_matrix
-        # self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
 
         device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         self.adj_matrix = adj_matrix.to(device) 

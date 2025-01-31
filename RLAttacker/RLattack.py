@@ -8,6 +8,7 @@ from collections import deque
 from GCN.victim import victim
 import torch.optim as optim
 from database import MetricsLogger
+from .kernel_estimator import KernelEstimator
 # import tensor
 gpu_index = 2
 
@@ -304,20 +305,26 @@ class agent:
             # Create a victim model and train
             victim_model = victim()
             victim_model.train()
-            fairness_loss, dp, eod, cdp = victim_model.evaluate()
+            fairness_loss = -1
+            dp, eod = victim_model.evaluate()
+            # Result of majority
+            # den0 = torch.sigmoid(output.view(-1))[self.sens == 0]
+            # Result of minority
+            # den1 = torch.sigmoid(output.view(-1))[self.sens == 1]
+
             emb_matrix = self.embedding.n2v(self.graph)
             state_embedding = self.embedding.g2v(emb_matrix)
 
-            self.metrics_logger.log_metrics(
-                episode=episode + 1,
-                iteration=0,
-                accuracy=0,
-                training_loss=0,
-                demographic_parity=dp,
-                equality_of_odds=eod,
-                conditional_dp=cdp,
-                surrogate_loss=fairness_loss
-            )
+            # self.metrics_logger.log_metrics(
+            #     episode=episode + 1,
+            #     iteration=0,
+            #     accuracy=0,
+            #     training_loss=0,
+            #     demographic_parity=dp,
+            #     equality_of_odds=eod,
+            #     conditional_dp=cdp,
+            #     surrogate_loss=fairness_loss
+            # )
             # Launch a cycle of attack
 
             # Employ dynamic exploration rate to encourge more exploration during the previous stage
@@ -340,7 +347,7 @@ class agent:
 
                 # After changing the model, retrain the victim model and calculate the new fairness value
                 victim_model.train()
-                new_loss, dp, eod, cdp = victim_model.evaluate()
+                dp, eod = victim_model.evaluate()
                 # Determine the difference of fairness, which is the reward
                 reward = new_loss - fairness_loss
                 cumulative_reward += reward
@@ -357,16 +364,16 @@ class agent:
                 self.Q_function2.exploration_rate = min_exploration_rate
                 self.train_step()
 
-                self.metrics_logger.log_metrics(
-                    episode=episode + 1,
-                    iteration=i + 1,
-                    accuracy=0.0,
-                    training_loss=0.0,
-                    demographic_parity=dp,
-                    equality_of_odds=eod,
-                    conditional_dp=cdp,
-                    surrogate_loss=fairness_loss
-                )
+                # self.metrics_logger.log_metrics(
+                #     episode=episode + 1,
+                #     iteration=i + 1,
+                #     accuracy=0.0,
+                #     training_loss=0.0,
+                #     demographic_parity=dp,
+                #     equality_of_odds=eod,
+                #     conditional_dp=cdp,
+                #     surrogate_loss=fairness_loss
+                # )
 
 
             all_rewards.append(cumulative_reward)
@@ -408,20 +415,20 @@ class agent:
         # Create a victim model and train
         victim_model = victim()
         victim_model.train()
-        fairness_loss, dp, eod, cdp = victim_model.evaluate()
+        dp, eod = victim_model.evaluate()
         emb_matrix = self.embedding.n2v(self.graph)
         state_embedding = self.embedding.g2v(emb_matrix)
 
-        self.metrics_logger.log_metrics(
-            episode= 1,
-            iteration=0,
-            accuracy=0,
-            training_loss=0,
-            demographic_parity=dp,
-            equality_of_odds=eod,
-            conditional_dp=cdp,
-            surrogate_loss=fairness_loss
-        )
+        # self.metrics_logger.log_metrics(
+        #     episode= 1,
+        #     iteration=0,
+        #     accuracy=0,
+        #     training_loss=0,
+        #     demographic_parity=dp,
+        #     equality_of_odds=eod,
+        #     conditional_dp=cdp,
+        #     surrogate_loss=fairness_loss
+        # )
         # Launch a cycle of attack
 
         # Employ dynamic exploration rate to encourge more exploration during the previous stage
@@ -444,7 +451,7 @@ class agent:
 
             # After changing the model, retrain the victim model and calculate the new fairness value
             victim_model.train()
-            new_loss, dp, eod, cdp = victim_model.evaluate()
+            dp, eod = victim_model.evaluate()
             # Determine the difference of fairness, which is the reward
             reward = new_loss - fairness_loss
             cumulative_reward += reward
@@ -459,16 +466,16 @@ class agent:
             state_embedding = new_state_embedding
             self.train_step()
 
-            self.metrics_logger.log_metrics(
-                episode= 1,
-                iteration=i + 1,
-                accuracy=0.0,
-                training_loss=0.0,
-                demographic_parity=dp,
-                equality_of_odds=eod,
-                conditional_dp=cdp,
-                surrogate_loss=fairness_loss
-            )
+            # self.metrics_logger.log_metrics(
+            #     episode= 1,
+            #     iteration=i + 1,
+            #     accuracy=0.0,
+            #     training_loss=0.0,
+            #     demographic_parity=dp,
+            #     equality_of_odds=eod,
+            #     conditional_dp=cdp,
+            #     surrogate_loss=fairness_loss
+            # )
 
         avg_reward = np.mean(all_rewards[-10:])
         print(f"epoch {epoch}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
