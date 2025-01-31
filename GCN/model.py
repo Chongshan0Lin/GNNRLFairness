@@ -28,7 +28,7 @@ class GCN(nn.Module):
 
         # Second layer
         x = self.gc2(x, adj_norm)
-        return F.log_softmax(x, dim=1)
+        return x
 
     def initialization(self):
         self.gc1.reset_parameters()
