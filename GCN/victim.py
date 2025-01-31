@@ -115,10 +115,11 @@ class victim:
     def evaluate(self):
         self.model.eval()
         with torch.no_grad():
-            output_test = self.model(self.feature_matrix, self.adj_norm)
-            loss_test = F.nll_loss(output_test[self.idx_test], self.labels[self.idx_test])
-            pred_test = output_test[self.idx_test].max(1)[1]
-            acc_test  = pred_test.eq(self.labels[self.idx_test]).sum().item() / self.idx_test.size(0)
+            output_test = self.model(self.feature_matrix, self.adj_norm).squeeze()  # Shape: [batch_size]
+            loss_test = F.binary_cross_entropy_with_logits(output_test[self.idx_test], self.labels[self.idx_test])
+            prob_test = torch.sigmoid(output_test[self.idx_test])
+            pred_test = (prob_test >= 0.5).long()
+            acc_test = pred_test.eq(self.labels[self.idx_test].long()).sum().item() / self.idx_test.size(0)
 
         print(f"Test Loss: {loss_test.item():.4f}, Test Accuracy: {acc_test:.4f}")
 
@@ -126,7 +127,7 @@ class victim:
         Fairness Evauation
         """
 
-        losses  = fair_metric(pred_test, self.labels[self.idx_test], self.sens[self.idx_test])
+        losses = fair_metric(pred_test, self.labels[self.idx_test].long(), self.sens[self.idx_test])
         DP, EOd = losses[0], losses[1]
         print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}")
         return DP, EOd
