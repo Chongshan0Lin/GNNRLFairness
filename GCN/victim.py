@@ -71,6 +71,10 @@ class victim:
                 output_val = self.model(self.feature_matrix, self.adj_norm)
                 loss_val = F.nll_loss(output_val[self.idx_val], self.labels[self.idx_val])
                 # Cross entropy loss
+                target = output[self.idx_train]
+                ipt = self.labels[self.idx_train].unsqueeze(1).float()
+                print("Target:", target)
+                print("Input:", ipt)
                 ce_loss = F.binary_cross_entropy_with_logits(output[self.idx_train], self.labels[self.idx_train].unsqueeze(1).float())            
                 den0 = torch.sigmoid(output.view(-1))[self.sens == 0]
                 den1 = torch.sigmoid(output.view(-1))[self.sens == 1]
