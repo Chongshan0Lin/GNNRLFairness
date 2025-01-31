@@ -58,6 +58,7 @@ class Q_function:
         device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         self.policy_network.to(device)
         self.target_network.to(device)
+        print(device)
 
 
 
