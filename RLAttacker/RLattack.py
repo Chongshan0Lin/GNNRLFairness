@@ -22,16 +22,19 @@ class DQN(nn.Module):
     It has three layers, one state_size * hidden_layer_size, one hidden_layer_size * hidden_layer_size, one hidden_layer_size * action_size
     The forwarding uses relu as non-linear layer
     """
-    def __init__(self, state_size, action_size, hidden_layer_size):
+    def __init__(self, state_size, action_size, hidden_layer_size, dropout_rate=0.5):
         super(DQN, self).__init__()
         self.fc1 = nn.Linear(state_size, hidden_layer_size)
+        self.dropout1 = nn.Dropout(p=dropout_rate)
         self.fc2 = nn.Linear(hidden_layer_size, hidden_layer_size)
+        self.dropout2 = nn.Dropout(p=dropout_rate)
         self.fc3 = nn.Linear(hidden_layer_size, action_size)
 
     def forward(self, x):
         x = torch.relu(self.fc1(x))
+        x = self.dropout1(x)
         x = torch.relu(self.fc2(x))
-
+        x = self.dropout2(x)
         return self.fc3(x)
 
 class Q_function:
@@ -40,16 +43,16 @@ class Q_function:
     Argument: order, state_size, action_size, hidden_layer_size (optional), buffer_capacity
     Components: policy network, target network, order, replay_buffer
     """
-    def __init__(self, order, state_size, action_size, buffer_capacity, exploration_rate, min_memory_step, hidden_layer_size = 128):
+    def __init__(self, order, state_size, action_size, buffer_capacity, exploration_rate, min_memory_step, hidden_layer_size = 128, dropout_rate=0.5):
         self.order = order
-        self.policy_network = DQN(state_size, action_size, hidden_layer_size)
-        self.target_network = DQN(state_size, action_size, hidden_layer_size)
+        self.policy_network = DQN(state_size, action_size, hidden_layer_size, dropout_rate=dropout_rate)
+        self.target_network = DQN(state_size, action_size, hidden_layer_size, dropout_rate=dropout_rate)
         self.replay_buffer = replay_buffer(capacity=buffer_capacity)
         self.min_memory_step = min_memory_step
         self.state_size = state_size
         self.action_size = action_size
         self.build_Q_network()
-        self.optimizer = optim.Adam(self.policy_network.parameters(), lr=1e-3, weight_decay=0)
+        self.optimizer = optim.Adam(self.policy_network.parameters(), lr=1e-4, weight_decay=1e-5)
         self.exploration_rate = exploration_rate
         device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         self.policy_network.to(device)
@@ -272,7 +275,7 @@ class agent:
             self.graph.add_edge(node1, node2)
 
 
-    def train(self):
+    def train(self, n_episodes):
         """
         Train the two agent hierarchically.
         First Q function gives the first node, second Q function gives the second node.
@@ -280,7 +283,7 @@ class agent:
         The agent runs until it runs out of the budget or successfully achieves the goal
         """
 
-        n_episodes = 200
+        # n_episodes = 200
         print("Number of episodes", n_episodes)
 
         min_exploration_rate = self.Q_function1.exploration_rate
