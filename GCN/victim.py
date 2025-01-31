@@ -72,10 +72,10 @@ class victim:
                 loss_val = F.nll_loss(output_val[self.idx_val], self.labels[self.idx_val])
                 # Cross entropy loss
                 target = output[self.idx_train]
-                ipt = self.labels[self.idx_train].unsqueeze(1).float()
+                ipt = self.labels[self.idx_train]
                 print("Target:", target)
                 print("Input:", ipt)
-                ce_loss = F.binary_cross_entropy_with_logits(output[self.idx_train], self.labels[self.idx_train].unsqueeze(1).float())            
+                ce_loss = F.binary_cross_entropy_with_logits(output[self.idx_train], self.labels[self.idx_train])            
                 den0 = torch.sigmoid(output.view(-1))[self.sens == 0]
                 den1 = torch.sigmoid(output.view(-1))[self.sens == 1]
                 integral_x = torch.arange(0, 1, 1 / int_num).to(self.device)
