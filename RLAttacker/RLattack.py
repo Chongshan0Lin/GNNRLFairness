@@ -308,7 +308,7 @@ class agent:
             ce_loss, reg = victim_model.train()
             fairness_loss = -1
             dp, eod = victim_model.evaluate()
-            loss_val = ce_loss + reg * alpha
+            loss_val = reg * alpha
             # Result of majority
             # den0 = torch.sigmoid(output.view(-1))[self.sens == 0]
             # Result of minority
@@ -349,7 +349,7 @@ class agent:
                 # After changing the model, retrain the victim model and calculate the new fairness value
                 ce_loss, reg = victim_model.train()
                 dp, eod = victim_model.evaluate()
-                new_loss_val = ce_loss + reg * alpha
+                new_loss_val =  reg * alpha
                 # Determine the difference of fairness, which is the reward
                 reward = new_loss_val - loss_val
                 cumulative_reward += reward
@@ -403,11 +403,12 @@ class agent:
 
         # Create a victim model and train
         victim_model = victim()
-        victim_model.train()
-        dp, eod = victim_model.evaluate()
+        ce_loss, reg = victim_model.train()
+        dp,eod = victim_model.evaluate()
         emb_matrix = self.embedding.n2v(self.graph)
         state_embedding = self.embedding.g2v(emb_matrix)
 
+        new_loss_val = reg * alpha
         # self.metrics_logger.log_metrics(
         #     episode= 1,
         #     iteration=0,
@@ -442,7 +443,7 @@ class agent:
             victim_model.train()
             ce_loss, reg = victim_model.train()
             dp, eod = victim_model.evaluate()
-            new_loss_val = ce_loss + reg * alpha
+            new_loss_val = reg * alpha
             # Determine the difference of fairness, which is the reward
             reward = new_loss_val - loss_val
             cumulative_reward += reward
