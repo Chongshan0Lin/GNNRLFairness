@@ -64,7 +64,7 @@ class victim:
             loss_train = F.nll_loss(output[self.idx_train], self.labels[self.idx_train])
             loss_train.backward()
             self.optimizer.step()
-            ce_loss = F.binary_cross_entropy_with_logits(output_val[self.idx_train], self.labels[self.idx_train])
+            ce_loss = F.binary_cross_entropy_with_logits(output[self.idx_train], self.labels[self.idx_train])
             den0 = torch.sigmoid(output.view(-1))[self.sens == 0]
             den1 = torch.sigmoid(output.view(-1))[self.sens == 1]
             integral_x = torch.arange(0, 1, 1 / int_num).to(self.device)
