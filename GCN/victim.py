@@ -46,8 +46,11 @@ class victim:
 
 
 
-    def train(self):
-
+    def train(self, int_num = 10000, h = 0.1):
+        """
+        bandwidth h
+        number of intervals int_num
+        """
         self.model.train()
         for epoch in range(EPOCH):
 
@@ -67,10 +70,17 @@ class victim:
                 self.model.eval()
                 output_val = self.model(self.feature_matrix, self.adj_norm)
                 loss_val = F.nll_loss(output_val[self.idx_val], self.labels[self.idx_val])
+                # Cross entropy loss
+                ce_loss = F.binary_cross_entropy_with_logits(output[self.idx_train], self.labels[self.idx_train].unsqueeze(1).float())            
+                den0 = torch.sigmoid(output.view(-1))[self.sens == 0]
+                den1 = torch.sigmoid(output.view(-1))[self.sens == 1]
+                integral_x = torch.arange(0, 1, 1 / int_num).to(self.device)
+                
+                reg = torch.abs(KernelEstimator(integral_x, den0, h) - KernelEstimator(integral_x, den1, h)).mean()
                 pred_val = output_val[self.idx_val].max(1)[1]
                 acc_val  = pred_val.eq(self.labels[self.idx_val]).sum().item() / self.idx_val.size(0)
                 self.model.train()
-            # print("Episode")
+
             if (epoch+1) % 100 == 0:
                 print(
                     f"Epoch: {epoch:03d}, "
@@ -79,6 +89,11 @@ class victim:
                     f"Val Acc: {acc_val:.4f}"
                 )
         # return 0
+        return ce_loss, reg
+
+        # Return the result of loss function
+        # Instead, return the loss_train as well as reg
+    
     
     def evaluate(self):
         self.model.eval()
@@ -93,7 +108,7 @@ class victim:
         """
         Fairness Evauation
         """
-        
+
         losses  = fair_metric(pred_test, self.labels[self.idx_test], self.sens[self.idx_test])
         DP, EOd = losses[0], losses[1]
         print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}")

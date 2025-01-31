@@ -276,7 +276,7 @@ class agent:
             self.graph.add_edge(node1, node2)
 
 
-    def train(self, n_episodes):
+    def train(self, n_episodes, alpha = 1):
         """
         Train the two agent hierarchically.
         First Q function gives the first node, second Q function gives the second node.
@@ -304,9 +304,10 @@ class agent:
 
             # Create a victim model and train
             victim_model = victim()
-            victim_model.train()
+            ce_loss, reg = victim_model.train()
             fairness_loss = -1
             dp, eod = victim_model.evaluate()
+            loss_val = ce_loss + reg * alpha
             # Result of majority
             # den0 = torch.sigmoid(output.view(-1))[self.sens == 0]
             # Result of minority
@@ -330,7 +331,6 @@ class agent:
             # Employ dynamic exploration rate to encourge more exploration during the previous stage
 
             for i in range(self.budegt):
-
                 
                 print(i,"th iteration")
                 # Get the current state embedding
@@ -346,12 +346,13 @@ class agent:
                 victim_model.update_adj_matrix(torch.from_numpy(nx.to_numpy_array(self.graph)))
 
                 # After changing the model, retrain the victim model and calculate the new fairness value
-                victim_model.train()
+                ce_loss, reg = victim_model.train()
                 dp, eod = victim_model.evaluate()
+                new_loss_val = ce_loss + reg * alpha
                 # Determine the difference of fairness, which is the reward
-                reward = new_loss - fairness_loss
+                reward = new_loss_val - loss_val
                 cumulative_reward += reward
-                fairness_loss = new_loss
+                loss_val = new_loss_val
 
                 # Update the embedding correspondingly as the new state
                 emb_matrix = self.embedding.n2v(self.graph)
@@ -364,25 +365,12 @@ class agent:
                 self.Q_function2.exploration_rate = min_exploration_rate
                 self.train_step()
 
-                # self.metrics_logger.log_metrics(
-                #     episode=episode + 1,
-                #     iteration=i + 1,
-                #     accuracy=0.0,
-                #     training_loss=0.0,
-                #     demographic_parity=dp,
-                #     equality_of_odds=eod,
-                #     conditional_dp=cdp,
-                #     surrogate_loss=fairness_loss
-                # )
-
-
             all_rewards.append(cumulative_reward)
             # Update the target network periodically
             if episode % 2 == 0:
                 self.Q_function1.target_network.load_state_dict(self.Q_function1.policy_network.state_dict())
                 self.Q_function2.target_network.load_state_dict(self.Q_function2.policy_network.state_dict())
 
-            # print(episode, "th episode")
             if (episode) % 1 == 0:
                 avg_reward = np.mean(all_rewards[-10:])
                 print(f"Episode {episode}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
@@ -453,9 +441,11 @@ class agent:
             victim_model.train()
             dp, eod = victim_model.evaluate()
             # Determine the difference of fairness, which is the reward
-            reward = new_loss - fairness_loss
+            new_loss_val = ce_loss + reg * alpha
+            # Determine the difference of fairness, which is the reward
+            reward = new_loss_val - loss_val
             cumulative_reward += reward
-            fairness_loss = new_loss
+            loss_val = new_loss_val
 
             # Update the embedding correspondingly as the new state
             emb_matrix = self.embedding.n2v(self.graph)
