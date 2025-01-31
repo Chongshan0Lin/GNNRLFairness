@@ -68,7 +68,7 @@ class victim:
             prob = torch.sigmoid(output)  # Shape: [batch_size]
             den0 = prob[self.sens == 0]
             den1 = prob[self.sens == 1]
-            integral_x = torch.arange(0, 1, 1 / int_num).to(self.device)
+            integral_x = torch.arange(0, 1, 1 / int_num).to(device)
             
             reg = torch.abs(KernelEstimator(integral_x, den0, h) - KernelEstimator(integral_x, den1, h)).mean()
 
@@ -76,7 +76,7 @@ class victim:
             with torch.no_grad():
                 self.model.eval()
                 output_val = self.model(self.feature_matrix, self.adj_norm).squeeze()
-                loss_val = F.binary_cross_entropy_with_logits(output_val[self.idx_val], self.labels[self.idx_val])
+                loss_val = F.binary_cross_entropy_with_logits(output[self.idx_train].float(), self.labels[self.idx_train].float())
                 prob_val = torch.sigmoid(output_val)
                 pred_val = (prob_val[self.idx_val] >= 0.5).long()
                 acc_val = pred_val.eq(self.labels[self.idx_val].long()).sum().item() / self.idx_val.size(0)
