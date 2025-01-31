@@ -7,10 +7,13 @@ from .model import GCN
 from .utils import normalize_adjacency
 from .utils import demographic_parity, conditional_demographic_parity, equality_of_odds
 from .utils import fair_metric
+from .kernel_estimator import KernelEstimator
 import torch.nn.functional as F
 EPOCH = 100
 gpu_index = 2
-# 1000?
+from torch.nn import functional as F
+
+
 device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
 
 class victim:

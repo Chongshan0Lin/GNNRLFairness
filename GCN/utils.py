@@ -132,7 +132,7 @@ def fair_metric(pred, labels, sens):
     # equality = abs(pred[idx_s0_y1].sum() / (idx_s0_y1.sum() + epsilon) - pred[idx_s1_y1].sum() / (idx_s1_y1.sum() + epsilon))
     
     # return parity, equality
-# Move tensors to CPU and convert to NumPy arrays
+    # Move tensors to CPU and convert to NumPy arrays
     pred_np = pred.detach().cpu().numpy()
     labels_np = labels.detach().cpu().numpy()
     sens_np = sens.detach().cpu().numpy()
