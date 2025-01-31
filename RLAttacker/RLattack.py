@@ -361,8 +361,8 @@ class agent:
                 self.Q_function1.target_network.load_state_dict(self.Q_function1.policy_network.state_dict())
                 self.Q_function2.target_network.load_state_dict(self.Q_function2.policy_network.state_dict())
 
-        print("Change of parity:", parity - init_parity)
-        print("Change of oddity:", oddity - init_oddity)
+            print("Change of parity:", parity - init_parity)
+            print("Change of oddity:", oddity - init_oddity)
 
         avg_reward = np.mean(all_rewards[-10:])
         print(f"Episode {episode}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
