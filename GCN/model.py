@@ -14,7 +14,7 @@ class GCN(nn.Module):
         self.with_relu = True
         self.gc2 = GCNLayer(in_features=hidden_features, out_features=out_features)
         self.dropout = dropout
-        device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
+        # device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         # self.gc1.to(device)
         # self.gc2.to(device)
         # self.to(device)

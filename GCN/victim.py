@@ -59,12 +59,14 @@ class victim:
             # print(feature_matrix.shape[0])
             # print(feature_matrix.shape[1])
             output = self.model(self.feature_matrix, self.adj_norm)
+            output = output.squeeze()
 
             # Compute loss only over training nodes
-            loss_train = F.nll_loss(output[self.idx_train], self.labels[self.idx_train])
+            loss_train = F.binary_cross_entropy_with_logits(output[self.idx_train], self.labels[self.idx_train].float())
             loss_train.backward()
             self.optimizer.step()
-            ce_loss = F.cross_entropy(output[self.idx_train], self.labels[self.idx_train])
+            
+            ce_loss = F.binary_cross_entropy_with_logits(output[self.idx_train], self.labels[self.idx_train])
             den0 = torch.sigmoid(output.view(-1))[self.sens == 0]
             den1 = torch.sigmoid(output.view(-1))[self.sens == 1]
             integral_x = torch.arange(0, 1, 1 / int_num).to(self.device)
@@ -74,14 +76,15 @@ class victim:
             # Optional: monitor validation accuracy
             with torch.no_grad():
                 self.model.eval()
-                output_val = self.model(self.feature_matrix, self.adj_norm)
-                loss_val = F.nll_loss(output_val[self.idx_val], self.labels[self.idx_val])
+                output_val = self.model(self.feature_matrix, self.adj_norm).squeeze()
+                loss_val = F.binary_cross_entropy_with_logits(output_val[self.idx_val], self.labels[self.idx_val].float())
                 # Cross entropy loss
                 target = output_val[self.idx_train]
                 ipt = self.labels[self.idx_train]
                 print("Target:", target)
                 print("Input:", ipt)
-                ce_loss = F.cross_entropy(output_val[self.idx_train], self.labels[self.idx_train])
+                
+                ce_loss = F.binary_cross_entropy_with_logits(output_val[self.idx_train], self.labels[self.idx_train])
                 den0 = torch.sigmoid(output.view(-1))[self.sens == 0]
                 den1 = torch.sigmoid(output.view(-1))[self.sens == 1]
                 integral_x = torch.arange(0, 1, 1 / int_num).to(self.device)
