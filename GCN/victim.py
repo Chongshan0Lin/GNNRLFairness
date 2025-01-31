@@ -116,7 +116,7 @@ class victim:
         self.model.eval()
         with torch.no_grad():
             output_test = self.model(self.feature_matrix, self.adj_norm).squeeze()  # Shape: [batch_size]
-            loss_test = F.binary_cross_entropy_with_logits(output_test[self.idx_test], self.labels[self.idx_test])
+            loss_test = F.binary_cross_entropy_with_logits(output_test[self.idx_test].float(), self.labels[self.idx_test].float())
             prob_test = torch.sigmoid(output_test[self.idx_test])
             pred_test = (prob_test >= 0.5).long()
             acc_test = pred_test.eq(self.labels[self.idx_test].long()).sum().item() / self.idx_test.size(0)
