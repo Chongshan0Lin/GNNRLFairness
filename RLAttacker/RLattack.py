@@ -385,7 +385,7 @@ class agent:
         self.Q_function1.train_step()
         self.Q_function2.train_step()
 
-    def evaluate(self, epoch):
+    def evaluate(self, epoch, alpha = 1):
         """
         Evaluate the trained model by setting exploration rate to be 0
         """
@@ -439,8 +439,8 @@ class agent:
 
             # After changing the model, retrain the victim model and calculate the new fairness value
             victim_model.train()
+            ce_loss, reg = victim_model.train()
             dp, eod = victim_model.evaluate()
-            # Determine the difference of fairness, which is the reward
             new_loss_val = ce_loss + reg * alpha
             # Determine the difference of fairness, which is the reward
             reward = new_loss_val - loss_val
