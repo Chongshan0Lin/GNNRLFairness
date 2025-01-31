@@ -59,7 +59,7 @@ class victim:
             output = output.squeeze()
 
             # Compute loss only over training nodes
-            loss_train = F.binary_cross_entropy_with_logits(output[self.idx_train], self.labels[self.idx_train])
+            loss_train = F.binary_cross_entropy_with_logits(output[self.idx_train].float(), self.labels[self.idx_train].float())
             loss_train.backward()
             self.optimizer.step()
             
@@ -81,7 +81,7 @@ class victim:
                 pred_val = (prob_val[self.idx_val] >= 0.5).long()
                 acc_val = pred_val.eq(self.labels[self.idx_val].long()).sum().item() / self.idx_val.size(0)
                 self.model.train()
-                
+
                 # Cross entropy loss
                 # target = output_val[self.idx_train]
                 # ipt = self.labels[self.idx_train]
