@@ -55,9 +55,6 @@ class victim:
         for epoch in range(EPOCH):
 
             self.optimizer.zero_grad()
-            # print(feature_matrix.shape)
-            # print(feature_matrix.shape[0])
-            # print(feature_matrix.shape[1])
             output = self.model(self.feature_matrix, self.adj_norm)
             output = output.squeeze()
 
@@ -66,10 +63,11 @@ class victim:
             loss_train.backward()
             self.optimizer.step()
             
-            ce_loss = F.binary_cross_entropy_with_logits(output[self.idx_train], self.labels[self.idx_train])
+            # ce_loss = F.binary_cross_entropy_with_logits(output[self.idx_train], self.labels[self.idx_train])
             # prob = torch.sigmoid(output)
-            den0 = torch.sigmoid(output)[self.sens == 0]
-            den1 = torch.sigmoid(output)[self.sens == 1]
+            prob = torch.sigmoid(output)  # Shape: [batch_size]
+            den0 = prob[self.sens == 0]
+            den1 = prob[self.sens == 1]
             integral_x = torch.arange(0, 1, 1 / int_num).to(self.device)
             
             reg = torch.abs(KernelEstimator(integral_x, den0, h) - KernelEstimator(integral_x, den1, h)).mean()
@@ -79,21 +77,26 @@ class victim:
                 self.model.eval()
                 output_val = self.model(self.feature_matrix, self.adj_norm).squeeze()
                 loss_val = F.binary_cross_entropy_with_logits(output_val[self.idx_val], self.labels[self.idx_val])
-                # Cross entropy loss
-                target = output_val[self.idx_train]
-                ipt = self.labels[self.idx_train]
-                print("Target:", target)
-                print("Input:", ipt)
-
-                ce_loss = F.binary_cross_entropy_with_logits(output_val[self.idx_train], self.labels[self.idx_train])
-                den0 = torch.sigmoid(output)[self.sens == 0]
-                den1 = torch.sigmoid(output)[self.sens == 1]
-                integral_x = torch.arange(0, 1, 1 / int_num).to(self.device)
-                
-                reg = torch.abs(KernelEstimator(integral_x, den0, h) - KernelEstimator(integral_x, den1, h)).mean()
-                pred_val = output_val[self.idx_val].max(1)[1]
-                acc_val  = pred_val.eq(self.labels[self.idx_val]).sum().item() / self.idx_val.size(0)
+                prob_val = torch.sigmoid(output_val)
+                pred_val = (prob_val[self.idx_val] >= 0.5).long()
+                acc_val = pred_val.eq(self.labels[self.idx_val].long()).sum().item() / self.idx_val.size(0)
                 self.model.train()
+                
+                # Cross entropy loss
+                # target = output_val[self.idx_train]
+                # ipt = self.labels[self.idx_train]
+                # print("Target:", target)
+                # print("Input:", ipt)
+
+                # # ce_loss = F.binary_cross_entropy_with_logits(output_val[self.idx_train], self.labels[self.idx_train])
+                # den0 = torch.sigmoid(output)[self.sens == 0]
+                # den1 = torch.sigmoid(output)[self.sens == 1]
+                # integral_x = torch.arange(0, 1, 1 / int_num).to(self.device)
+                
+                # reg = torch.abs(KernelEstimator(integral_x, den0, h) - KernelEstimator(integral_x, den1, h)).mean()
+                # pred_val = output_val[self.idx_val].max(1)[1]
+                # acc_val  = pred_val.eq(self.labels[self.idx_val]).sum().item() / self.idx_val.size(0)
+                # self.model.train()
 
             if (epoch+1) % 100 == 0:
                 print(
@@ -103,7 +106,7 @@ class victim:
                     f"Val Acc: {acc_val:.4f}"
                 )
         # return 0
-        return ce_loss, reg
+        return loss_train.item(), reg.item()
 
         # Return the result of loss function
         # Instead, return the loss_train as well as reg

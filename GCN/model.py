@@ -32,5 +32,5 @@ class GCN(nn.Module):
 
     def initialization(self):
         self.gc1.reset_parameters()
-        # self.gc2.reset_parameters()
-        self.W.reset_parameters()
+        self.gc2.reset_parameters()
+        # self.W.reset_parameters()
