@@ -136,7 +136,7 @@ class victim:
 
         # Update the adj_norm correspondingly
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
-    
+
     def update_adj_matrix(self, adj_matrix):
         # self.adj_matrix = adj_matrix
         # self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()

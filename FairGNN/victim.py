@@ -3,11 +3,16 @@ import networkx as nx
 import pandas as pd
 import numpy as np
 import torch
-from .model import GCN
+# from .model import GCN
+from .FairGNN import FairGNN
 from .utils import normalize_adjacency
 from .utils import demographic_parity, conditional_demographic_parity, equality_of_odds
 from .utils import fair_metric
 import torch.nn.functional as F
+import dgl
+import time
+from sklearn.metrics import roc_auc_score
+
 EPOCH = 100
 gpu_index = 2
 device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
@@ -37,69 +42,150 @@ class victim:
         # print("nclasses: ",self.nclasses)
         # print("hfeatures: ",self.hfeatures)
 
-        self.model = GCN(in_features=self.nfeatures, hidden_features = self.hfeatures, out_features=self.nclasses, dropout=0.5)
+        self.model = FairGNN(in_features=self.nfeatures, hidden_features=self.hfeatures, out_features=self.nclasses, dropout=0.5)
         self.model.to(device)
-
-        # if torch.cuda.is_available():
-        #     print("CUDA is available. PyTorch can use the GPU.")
-        #     print(f"Number of CUDA devices: {torch.cuda.device_count()}")
-        #     print(f"Current CUDA device: {torch.cuda.current_device()}")
-        #     print(f"Device name: {torch.cuda.get_device_name(torch.cuda.current_device())}")
-        # else:
-        #     print("CUDA is not available. PyTorch will use the CPU.")
-        # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-        # device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
-        # self.model.to(device)
-
-        # params = list(self.model.parameters())
-        # param_count = len(params)
-        # print(f"Total parameters in model: {param_count}")
-        # for idx, param in enumerate(params):
-        #     print(f"Parameter {idx}: Shape {param.shape}, requires_grad={param.requires_grad}")
-
-        # print("number of parameter to optimizer",self.model.parameters().__sizeof__())
 
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01, weight_decay=5e-4)
         # print("Optimizer initialized with model parameters.")
 
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
 
-
-
+    # def train(self):
     def train(self):
+        """
+        New training loop based on your first code chunk.
+        (Some minor adaptations were made so that the victim’s data attributes are used.)
+        """
+        # --- Setup ---
+        # Create a DGL graph from the (assumed scipy sparse) adjacency matrix.
+        G = dgl.DGLGraph()
+        G.from_scipy_sparse_matrix(self.adj_matrix)
+        
+        # Get the data from self.
+        features = self.feature_matrix
+        labels = self.labels
+        idx_train = self.idx_train
+        idx_val = self.idx_val
+        idx_test = self.idx_test
+        sens = self.sens
+        # If a separate sensitive attribute training index is needed, here we re-use idx_train.
+        idx_sens_train = self.idx_train
 
-        self.model.train()
-        for epoch in range(EPOCH):
+        # Define training hyperparameters.
+        epochs = 2000
+        acc_threshold = 0.688
+        roc_threshold = 0.745
 
+        best_result = {}
+        best_fair = float('inf')
+        t_total = time.time()
+
+        # --- Define a local fairness-metric function ---
+        def fair_metric_new(output, idx, labels, sens):
+            """
+            Computes parity and equality differences.
+            (This function assumes binary sensitive attribute and binary classification.)
+            """
+            # Extract ground-truth for the selected indices.
+            val_y = labels[idx].cpu().numpy()
+            # Get sensitive attribute values for the given indices.
+            idx_cpu = idx.cpu().numpy()
+            sens_cpu = sens.cpu().numpy()
+            idx_s0 = sens_cpu[idx_cpu] == 0
+            idx_s1 = sens_cpu[idx_cpu] == 1
+
+            # For equality of opportunity, focus on the positive label.
+            idx_s0_y1 = np.bitwise_and(idx_s0, val_y == 1)
+            idx_s1_y1 = np.bitwise_and(idx_s1, val_y == 1)
+
+            # Here we assume that the raw output is such that positive predictions exceed 0.
+            pred_y = (output[idx].squeeze() > 0).type_as(labels).cpu().numpy()
+            # Use a small epsilon to avoid division-by-zero.
+            eps = 1e-8
+            parity = abs((sum(pred_y[idx_s0]) / (sum(idx_s0) + eps)) - (sum(pred_y[idx_s1]) / (sum(idx_s1) + eps)))
+            equality = abs((sum(pred_y[idx_s0_y1]) / (sum(idx_s0_y1) + eps)) - (sum(pred_y[idx_s1_y1]) / (sum(idx_s1_y1) + eps)))
+            return parity, equality
+
+        # --- Training loop ---
+        for epoch in range(epochs):
+            self.model.train()
             self.optimizer.zero_grad()
-            # print(feature_matrix.shape)
-            # print(feature_matrix.shape[0])
-            # print(feature_matrix.shape[1])
-            output = self.model(self.feature_matrix, self.adj_norm)
+            # Perform one optimization step.
+            # (Your FairGNN model should implement an optimize() method that uses G, features, etc.)
+            self.model.optimize(G, features, labels, idx_train, sens, idx_sens_train)
 
-            # Compute loss only over training nodes
-            loss_train = F.nll_loss(output[self.idx_train], self.labels[self.idx_train])
-            loss_train.backward()
-            self.optimizer.step()
+            # Retrieve loss components (assumed to be stored as attributes by optimize()).
+            cov = self.model.cov
+            cls_loss = self.model.cls_loss
+            adv_loss = self.model.adv_loss
 
-            # Optional: monitor validation accuracy
-            with torch.no_grad():
-                self.model.eval()
-                output_val = self.model(self.feature_matrix, self.adj_norm)
-                loss_val = F.nll_loss(output_val[self.idx_val], self.labels[self.idx_val])
-                pred_val = output_val[self.idx_val].max(1)[1]
-                acc_val  = pred_val.eq(self.labels[self.idx_val]).sum().item() / self.idx_val.size(0)
-                self.model.train()
-            # print("Episode")
-            if (epoch+1) % 100 == 0:
-                print(
-                    f"Epoch: {epoch:03d}, "
-                    f"Train Loss: {loss_train.item():.4f}, "
-                    f"Val Loss: {loss_val.item():.4f}, "
-                    f"Val Acc: {acc_val:.4f}"
-                )
-    
+            # Evaluate the model.
+            self.model.eval()
+            output, s = self.model(G, features)
+
+            # Compute validation accuracy.
+            pred_val = output[idx_val].max(1)[1]
+            acc_val = (pred_val == labels[idx_val]).float().mean()
+            try:
+                roc_val = roc_auc_score(labels[idx_val].cpu().numpy(),
+                                        output[idx_val].detach().cpu().numpy())
+            except Exception as e:
+                roc_val = 0.0
+
+            # Compute fairness metrics on the validation set.
+            parity_val, equality_val = fair_metric_new(output, idx_val, labels, sens)
+
+            # Compute test set metrics.
+            pred_test = output[idx_test].max(1)[1]
+            acc_test = (pred_test == labels[idx_test]).float().mean()
+            try:
+                roc_test = roc_auc_score(labels[idx_test].cpu().numpy(), output[idx_test].detach().cpu().numpy())
+            except Exception as e:
+                roc_test = 0.0
+            parity, equality = fair_metric_new(output, idx_test, labels, sens)
+
+            # Compute the sensitive attribute prediction accuracy (from the adversary output `s`).
+            pred_sens = s[idx_test].max(1)[1]
+            acc_sens = (pred_sens == sens[idx_test]).float().mean()
+
+            # Check if the validation metrics meet the thresholds.
+            if acc_val.item() > acc_threshold and roc_val > roc_threshold:
+                if best_fair > (parity_val + equality_val):
+                    best_fair = parity_val + equality_val
+                    best_result['acc'] = acc_test.item()
+                    best_result['roc'] = roc_test
+                    best_result['parity'] = parity
+                    best_result['equality'] = equality
+
+                print("=================================")
+                print('Epoch: {:04d}'.format(epoch + 1),
+                      'cov: {:.4f}'.format(cov.item()),
+                      'cls: {:.4f}'.format(cls_loss.item()),
+                      'adv: {:.4f}'.format(adv_loss.item()),
+                      'acc_val: {:.4f}'.format(acc_val.item()),
+                      "roc_val: {:.4f}".format(roc_val),
+                      "parity_val: {:.4f}".format(parity_val),
+                      "equality: {:.4f}".format(equality_val))
+                print("Test:",
+                      "accuracy: {:.4f}".format(acc_test.item()),
+                      "roc: {:.4f}".format(roc_test),
+                      "acc_sens: {:.4f}".format(acc_sens.item()),
+                      "parity: {:.4f}".format(parity),
+                      "equality: {:.4f}".format(equality))
+        print("Optimization Finished!")
+        print("Total time elapsed: {:.4f}s".format(time.time() - t_total))
+        print('============performance on test set=============')
+        if best_result:
+            print("Test:",
+                  "accuracy: {:.4f}".format(best_result['acc']),
+                  "roc: {:.4f}".format(best_result['roc']),
+                  "acc_sens: {:.4f}".format(acc_sens.item()),
+                  "parity: {:.4f}".format(best_result['parity']),
+                  "equality: {:.4f}".format(best_result['equality']))
+        else:
+            print("Please set smaller acc/roc thresholds")
+
+
     def evaluate(self):
         self.model.eval()
         with torch.no_grad():
@@ -136,7 +222,7 @@ class victim:
 
         # Update the adj_norm correspondingly
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
-    
+
     def update_adj_matrix(self, adj_matrix):
         # self.adj_matrix = adj_matrix
         # self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
