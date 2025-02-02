@@ -17,6 +17,8 @@ import scipy.sparse as sp
 EPOCH = 100
 gpu_index = 2
 device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
+torch.autograd.set_detect_anomaly(True)
+
 
 class victim:
 
@@ -73,6 +75,11 @@ class victim:
         # self.G = self.G.to(device)
         self.G = dgl.from_scipy(self.adj_norm)
         self.G = self.G.to(device)
+
+        print("Graph device:", self.G.device)
+        print("Features device:", features.device)
+        print("Labels device:", labels.device)
+
 
 
         # Get the data from self.
