@@ -12,6 +12,7 @@ import torch.nn.functional as F
 import dgl
 import time
 from sklearn.metrics import roc_auc_score
+import scipy.sparse as sp
 
 EPOCH = 100
 gpu_index = 2
@@ -60,7 +61,9 @@ class victim:
         # --- Setup ---
         # Create a DGL graph from the (assumed scipy sparse) adjacency matrix.
         G = dgl.DGLGraph()
-        G = dgl.from_scipy(self.adj_matrix)
+        adj_np = self.adj_matrix.cpu().numpy()  # Ensure the tensor is on CPU and convert to NumPy.
+        adj_sp = sp.csr_matrix(adj_np)          # Create a SciPy CSR sparse matrix.
+        G = dgl.from_scipy(adj_sp)              # Now create the DGL graph.
         
         # Get the data from self.
         features = self.feature_matrix
