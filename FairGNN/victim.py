@@ -51,7 +51,8 @@ class victim:
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01, weight_decay=5e-4)
 
         # self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
-        self.adj_norm = sp.csr_matrix(normalize_adjacency(self.adj_matrix).detach().numpy())
+        norm_np = normalize_adjacency(self.adj_matrix).detach().numpy()
+        self.adj_norm = sp.csr_matrix(norm_np)
 
     # def train(self):
     def train(self):
@@ -238,7 +239,8 @@ class victim:
 
         # Update the adj_norm correspondingly
         # self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
-        self.adj_norm = sp.csr_matrix(normalize_adjacency(self.adj_matrix).detach().numpy())
+        norm_np = normalize_adjacency(self.adj_matrix).detach().numpy()
+        self.adj_norm = sp.csr_matrix(norm_np)
 
 
     def update_adj_matrix(self, adj_matrix):
@@ -249,7 +251,8 @@ class victim:
         self.adj_matrix = adj_matrix.to(device) 
         # self.adj_norm = normalize_adjacency(self.adj_matrix).detach()
 
-        self.adj_norm = sp.csr_matrix(normalize_adjacency(self.adj_matrix).detach().numpy())
+        norm_np = normalize_adjacency(self.adj_matrix).detach().numpy()
+        self.adj_norm = sp.csr_matrix(norm_np)
 
 
 s = victim()
