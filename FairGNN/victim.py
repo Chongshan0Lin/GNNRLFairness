@@ -76,19 +76,20 @@ class victim:
         self.G = dgl.from_scipy(self.adj_norm)
         self.G = self.G.to(device)
 
-        print("Graph device:", self.G.device)
-        print("Features device:", features.device)
-        print("Labels device:", labels.device)
 
 
 
         # Get the data from self.
         features = self.feature_matrix.to(device)
-        labels = self.labels
+        labels = self.labels.to(device)
         idx_train = self.idx_train
         idx_val = self.idx_val
         idx_test = self.idx_test
         sens = self.sens
+        print("Graph device:", self.G.device)
+        print("Features device:", features.device)
+        print("Labels device:", labels.device)
+
         # If a separate sensitive attribute training index is needed, here we re-use idx_train.
         idx_sens_train = self.idx_train
 
