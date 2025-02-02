@@ -213,8 +213,11 @@ class victim:
             features = self.feature_matrix.to(device)
             # output_test = self.model(self.feature_matrix, self.adj_norm)
             output_test = self.model(self.G, features)
-            # print("index set data type:",self.idx_test.dtype)
-            loss_test = F.nll_loss(output_test[self.idx_test], self.labels[self.idx_test])
+
+            print("index set data type:",self.idx_test.dtype)
+
+            idx = self.idx_test.squeeze()
+            loss_test = F.nll_loss(output_test[idx], self.labels[idx])
             pred_test = output_test[self.idx_test].max(1)[1]
             acc_test  = pred_test.eq(self.labels[self.idx_test]).sum().item() / self.idx_test.size(0)
 
