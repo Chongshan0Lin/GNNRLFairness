@@ -216,7 +216,7 @@ class victim:
 
 
             idx = self.idx_test.squeeze()
-            print("index set data type:",self.idx.dtype)
+            print("index set data type:",idx.dtype)
             print(idx)
             loss_test = F.nll_loss(output_test[idx], self.labels[idx])
             pred_test = output_test[self.idx_test].max(1)[1]
