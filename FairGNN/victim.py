@@ -214,9 +214,10 @@ class victim:
             # output_test = self.model(self.feature_matrix, self.adj_norm)
             output_test = self.model(self.G, features)
 
-            print("index set data type:",self.idx_test.dtype)
 
             idx = self.idx_test.squeeze()
+            print("index set data type:",self.idx.dtype)
+            print(idx)
             loss_test = F.nll_loss(output_test[idx], self.labels[idx])
             pred_test = output_test[self.idx_test].max(1)[1]
             acc_test  = pred_test.eq(self.labels[self.idx_test]).sum().item() / self.idx_test.size(0)
