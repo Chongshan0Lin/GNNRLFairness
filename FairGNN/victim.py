@@ -40,7 +40,7 @@ class victim:
             self.idx_test = self.idx_test.to(device)
 
         print("Test Index: ", self.idx_test)
-        print("Type of Test Index: ", type(self.idx_test))
+        print("Type of Test Index: ", self.idx_test.dtype)
 
         # print("feature_matrix.shape: ",self.feature_matrix.shape)
         # print("nnodes: ",self.nnodes)
