@@ -70,6 +70,7 @@ class FairGNN(nn.Module):
         print("adv_loss: ", self.adv_loss)
         print("cov: ", self.cov)
         self.G_loss = self.cls_loss  + self.alpha * self.cov - self.beta * self.adv_loss
+        print("G_loss: ", self.G_loss)
         self.G_loss.backward()
         self.optimizer_G.step()
 
