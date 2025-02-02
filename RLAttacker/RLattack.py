@@ -5,9 +5,10 @@ import random
 import numpy as np
 from .graph_embedding import s2v_embedding
 from collections import deque
-from GCN.victim import victim
+# from GCN.victim import victim
 import torch.optim as optim
 from database import MetricsLogger
+from FairGNN.victim import victim
 # import tensor
 gpu_index = 2
 
@@ -315,7 +316,6 @@ class agent:
             # Employ dynamic exploration rate to encourge more exploration during the previous stage
 
             for i in range(self.budegt):
-
 
                 print(i,"th iteration")
                 # Get the current state embedding
