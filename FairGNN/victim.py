@@ -65,9 +65,10 @@ class victim:
         adj_sp = sp.csr_matrix(adj_np)          # Create a SciPy CSR sparse matrix.
         G = dgl.from_scipy(adj_sp)              # Now create the DGL graph.
         G = dgl.add_self_loop(G)
-        
+        G = G.to(device)
+
         # Get the data from self.
-        features = self.feature_matrix
+        features = self.feature_matrix.to(device)
         labels = self.labels
         idx_train = self.idx_train
         idx_val = self.idx_val
