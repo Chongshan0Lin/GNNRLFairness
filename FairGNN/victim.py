@@ -60,7 +60,7 @@ class victim:
         # --- Setup ---
         # Create a DGL graph from the (assumed scipy sparse) adjacency matrix.
         G = dgl.DGLGraph()
-        G.from_scipy_sparse_matrix(self.adj_matrix)
+        G = dgl.from_scipy(self.adj_matrix)
         
         # Get the data from self.
         features = self.feature_matrix
