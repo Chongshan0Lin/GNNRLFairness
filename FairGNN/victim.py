@@ -215,12 +215,17 @@ class victim:
             output_test = self.model(self.G, features)
 
 
-            idx = self.idx_test.squeeze()
+            idx = self.idx_test.view(-1)
             print("index set data type:",idx.dtype)
             print(idx)
-            loss_test = F.nll_loss(output_test[idx], self.labels[idx])
-            pred_test = output_test[self.idx_test].max(1)[1]
-            acc_test  = pred_test.eq(self.labels[self.idx_test]).sum().item() / self.idx_test.size(0)
+            idx_list = idx.tolist()
+            # loss_test = F.nll_loss(output_test[idx], self.labels[idx])
+            # pred_test = output_test[self.idx_test].max(1)[1]
+            # acc_test  = pred_test.eq(self.labels[self.idx_test]).sum().item() / self.idx_test.size(0)
+            loss_test = F.nll_loss(output_test[idx_list], self.labels[idx_list])
+            pred_test = output_test[idx_list].max(1)[1]
+            acc_test  = pred_test.eq(self.labels[idx_list]).sum().item() / len(idx_list)
+
 
         print(f"Test Loss: {loss_test.item():.4f}, Test Accuracy: {acc_test:.4f}")
 
