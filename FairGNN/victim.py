@@ -56,6 +56,9 @@ class victim:
         norm_np = normalize_adjacency(self.adj_matrix).detach().numpy()
         self.adj_norm = sp.csr_matrix(norm_np)
 
+        self.G = dgl.from_scipy(self.adj_norm)
+        self.G = self.G.to(device)
+
     # def train(self):
     def train(self):
         """
@@ -249,6 +252,8 @@ class victim:
         # self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
         norm_np = normalize_adjacency(self.adj_matrix).detach().numpy()
         self.adj_norm = sp.csr_matrix(norm_np)
+        self.G = dgl.from_scipy(self.adj_norm)
+        self.G = self.G.to(device)
 
 
     def update_adj_matrix(self, adj_matrix):
@@ -261,6 +266,8 @@ class victim:
 
         norm_np = normalize_adjacency(self.adj_matrix).detach().numpy()
         self.adj_norm = sp.csr_matrix(norm_np)
+        self.G = dgl.from_scipy(self.adj_norm)
+        self.G = self.G.to(device)
 
 
 s = victim()
