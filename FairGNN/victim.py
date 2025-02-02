@@ -39,6 +39,7 @@ class victim:
         if isinstance(self.idx_test, torch.Tensor):
             self.idx_test = self.idx_test.to(device)
 
+        print("Test Index: ", self.idx_test)
 
         # print("feature_matrix.shape: ",self.feature_matrix.shape)
         # print("nnodes: ",self.nnodes)
