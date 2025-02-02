@@ -64,6 +64,7 @@ class victim:
         adj_np = self.adj_matrix.to_dense().cpu().numpy()  # Ensure the tensor is on CPU and convert to NumPy.
         adj_sp = sp.csr_matrix(adj_np)          # Create a SciPy CSR sparse matrix.
         G = dgl.from_scipy(adj_sp)              # Now create the DGL graph.
+        G = dgl.add_self_loop(G)
         
         # Get the data from self.
         features = self.feature_matrix
