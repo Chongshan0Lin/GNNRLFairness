@@ -89,9 +89,9 @@ class victim:
         idx_val = self.idx_val
         idx_test = self.idx_test
         sens = self.sens
-        print("Graph device:", self.G.device)
-        print("Features device:", features.device)
-        print("Labels device:", labels.device)
+        # print("Graph device:", self.G.device)
+        # print("Features device:", features.device)
+        # print("Labels device:", labels.device)
 
         # If a separate sensitive attribute training index is needed, here we re-use idx_train.
         idx_sens_train = self.idx_train

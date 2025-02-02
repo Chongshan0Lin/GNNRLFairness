@@ -66,11 +66,11 @@ class FairGNN(nn.Module):
 
         if torch.isnan(self.cls_loss) or torch.isnan(self.adv_loss) or torch.isnan(self.cov):
             print("Found NaNs in loss components!")
-        print("cls_loss: ", self.cls_loss)
-        print("adv_loss: ", self.adv_loss)
-        print("cov: ", self.cov)
+        # print("cls_loss: ", self.cls_loss)
+        # print("adv_loss: ", self.adv_loss)
+        # print("cov: ", self.cov)
         self.G_loss = self.cls_loss  + self.alpha * self.cov - self.beta * self.adv_loss
-        print("G_loss: ", self.G_loss)
+        # print("G_loss: ", self.G_loss)
         self.G_loss.backward()
         self.optimizer_G.step()
 
