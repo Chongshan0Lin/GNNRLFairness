@@ -212,9 +212,9 @@ class victim:
 
             features = self.feature_matrix.to(device)
             # output_test = self.model(self.feature_matrix, self.adj_norm)
-            output_test = self.model(self.G, features)
+            output_test,_ = self.model(self.G, features)
 
-
+            print("Result:", output_test)
             idx = self.idx_test.view(-1)
             print("index set data type:",idx.dtype)
             print(idx)
