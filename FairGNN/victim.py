@@ -39,14 +39,7 @@ class victim:
         if isinstance(self.idx_test, torch.Tensor):
             self.idx_test = self.idx_test.to(device)
 
-        print("Test Index: ", self.idx_test)
-        print("Type of Test Index: ", self.idx_test.dtype)
-
-        # print("feature_matrix.shape: ",self.feature_matrix.shape)
-        # print("nnodes: ",self.nnodes)
-        # print("nclasses: ",self.nclasses)
-        # print("hfeatures: ",self.hfeatures)
-        # def __init__(self, nfeat, nhid, nclass, weight_decay, lr, dropout, alpha, beta):
+        self.idx_test = self.idx_test.squeeze()
 
 
         self.model = FairGNN(nfeat=self.nfeatures, nhid=self.hfeatures, nclass=self.nclasses, dropout=0.5, lr = 1e-3, weight_decay=1e-5, alpha=60, beta=10)
@@ -220,7 +213,7 @@ class victim:
             features = self.feature_matrix.to(device)
             # output_test = self.model(self.feature_matrix, self.adj_norm)
             output_test = self.model(self.G, features)
-            print("index set data type:",self.idx_test.dtype)
+            # print("index set data type:",self.idx_test.dtype)
             loss_test = F.nll_loss(output_test[self.idx_test], self.labels[self.idx_test])
             pred_test = output_test[self.idx_test].max(1)[1]
             acc_test  = pred_test.eq(self.labels[self.idx_test]).sum().item() / self.idx_test.size(0)
