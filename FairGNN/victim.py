@@ -62,11 +62,13 @@ class victim:
         # Create a DGL graph from the (assumed scipy sparse) adjacency matrix.
         # G = dgl.DGLGraph()
         # G = dgl.graph()
-        adj_np = self.adj_matrix.to_dense().cpu().numpy()  # Ensure the tensor is on CPU and convert to NumPy.
-        adj_sp = sp.csr_matrix(adj_np)          # Create a SciPy CSR sparse matrix.
-        G = dgl.from_scipy(adj_sp)              # Now create the DGL graph.
-        G = dgl.add_self_loop(G)
-        G = G.to(device)
+        # adj_np = self.adj_matrix.to_dense().cpu().numpy()  # Ensure the tensor is on CPU and convert to NumPy.
+        # adj_sp = sp.csr_matrix(adj_np)          # Create a SciPy CSR sparse matrix.
+        # G = dgl.from_scipy(adj_sp)              # Now create the DGL graph.
+        # G = dgl.add_self_loop(G)
+        # g = dgl.from_scipy(adj_norm)
+        self.G = dgl.from_scipy(self.adj_norm)
+        self.G = self.G.to(device)
 
         # Get the data from self.
         features = self.feature_matrix.to(device)
@@ -119,7 +121,7 @@ class victim:
             self.optimizer.zero_grad()
             # Perform one optimization step.
             # (Your FairGNN model should implement an optimize() method that uses G, features, etc.)
-            self.model.optimize(G, features, labels, idx_train, sens, idx_sens_train)
+            self.model.optimize(self.G, features, labels, idx_train, sens, idx_sens_train)
 
             # Retrieve loss components (assumed to be stored as attributes by optimize()).
             cov = self.model.cov
@@ -128,7 +130,7 @@ class victim:
 
             # Evaluate the model.
             self.model.eval()
-            output, s = self.model(G, features)
+            output, s = self.model(self.G, features)
 
             # Compute validation accuracy.
             pred_val = output[idx_val].max(1)[1]
@@ -196,7 +198,10 @@ class victim:
     def evaluate(self):
         self.model.eval()
         with torch.no_grad():
-            output_test = self.model(self.feature_matrix, self.adj_norm)
+
+            features = self.feature_matrix.to(device)
+            # output_test = self.model(self.feature_matrix, self.adj_norm)
+            output_test = self.model(self.G, features)
             loss_test = F.nll_loss(output_test[self.idx_test], self.labels[self.idx_test])
             pred_test = output_test[self.idx_test].max(1)[1]
             acc_test  = pred_test.eq(self.labels[self.idx_test]).sum().item() / self.idx_test.size(0)
