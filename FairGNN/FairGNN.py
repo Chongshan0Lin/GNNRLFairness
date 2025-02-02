@@ -64,6 +64,9 @@ class FairGNN(nn.Module):
         self.cls_loss = self.criterion(y[idx_train],labels[idx_train].unsqueeze(1).float())
         self.adv_loss = self.criterion(s_g,s_score)
 
+        if torch.isnan(self.cls_loss) or torch.isnan(self.adv_loss) or torch.isnan(self.cov):
+            print("Found NaNs in loss components!")
+        
         self.G_loss = self.cls_loss  + self.alpha * self.cov - self.beta * self.adv_loss
         self.G_loss.backward()
         self.optimizer_G.step()
