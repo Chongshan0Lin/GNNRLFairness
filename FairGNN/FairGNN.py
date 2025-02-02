@@ -20,7 +20,7 @@ class FairGNN(nn.Module):
     def __init__(self, nfeat, nhid, nclass, weight_decay, lr, dropout, alpha, beta):
         super(FairGNN,self).__init__()
 
-        self.estimator = GCN(nfeat = nfeat, nhid = nhid, nclass = nclass, dropout = dropout)
+        self.estimator = GCN(nfeat = nfeat, nhid = nhid, nclass = nclass, dropout = dropout, lr = lr, weight_decay = weight_decay, alpha = alpha, beta = beta)
         self.GNN = get_model(nfeat,num_hidden=nhid, dropout=dropout)
         self.classifier = nn.Linear(nhid,1)
         self.adv = nn.Linear(nhid,1)
@@ -31,6 +31,8 @@ class FairGNN(nn.Module):
 
         # self.args = args
         self.criterion = nn.BCEWithLogitsLoss()
+        self.alpha = alpha
+        self.beta = beta
 
         self.G_loss = 0
         self.A_loss = 0

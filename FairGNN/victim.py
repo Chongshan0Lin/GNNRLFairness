@@ -41,12 +41,13 @@ class victim:
         # print("nnodes: ",self.nnodes)
         # print("nclasses: ",self.nclasses)
         # print("hfeatures: ",self.hfeatures)
+        # def __init__(self, nfeat, nhid, nclass, weight_decay, lr, dropout, alpha, beta):
 
-        self.model = FairGNN(in_features=self.nfeatures, hidden_features=self.hfeatures, out_features=self.nclasses, dropout=0.5)
+
+        self.model = FairGNN(nfeat=self.nfeatures, nhid=self.hfeatures, nclass=self.nclasses, dropout=0.5, lr = 1e-3, weight_decay=1e-5, alpha=60, beta=10)
         self.model.to(device)
 
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01, weight_decay=5e-4)
-        # print("Optimizer initialized with model parameters.")
 
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
 
