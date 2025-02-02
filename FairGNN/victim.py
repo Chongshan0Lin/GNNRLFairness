@@ -60,7 +60,8 @@ class victim:
         """
         # --- Setup ---
         # Create a DGL graph from the (assumed scipy sparse) adjacency matrix.
-        G = dgl.DGLGraph()
+        # G = dgl.DGLGraph()
+        G = dgl.graph()
         adj_np = self.adj_matrix.to_dense().cpu().numpy()  # Ensure the tensor is on CPU and convert to NumPy.
         adj_sp = sp.csr_matrix(adj_np)          # Create a SciPy CSR sparse matrix.
         G = dgl.from_scipy(adj_sp)              # Now create the DGL graph.
