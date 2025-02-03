@@ -315,7 +315,8 @@ class agent:
             print("Initial Parity:", parity)
             print("Initial Oddity:", oddity)
             # Employ dynamic exploration rate to encourge more exploration during the previous stage
-
+            max_dp = parity
+            max_eod = oddity
             for i in range(self.budegt):
 
                 print(i,"th iteration")
@@ -341,6 +342,8 @@ class agent:
                 # Determine the difference of fairness, which is the reward
                 print("Parity:", new_parity)
                 print("Oddity:", oddity)
+                max_dp = max(max_dp, new_parity)
+                max_eod = max(max_eod, oddity)
                 if parity < 0 or oddity < 0: 
                     # Revert the change
                     self.change_edge(first_node, second_node)
@@ -371,11 +374,16 @@ class agent:
 
             print("Change of parity:", parity - init_parity)
             print("Change of oddity:", oddity - init_oddity)
+            print("Max DP:", max_dp)
+            print("Max EOD:", max_eod)
+
 
         avg_reward = np.mean(all_rewards[-10:])
         print(f"Episode {episode}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
         self.Q_function1.exploration_rate = min_exploration_rate
         self.Q_function2.exploration_rate = min_exploration_rate
+
+
 
     def train_step(self):
         """
@@ -416,15 +424,16 @@ class agent:
         print("Initial Oddity:", oddity)
 
         # Employ dynamic exploration rate to encourge more exploration during the previous stage
+        max_dp = parity
+        max_eod = oddity
 
         for i in range(self.budegt):
-
 
             print(i,"th iteration")
             # Get the current state embedding
             # Select the first node:
             # How shall I make sure that the first node is different from the second node?
-
+            
             first_node = self.Q_function1.select_action(state_embedding)
             second_node = self.Q_function2.select_action(state_embedding)
 
@@ -434,6 +443,8 @@ class agent:
             victim_model.update_adj_matrix(torch.from_numpy(nx.to_numpy_array(self.graph)))
 
             # After changing the model, retrain the victim model and calculate the new fairness value
+            # victim_model.train()
+
             new_parity, oddity = victim_model.train()
             # new_losses, new_dp, eod, cdp = victim_model.evaluate()
             # new_parity = new_losses[0]
@@ -441,6 +452,13 @@ class agent:
             # Determine the difference of fairness, which is the reward
             print("Parity:", new_parity)
             print("Oddity:", oddity)
+            max_dp = max(max_dp, new_parity)
+            max_eod = max(max_eod, oddity)
+            if parity < 0 or oddity < 0: 
+                # Revert the change
+                self.change_edge(first_node, second_node)
+                continue
+
             reward = new_parity - parity
             cumulative_reward += reward
             parity = new_parity
@@ -450,24 +468,18 @@ class agent:
             emb_matrix = self.embedding.n2v(self.graph)
             new_state_embedding = self.embedding.g2v(emb_matrix).detach()
 
-            # self.Q_function1.replay_buffer.push(state=state_embedding.detach(), action=first_node, reward=reward,next_state=new_state_embedding, done=False)
-            # self.Q_function2.replay_buffer.push(state=state_embedding.detach(), action=second_node, reward=reward,next_state=new_state_embedding, done=False)
             state_embedding = new_state_embedding
             self.train_step()
+        
 
-            # self.metrics_logger.log_metrics(
-            #     episode= 1,
-            #     iteration=i + 1,
-            #     accuracy=0.0,
-            #     training_loss=0.0,
-            #     demographic_parity=dp,
-            #     equality_of_odds=eod,
-            #     conditional_dp=cdp,
-            #     surrogate_loss=fairness_loss
-            # )
+        all_rewards.append(cumulative_reward)
+        # Update the target network periodically
 
         print("Change of parity:", parity - init_parity)
         print("Change of oddity:", oddity - init_oddity)
+        print("Max DP:", max_dp)
+        print("Max EOD:", max_eod)
+
 
         avg_reward = np.mean(all_rewards[:])
         print(f"epoch {epoch}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
