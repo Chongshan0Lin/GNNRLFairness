@@ -80,7 +80,7 @@ class victim:
         # epochs = 2000
         # epochs = 50
         acc_threshold = 0.688
-        roc_threshold = 0.745
+        roc_threshold = 0.5
 
         best_result = {}
         best_fair = float('inf')
