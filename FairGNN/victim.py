@@ -65,9 +65,6 @@ class victim:
         self.G = dgl.from_scipy(self.adj_norm)
         self.G = self.G.to(device)
 
-
-
-
         # Get the data from self.
         features = self.feature_matrix.to(device)
         labels = self.labels.to(device)
@@ -152,24 +149,30 @@ class victim:
             except Exception as e:
                 roc_test = 0.0
             parity, equality = fair_metric_new(output, idx_test, labels, sens)
+            
+            best_result['acc'] = -1
+            best_result['roc'] = -1
+            best_result['parity'] = parity
+            best_result['equality'] = equality
 
             # Compute the sensitive attribute prediction accuracy (from the adversary output `s`).
             pred_sens = s[idx_test].max(1)[1]
             acc_sens = (pred_sens == sens[idx_test]).float().mean()
-            # print("Epoch: {:04d}".format(epoch + 1))
-            # print("Accuracy item:", acc_val.item())
-            # print("roc_val:", roc_val)
+            print("Epoch: {:04d}".format(epoch + 1))
+            print("Accuracy item:", acc_val.item())
+            print("roc_val:", roc_val)
+
 
             # Check if the validation metrics meet the thresholds.
-            # if True:
-            #     if best_fair > (parity_val + equality_val):
-            #         best_fair = parity_val + equality_val
-            #         print()
-            best_result['acc'] = acc_test.item()
-            best_result['roc'] = roc_test
-            best_result['parity'] = parity
-            best_result['equality'] = equality
-
+            if acc_val.item() > acc_threshold and roc_val > roc_threshold:
+                if best_fair > (parity_val + equality_val):
+                    best_fair = parity_val + equality_val
+                    best_result['acc'] = acc_test.item()
+                    best_result['roc'] = roc_test
+                    best_result['parity'] = parity
+                    best_result['equality'] = equality
+            else:
+                break
                 # print("=================================")
                 # print('Epoch: {:04d}'.format(epoch + 1),
                 #       'cov: {:.4f}'.format(cov.item()),
@@ -210,13 +213,13 @@ class victim:
             # output_test = self.model(self.feature_matrix, self.adj_norm)
             output_test,_ = self.model(self.G, features)
 
-            # print("Result:", output_test)
+            print("Result:", output_test)
             idx = self.idx_test.view(-1)
-            # print("index set data type:",idx.dtype)
-            # print(idx)
+            print("index set data type:",idx.dtype)
+            print(idx)
             idx_list = idx.tolist()
-            # print("Shape of output_test:", output_test.shape)
-            # print("Index range:", min(idx_list), max(idx_list))
+            print("Shape of output_test:", output_test.shape)
+            print("Index range:", min(idx_list), max(idx_list))
 
             # loss_test = F.nll_loss(output_test[idx], self.labels[idx])
             # pred_test = output_test[self.idx_test].max(1)[1]

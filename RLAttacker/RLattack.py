@@ -345,7 +345,7 @@ class agent:
                     # Revert the change
                     self.change_edge(first_node, second_node)
                     continue
-                
+
                 reward = new_parity - parity
                 cumulative_reward += reward
                 parity = new_parity
@@ -419,7 +419,7 @@ class agent:
 
         for i in range(self.budegt):
 
-            
+
             print(i,"th iteration")
             # Get the current state embedding
             # Select the first node:
