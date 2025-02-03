@@ -80,7 +80,7 @@ class victim:
         # epochs = 2000
         # epochs = 50
         acc_threshold = 0.688
-        roc_threshold = 0.5
+        roc_threshold = 0.768
 
         best_result = {}
         best_fair = float('inf')
@@ -119,7 +119,7 @@ class victim:
         parity_val, equality_val = fair_metric_new(output, idx_val, labels, sens)
         parity, equality = fair_metric_new(output, idx_test, labels, sens)
 
-        # best_fair = parity_val + equality_val
+        best_fair = parity_val + equality_val
         best_result['acc'] = -1
         best_result['roc'] = -1
         best_result['parity'] = parity
