@@ -112,10 +112,25 @@ class victim:
             equality = abs((sum(pred_y[idx_s0_y1]) / (sum(idx_s0_y1) + eps)) - (sum(pred_y[idx_s1_y1]) / (sum(idx_s1_y1) + eps)))
             return parity, equality
 
+        self.model.eval()
+        output, s = self.model(self.G, features)
+
+        parity_val, equality_val = fair_metric_new(output, idx_val, labels, sens)
+        best_fair = parity_val + equality_val
+        best_result['acc'] = -1
+        best_result['roc'] = -1
+        best_result['parity'] = parity
+        best_result['equality'] = equality
+
+
         # --- Training loop ---
         for epoch in range(epochs):
             self.model.train()
             self.optimizer.zero_grad()
+            self.model.eval()
+            output, s = self.model(self.G, features)
+
+
             # Perform one optimization step.
             # (Your FairGNN model should implement an optimize() method that uses G, features, etc.)
             self.model.optimize(self.G, features, labels, idx_train, sens, idx_sens_train)
@@ -149,11 +164,6 @@ class victim:
             except Exception as e:
                 roc_test = 0.0
             parity, equality = fair_metric_new(output, idx_test, labels, sens)
-            
-            best_result['acc'] = -1
-            best_result['roc'] = -1
-            best_result['parity'] = parity
-            best_result['equality'] = equality
 
             # Compute the sensitive attribute prediction accuracy (from the adversary output `s`).
             pred_sens = s[idx_test].max(1)[1]
