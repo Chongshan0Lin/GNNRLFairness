@@ -93,8 +93,8 @@ class victim:
 
         # Define training hyperparameters.
         epochs = 2000
-        acc_threshold = 5
-        roc_threshold = 5
+        acc_threshold = 50
+        roc_threshold = 50
 
         best_result = {}
         best_fair = float('inf')
