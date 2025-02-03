@@ -62,15 +62,6 @@ class victim:
         """
         # --- Setup ---
         # Create a DGL graph from the (assumed scipy sparse) adjacency matrix.
-        # G = dgl.DGLGraph()
-        # G = dgl.graph()
-        # adj_np = self.adj_matrix.to_dense().cpu().numpy()  # Ensure the tensor is on CPU and convert to NumPy.
-        # adj_sp = sp.csr_matrix(adj_np)          # Create a SciPy CSR sparse matrix.
-        # G = dgl.from_scipy(adj_sp)              # Now create the DGL graph.
-        # G = dgl.add_self_loop(G)
-        # g = dgl.from_scipy(adj_norm)
-        # self.G = dgl.from_scipy(self.adj_norm)
-        # self.G = self.G.to(device)
         self.G = dgl.from_scipy(self.adj_norm)
         self.G = self.G.to(device)
 
@@ -84,9 +75,6 @@ class victim:
         idx_val = self.idx_val
         idx_test = self.idx_test
         sens = self.sens
-        # print("Graph device:", self.G.device)
-        # print("Features device:", features.device)
-        # print("Labels device:", labels.device)
 
         # If a separate sensitive attribute training index is needed, here we re-use idx_train.
         idx_sens_train = self.idx_train
@@ -168,12 +156,12 @@ class victim:
             # Compute the sensitive attribute prediction accuracy (from the adversary output `s`).
             pred_sens = s[idx_test].max(1)[1]
             acc_sens = (pred_sens == sens[idx_test]).float().mean()
-
-            # print("Accuracy item:", acc_val.item())
-            # print("roc_val:", roc_val)
+            print("Epoch: {:04d}".format(epoch + 1))
+            print("Accuracy item:", acc_val.item())
+            print("roc_val:", roc_val)
 
             # Check if the validation metrics meet the thresholds.
-            if acc_val.item() > acc_threshold and roc_val > roc_threshold:
+            if True:
                 if best_fair > (parity_val + equality_val):
                     best_fair = parity_val + equality_val
                     best_result['acc'] = acc_test.item()
