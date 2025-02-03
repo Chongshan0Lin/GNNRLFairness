@@ -424,7 +424,7 @@ class agent:
             # Get the current state embedding
             # Select the first node:
             # How shall I make sure that the first node is different from the second node?
-            
+
             first_node = self.Q_function1.select_action(state_embedding)
             second_node = self.Q_function2.select_action(state_embedding)
 

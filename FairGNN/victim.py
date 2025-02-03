@@ -123,7 +123,7 @@ class victim:
         best_result['roc'] = -1
         best_result['parity'] = parity
         best_result['equality'] = equality
-
+        print("Current result:", best_result)
 
         # --- Training loop ---
         for epoch in range(epochs):
