@@ -269,27 +269,25 @@ class victim:
 
         # Update the adj_norm correspondingly
         # self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
-        norm_np = normalize_adjacency(self.adj_matrix).detach().cpu().numpy()
-        self.adj_norm = sp.csr_matrix(norm_np)
-        self.G = dgl.from_scipy(self.adj_norm)
-        self.G = self.G.to(device)
+        # norm_np = normalize_adjacency(self.adj_matrix).detach().cpu().numpy()
+        # self.adj_norm = sp.csr_matrix(norm_np)
+        # self.G = dgl.from_scipy(self.adj_norm)
+        # self.G = self.G.to(device)
 
 
     def update_adj_matrix(self, adj_matrix):
         # self.adj_matrix = adj_matrix
         # self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
-
-        print("Update adj_matrix")
-        print(self.adj_matrix == adj_matrix)
+        # print(self.adj_matrix == adj_matrix)
 
         device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
-        self.adj_matrix = adj_matrix.to(device) 
+        self.adj_matrix = adj_matrix.to(device)
         # self.adj_norm = normalize_adjacency(self.adj_matrix).detach()
 
         norm_np = normalize_adjacency(self.adj_matrix).detach().cpu().numpy()
         self.adj_norm = sp.csr_matrix(norm_np)
-        self.G = dgl.from_scipy(self.adj_norm)
-        self.G = self.G.to(device)
+        # self.G = dgl.from_scipy(self.adj_norm)
+        # self.G = self.G.to(device)
 
 
 # s = victim()
