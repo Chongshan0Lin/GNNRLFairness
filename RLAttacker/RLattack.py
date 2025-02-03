@@ -301,10 +301,10 @@ class agent:
 
             # Create a victim model and train
             victim_model = victim()
-            victim_model.train()
-            fairness_losses, dp, eod, cdp = victim_model.evaluate()
-            parity = fairness_losses[0]
-            oddity = fairness_losses[1]
+            parity, oddity = victim_model.train()
+            # fairness_losses, dp, eod, cdp = victim_model.evaluate()
+            # parity = fairness_losses[0]
+            # oddity = fairness_losses[1]
             emb_matrix = self.embedding.n2v(self.graph)
             state_embedding = self.embedding.g2v(emb_matrix)
 
@@ -331,13 +331,15 @@ class agent:
                 victim_model.update_adj_matrix(torch.from_numpy(nx.to_numpy_array(self.graph)))
 
                 # After changing the model, retrain the victim model and calculate the new fairness value
-                victim_model.train()
-                new_losses, new_dp, eod, cdp = victim_model.evaluate()
-                new_parity = new_losses[0]
-                oddity = new_losses[1]
+                # victim_model.train()
+
+                new_parity, oddity = victim_model.train()
+                # new_losses, new_dp, eod, cdp = victim_model.evaluate()
+                # new_parity = new_losses[0]
+                # oddity = new_losses[1]
                 # Determine the difference of fairness, which is the reward
                 print("Parity:", new_parity)
-                print("Oddity:", new_losses[1])
+                print("Oddity:", oddity)
                 reward = new_parity - parity
                 cumulative_reward += reward
                 parity = new_parity
@@ -393,12 +395,13 @@ class agent:
 
         # Create a victim model and train
         victim_model = victim()
-        victim_model.train()
-        fairness_losses, dp, eod, cdp = victim_model.evaluate()
-        emb_matrix = self.embedding.n2v(self.graph)
-        state_embedding = self.embedding.g2v(emb_matrix)
-        parity = fairness_losses[0]
-        oddity = fairness_losses[1]
+
+        parity, oddity = victim_model.train()
+        # fairness_losses, dp, eod, cdp = victim_model.evaluate()
+        # emb_matrix = self.embedding.n2v(self.graph)
+        # state_embedding = self.embedding.g2v(emb_matrix)
+        # parity = fairness_losses[0]
+        # oddity = fairness_losses[1]
 
         init_parity = parity
         init_oddity = oddity
@@ -425,13 +428,13 @@ class agent:
             victim_model.update_adj_matrix(torch.from_numpy(nx.to_numpy_array(self.graph)))
 
             # After changing the model, retrain the victim model and calculate the new fairness value
-            victim_model.train()
-            new_losses, new_dp, eod, cdp = victim_model.evaluate()
-            new_parity = new_losses[0]
-            oddity = new_losses[1]
+            new_parity, oddity = victim_model.train()
+            # new_losses, new_dp, eod, cdp = victim_model.evaluate()
+            # new_parity = new_losses[0]
+            # oddity = new_losses[1]
             # Determine the difference of fairness, which is the reward
             print("Parity:", new_parity)
-            print("Oddity:", new_losses[1])
+            print("Oddity:", oddity)
             reward = new_parity - parity
             cumulative_reward += reward
             parity = new_parity

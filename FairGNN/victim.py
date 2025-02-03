@@ -204,7 +204,10 @@ class victim:
                   "equality: {:.4f}".format(best_result['equality']))
         else:
             print("Please set smaller acc/roc thresholds")
+        parity = best_result['parity']
+        equality = best_result['equality']
 
+        return parity, equality
 
     def evaluate(self):
         self.model.eval()
