@@ -85,7 +85,7 @@ class victim:
         best_result = {}
         best_fair = float('inf')
         t_total = time.time()
-        self.model
+        # self.model
 
         # --- Define a local fairness-metric function ---
         def fair_metric_new(output, idx, labels, sens):
@@ -170,12 +170,14 @@ class victim:
             # Compute the sensitive attribute prediction accuracy (from the adversary output `s`).
             pred_sens = s[idx_test].max(1)[1]
             acc_sens = (pred_sens == sens[idx_test]).float().mean()
-            # print("Epoch: {:04d}".format(epoch + 1))
-            # print("Accuracy item:", acc_val.item())
-            # print("roc_val:", roc_val)
+            print("Epoch: {:04d}".format(epoch + 1))
+            print("Accuracy item:", acc_val.item())
+            print("roc_val:", roc_val)
 
 
             # Check if the validation metrics meet the thresholds.
+            # print("Accuracy item:", acc_val.item())
+            # print("roc_val:", roc_val)
             if acc_val.item() > acc_threshold and roc_val > roc_threshold:
                 if best_fair > (parity_val + equality_val):
                     best_fair = parity_val + equality_val
