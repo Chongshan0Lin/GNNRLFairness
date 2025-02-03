@@ -396,6 +396,21 @@ class agent:
         """
         Evaluate the trained model by setting exploration rate to be 0
         """
+        # print("Episode", episode)
+        # print("Exploration rate", self.Q_function1.exploration_rate)
+
+        # all_rewards = []
+        # cumulative_reward = 0
+
+        # Create a victim model and train
+        # victim_model = victim()
+        # parity, oddity = victim_model.train()
+        # if parity < 0 or oddity < 0: continue
+        # fairness_losses, dp, eod, cdp = victim_model.evaluate()
+        # parity = fairness_losses[0]
+        # oddity = fairness_losses[1]
+        emb_matrix = self.embedding.n2v(self.graph)
+        state_embedding = self.embedding.g2v(emb_matrix)
 
         # print("Episode", episode)
         print("Evaluation mode, the", epoch, "th epoch")
