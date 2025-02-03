@@ -376,6 +376,8 @@ class agent:
             print("Change of oddity:", oddity - init_oddity)
             print("Max DP:", max_dp)
             print("Max EOD:", max_eod)
+            print("Max Change of DP:", max_dp - init_parity)
+            print("Max Change of EOD:", max_eod - init_oddity)
 
 
         avg_reward = np.mean(all_rewards[-10:])
@@ -488,6 +490,8 @@ class agent:
         print("Change of oddity:", oddity - init_oddity)
         print("Max DP:", max_dp)
         print("Max EOD:", max_eod)
+        print("Max Change of DP:", max_dp - init_parity)
+        print("Max Change of EOD:", max_eod - init_oddity)
 
 
         avg_reward = np.mean(all_rewards[:])
