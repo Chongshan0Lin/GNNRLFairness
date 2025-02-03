@@ -153,8 +153,7 @@ class victim:
             # pred_val = output[idx_val].max(1)[1]
             acc_val = self.accuracy(output[idx_val], labels[idx_val])
             try:
-                roc_val = roc_auc_score(labels[idx_val].cpu().numpy(),
-                                        output[idx_val].detach().cpu().numpy())
+                roc_val = roc_auc_score(labels[idx_val].cpu().numpy(),output[idx_val].detach().cpu().numpy())
             except Exception as e:
                 roc_val = 0.0
 
