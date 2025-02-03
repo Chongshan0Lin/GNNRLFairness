@@ -54,7 +54,7 @@ class victim:
         self.G = dgl.from_scipy(self.adj_norm)
         self.G = self.G.to(device)
 
-    def train(self, epochs=50):
+    def train(self, epochs=100):
         """
         New training loop based on your first code chunk.
         (Some minor adaptations were made so that the victim’s data attributes are used.)
