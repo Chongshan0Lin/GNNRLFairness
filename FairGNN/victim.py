@@ -161,13 +161,14 @@ class victim:
             # print("roc_val:", roc_val)
 
             # Check if the validation metrics meet the thresholds.
-            if True:
-                if best_fair > (parity_val + equality_val):
-                    best_fair = parity_val + equality_val
-                    best_result['acc'] = acc_test.item()
-                    best_result['roc'] = roc_test
-                    best_result['parity'] = parity
-                    best_result['equality'] = equality
+            # if True:
+            #     if best_fair > (parity_val + equality_val):
+            #         best_fair = parity_val + equality_val
+            #         print()
+            best_result['acc'] = acc_test.item()
+            best_result['roc'] = roc_test
+            best_result['parity'] = parity
+            best_result['equality'] = equality
 
                 # print("=================================")
                 # print('Epoch: {:04d}'.format(epoch + 1),
