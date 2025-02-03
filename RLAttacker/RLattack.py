@@ -281,7 +281,7 @@ class agent:
         The agent runs until it runs out of the budget or successfully achieves the goal
         """
 
-        n_episodes = 100
+        n_episodes = 0
         print("Number of episodes", n_episodes)
 
         min_exploration_rate = self.Q_function1.exploration_rate
