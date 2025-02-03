@@ -181,21 +181,21 @@ class victim:
                     best_result['parity'] = parity
                     best_result['equality'] = equality
 
-                print("=================================")
-                print('Epoch: {:04d}'.format(epoch + 1),
-                      'cov: {:.4f}'.format(cov.item()),
-                      'cls: {:.4f}'.format(cls_loss.item()),
-                      'adv: {:.4f}'.format(adv_loss.item()),
-                      'acc_val: {:.4f}'.format(acc_val.item()),
-                      "roc_val: {:.4f}".format(roc_val),
-                      "parity_val: {:.4f}".format(parity_val),
-                      "equality: {:.4f}".format(equality_val))
-                print("Test:",
-                      "accuracy: {:.4f}".format(acc_test.item()),
-                      "roc: {:.4f}".format(roc_test),
-                      "acc_sens: {:.4f}".format(acc_sens.item()),
-                      "parity: {:.4f}".format(parity),
-                      "equality: {:.4f}".format(equality))
+                # print("=================================")
+                # print('Epoch: {:04d}'.format(epoch + 1),
+                #       'cov: {:.4f}'.format(cov.item()),
+                #       'cls: {:.4f}'.format(cls_loss.item()),
+                #       'adv: {:.4f}'.format(adv_loss.item()),
+                #       'acc_val: {:.4f}'.format(acc_val.item()),
+                #       "roc_val: {:.4f}".format(roc_val),
+                #       "parity_val: {:.4f}".format(parity_val),
+                #       "equality: {:.4f}".format(equality_val))
+                # print("Test:",
+                #       "accuracy: {:.4f}".format(acc_test.item()),
+                #       "roc: {:.4f}".format(roc_test),
+                #       "acc_sens: {:.4f}".format(acc_sens.item()),
+                #       "parity: {:.4f}".format(parity),
+                #       "equality: {:.4f}".format(equality))
         print("Optimization Finished!")
         print("Total time elapsed: {:.4f}s".format(time.time() - t_total))
         print('============performance on test set=============')
