@@ -116,6 +116,8 @@ class victim:
         output, s = self.model(self.G, features)
 
         parity_val, equality_val = fair_metric_new(output, idx_val, labels, sens)
+        parity, equality = fair_metric_new(output, idx_test, labels, sens)
+
         best_fair = parity_val + equality_val
         best_result['acc'] = -1
         best_result['roc'] = -1
