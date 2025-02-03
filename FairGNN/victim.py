@@ -145,13 +145,13 @@ class victim:
             # Evaluate the model.
             self.model.eval()
             output, s = self.model(self.G, features)
-            print("raw output:", output)
-            print("output:", output[idx_val].max(1))
-            print("label:", labels[idx_val])
+            # print("raw output:", output)
+            # print("output:", output[idx_val].max(1))
+            # print("label:", labels[idx_val])
 
             # Compute validation accuracy.
-            pred_val = output[idx_val].max(1)[1]
-            acc_val = (pred_val == labels[idx_val]).float().mean()
+            # pred_val = output[idx_val].max(1)[1]
+            acc_val = self.accuracy(output[idx_val], labels[idx_val])
             try:
                 roc_val = roc_auc_score(labels[idx_val].cpu().numpy(),
                                         output[idx_val].detach().cpu().numpy())
@@ -294,6 +294,12 @@ class victim:
         # self.G = dgl.from_scipy(self.adj_norm)
         # self.G = self.G.to(device)
 
+    def accuracy(output, labels):
+        output = output.squeeze()
+        preds = (output>0).type_as(labels)
+        correct = preds.eq(labels).double()
+        correct = correct.sum()
+        return correct / len(labels)
 
 # s = victim()
 # s.train()
