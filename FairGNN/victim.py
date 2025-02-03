@@ -48,10 +48,10 @@ class victim:
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01, weight_decay=5e-4)
 
         # self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
-        norm_np = normalize_adjacency(self.adj_matrix).detach().cpu().numpy()
-        self.adj_norm = sp.csr_matrix(norm_np)
+        # norm_np = normalize_adjacency(self.adj_matrix).detach().cpu().numpy()
+        # self.adj_norm = sp.csr_matrix(norm_np)
 
-        self.G = dgl.from_scipy(self.adj_norm)
+        self.G = dgl.from_scipy(self.adj_matrix)
         self.G = self.G.to(device)
 
     def train(self, epochs=50):
@@ -62,7 +62,7 @@ class victim:
         # --- Setup ---
         # Create a DGL graph from the (assumed scipy sparse) adjacency matrix.
         self.model.reset_parameters()
-        self.G = dgl.from_scipy(self.adj_norm)
+        self.G = dgl.from_scipy(self.adj_matrix)
         self.G = self.G.to(device)
         # self.model.intialize
         # Get the data from self.
@@ -269,26 +269,12 @@ class victim:
         else:
             self.adj_matrix[node1][node2] = 1
 
-        # Update the adj_norm correspondingly
-        # self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
-        # norm_np = normalize_adjacency(self.adj_matrix).detach().cpu().numpy()
-        # self.adj_norm = sp.csr_matrix(norm_np)
-        # self.G = dgl.from_scipy(self.adj_norm)
-        # self.G = self.G.to(device)
-
 
     def update_adj_matrix(self, adj_matrix):
-        # self.adj_matrix = adj_matrix
-        # self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
-        # print(self.adj_matrix == adj_matrix)
 
         device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         self.adj_matrix = adj_matrix.to(device)
-        # self.adj_norm = normalize_adjacency(self.adj_matrix).detach()
-
-        norm_np = normalize_adjacency(self.adj_matrix).detach().cpu().numpy()
-        self.adj_norm = sp.csr_matrix(norm_np)
-        # self.G = dgl.from_scipy(self.adj_norm)
+        # self.G = dgl.from_scipy(self.adj_matrix)
         # self.G = self.G.to(device)
 
 
