@@ -20,10 +20,10 @@ class FairGNN(nn.Module):
     def __init__(self, nfeat, nhid, nclass, weight_decay, lr, dropout, alpha, beta):
         super(FairGNN,self).__init__()
 
-        self.estimator = GCN(nfeat = nfeat, nhid = nhid, nclass = nclass, dropout = dropout)
+        self.estimator = GCN(nfeat = nfeat, nhid = nhid, nclass = 1, dropout = dropout)
         self.GNN = get_model(nfeat,num_hidden=nhid, dropout=dropout)
         self.classifier = nn.Linear(nhid,1)
-        self.adv = nn.Linear(nhid, nclass)
+        self.adv = nn.Linear(nhid,1)
         
         G_params = list(self.GNN.parameters()) + list(self.classifier.parameters()) + list(self.estimator.parameters())
         self.optimizer_G = torch.optim.Adam(G_params, lr = lr, weight_decay = weight_decay)
