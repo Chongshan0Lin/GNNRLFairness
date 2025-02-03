@@ -294,7 +294,7 @@ class victim:
         # self.G = dgl.from_scipy(self.adj_norm)
         # self.G = self.G.to(device)
 
-    def accuracy(output, labels):
+    def accuracy(self, output, labels):
         output = output.squeeze()
         preds = (output>0).type_as(labels)
         correct = preds.eq(labels).double()
