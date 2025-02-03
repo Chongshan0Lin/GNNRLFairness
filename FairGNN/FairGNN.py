@@ -28,7 +28,7 @@ class FairGNN(nn.Module):
         G_params = list(self.GNN.parameters()) + list(self.classifier.parameters()) + list(self.estimator.parameters())
         self.optimizer_G = torch.optim.Adam(G_params, lr = lr, weight_decay = weight_decay)
         self.optimizer_A = torch.optim.Adam(self.adv.parameters(), lr = lr, weight_decay = weight_decay)
-
+        
         # self.args = args
         self.criterion = nn.BCEWithLogitsLoss()
         self.alpha = alpha

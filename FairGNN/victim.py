@@ -148,6 +148,7 @@ class victim:
 
             # Compute validation accuracy.
             pred_val = output[idx_val].max(1)[1]
+            print("pred_val:", pred_val)
             acc_val = (pred_val == labels[idx_val]).float().mean()
             try:
                 roc_val = roc_auc_score(labels[idx_val].cpu().numpy(),
