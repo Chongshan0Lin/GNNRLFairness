@@ -409,7 +409,7 @@ class agent:
         # Create a victim model and train
         victim_model = victim()
 
-        parity, oddity = victim_model.train(epoch = 200)
+        parity, oddity = victim_model.train(epochs = 200)
 
         init_parity = parity
         init_oddity = oddity
