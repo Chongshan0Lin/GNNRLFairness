@@ -145,7 +145,8 @@ class victim:
             # Evaluate the model.
             self.model.eval()
             output, s = self.model(self.G, features)
-            print("output:", output)
+            print("output:", output[idx_val].max(1))
+            # print("output:", output)
 
             # Compute validation accuracy.
             pred_val = output[idx_val].max(1)[1]
