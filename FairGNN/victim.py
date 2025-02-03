@@ -78,7 +78,7 @@ class victim:
 
         # Define training hyperparameters.
         epochs = 2000
-        epochs = 500
+        epochs = 50
         acc_threshold = 0.688
         roc_threshold = 0.745
 
@@ -183,8 +183,8 @@ class victim:
                     best_result['roc'] = roc_test
                     best_result['parity'] = parity
                     best_result['equality'] = equality
-            else:
-                break
+            # else:
+            #     break
                 # print("=================================")
                 # print('Epoch: {:04d}'.format(epoch + 1),
                 #       'cov: {:.4f}'.format(cov.item()),
