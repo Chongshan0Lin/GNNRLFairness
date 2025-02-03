@@ -407,9 +407,9 @@ class agent:
         cumulative_reward = 0
 
         # Create a victim model and train
-        victim_model = victim(epoch = 200)
+        victim_model = victim()
 
-        parity, oddity = victim_model.train()
+        parity, oddity = victim_model.train(epoch = 200)
 
         init_parity = parity
         init_oddity = oddity
