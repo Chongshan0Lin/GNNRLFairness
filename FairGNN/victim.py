@@ -147,6 +147,7 @@ class victim:
             output, s = self.model(self.G, features)
             print("raw output:", output)
             print("output:", output[idx_val].max(1))
+            print("label:", labels[idx_val])
 
             # Compute validation accuracy.
             pred_val = output[idx_val].max(1)[1]
