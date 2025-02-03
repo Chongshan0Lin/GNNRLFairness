@@ -12,6 +12,9 @@ class GCN(nn.Module):
         x = self.body(g,x)
         x = self.fc(x)
         return x
+    def reset_parameters(self):
+        self.body.reset_parameters()
+        self.fc.reset_parameters()
 
 # def GCN(nn.Module):
 class GCN_Body(nn.Module):
@@ -28,7 +31,10 @@ class GCN_Body(nn.Module):
         x = self.gc2(g, x)
         # x = self.dropout(x)
         return x    
-
+    def reset_parameters(self):
+        self.gc1.reset_parameters()
+        self.gc2.reset_parameters()
+        # self.dropout.reset_parameters()
 
 
 

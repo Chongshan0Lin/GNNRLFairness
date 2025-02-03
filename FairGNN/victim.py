@@ -54,7 +54,6 @@ class victim:
         self.G = dgl.from_scipy(self.adj_norm)
         self.G = self.G.to(device)
 
-    # def train(self):
     def train(self):
         """
         New training loop based on your first code chunk.
@@ -62,9 +61,10 @@ class victim:
         """
         # --- Setup ---
         # Create a DGL graph from the (assumed scipy sparse) adjacency matrix.
+        self.model.reset_parameters()
         self.G = dgl.from_scipy(self.adj_norm)
         self.G = self.G.to(device)
-
+        # self.model.intialize
         # Get the data from self.
         features = self.feature_matrix.to(device)
         labels = self.labels.to(device)
@@ -85,6 +85,7 @@ class victim:
         best_result = {}
         best_fair = float('inf')
         t_total = time.time()
+        self.model
 
         # --- Define a local fairness-metric function ---
         def fair_metric_new(output, idx, labels, sens):
@@ -134,7 +135,6 @@ class victim:
 
 
             # Perform one optimization step.
-            # (Your FairGNN model should implement an optimize() method that uses G, features, etc.)
             self.model.optimize(self.G, features, labels, idx_train, sens, idx_sens_train)
 
             # Retrieve loss components (assumed to be stored as attributes by optimize()).

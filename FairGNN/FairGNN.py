@@ -37,6 +37,12 @@ class FairGNN(nn.Module):
         self.G_loss = 0
         self.A_loss = 0
 
+    def reset_parameters(self):
+        self.estimator.reset_parameters()
+        self.GNN.reset_parameters()
+        self.classifier.reset_parameters()
+        self.adv.reset_parameters()
+
     def forward(self,g,x):
         s = self.estimator(g,x)
         z = self.GNN(g,x)
