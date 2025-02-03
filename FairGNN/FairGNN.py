@@ -22,7 +22,7 @@ class FairGNN(nn.Module):
 
         self.estimator = GCN(nfeat = nfeat, nhid = nhid, nclass = nclass, dropout = dropout)
         self.GNN = get_model(nfeat,num_hidden=nhid, dropout=dropout)
-        self.classifier = nn.Linear(nhid,1)
+        self.classifier = nn.Linear(nhid, nclass)
         self.adv = nn.Linear(nhid, nclass)  # which in your case is 2
 
         G_params = list(self.GNN.parameters()) + list(self.classifier.parameters()) + list(self.estimator.parameters())
