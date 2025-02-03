@@ -93,8 +93,8 @@ class victim:
 
         # Define training hyperparameters.
         epochs = 2000
-        acc_threshold = 0.688
-        roc_threshold = 0.745
+        acc_threshold = 5
+        roc_threshold = 5
 
         best_result = {}
         best_fair = float('inf')
@@ -167,10 +167,6 @@ class victim:
             # Compute the sensitive attribute prediction accuracy (from the adversary output `s`).
             pred_sens = s[idx_test].max(1)[1]
             acc_sens = (pred_sens == sens[idx_test]).float().mean()
-            best_result['acc'] = acc_test.item()
-            best_result['roc'] = roc_test
-            best_result['parity'] = parity
-            best_result['equality'] = equality
 
             # Check if the validation metrics meet the thresholds.
             if acc_val.item() > acc_threshold and roc_val > roc_threshold:
@@ -208,6 +204,7 @@ class victim:
                   "equality: {:.4f}".format(best_result['equality']))
         else:
             print("Please set smaller acc/roc thresholds")
+
         parity = best_result['parity']
         equality = best_result['equality']
 
