@@ -273,7 +273,7 @@ class agent:
             self.graph.add_edge(node1, node2)
 
 
-    def train(self, n_episodes =1000):
+    def train(self, n_episodes = 1000):
         """
         Train the two agent hierarchically.
         First Q function gives the first node, second Q function gives the second node.
@@ -281,7 +281,7 @@ class agent:
         The agent runs until it runs out of the budget or successfully achieves the goal
         """
 
-        # n_episodes = 200
+        n_episodes = 100
         print("Number of episodes", n_episodes)
 
         min_exploration_rate = self.Q_function1.exploration_rate
@@ -302,6 +302,7 @@ class agent:
             # Create a victim model and train
             victim_model = victim()
             parity, oddity = victim_model.train()
+            if parity < 0 or oddity < 0: continue
             # fairness_losses, dp, eod, cdp = victim_model.evaluate()
             # parity = fairness_losses[0]
             # oddity = fairness_losses[1]
@@ -340,6 +341,11 @@ class agent:
                 # Determine the difference of fairness, which is the reward
                 print("Parity:", new_parity)
                 print("Oddity:", oddity)
+                if parity < 0 or oddity < 0: 
+                    # Revert the change
+                    self.change_edge(first_node, second_node)
+                    continue
+                
                 reward = new_parity - parity
                 cumulative_reward += reward
                 parity = new_parity

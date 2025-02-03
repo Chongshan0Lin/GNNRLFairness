@@ -93,9 +93,9 @@ class victim:
 
         # Define training hyperparameters.
         epochs = 2000
-        epochs = 200
-        acc_threshold = 0
-        roc_threshold = 0
+        epochs = 500
+        acc_threshold = 0.688
+        roc_threshold = 0.745
 
         best_result = {}
         best_fair = float('inf')
@@ -206,13 +206,12 @@ class victim:
                   "acc_sens: {:.4f}".format(acc_sens.item()),
                   "parity: {:.4f}".format(best_result['parity']),
                   "equality: {:.4f}".format(best_result['equality']))
+            parity = best_result['parity']
+            equality = best_result['equality']
+            return parity, equality
         else:
             print("Please set smaller acc/roc thresholds")
-
-        parity = best_result['parity']
-        equality = best_result['equality']
-
-        return parity, equality
+            return -1, -1
 
     def evaluate(self):
         self.model.eval()
