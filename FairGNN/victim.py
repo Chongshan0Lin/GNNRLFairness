@@ -14,7 +14,7 @@ import time
 from sklearn.metrics import roc_auc_score
 import scipy.sparse as sp
 
-EPOCH = 100
+# EPOCH = 100
 gpu_index = 2
 device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
 torch.autograd.set_detect_anomaly(True)
@@ -54,7 +54,7 @@ class victim:
         self.G = dgl.from_scipy(self.adj_norm)
         self.G = self.G.to(device)
 
-    def train(self):
+    def train(self, epochs=50):
         """
         New training loop based on your first code chunk.
         (Some minor adaptations were made so that the victim’s data attributes are used.)
@@ -77,8 +77,8 @@ class victim:
         idx_sens_train = self.idx_train
 
         # Define training hyperparameters.
-        epochs = 2000
-        epochs = 50
+        # epochs = 2000
+        # epochs = 50
         acc_threshold = 0.688
         roc_threshold = 0.745
 

@@ -401,21 +401,15 @@ class agent:
         print("Evaluation mode, the", epoch, "th epoch")
         self.Q_function1.exploration_rate = 0.0
         self.Q_function2.exploration_rate = 0.0
-        min_exploration_rate = 0.0
         # print("Exploration rate", self.Q_function1.exploration_rate)
 
         all_rewards = []
         cumulative_reward = 0
 
         # Create a victim model and train
-        victim_model = victim()
+        victim_model = victim(epoch = 200)
 
         parity, oddity = victim_model.train()
-        # fairness_losses, dp, eod, cdp = victim_model.evaluate()
-        # emb_matrix = self.embedding.n2v(self.graph)
-        # state_embedding = self.embedding.g2v(emb_matrix)
-        # parity = fairness_losses[0]
-        # oddity = fairness_losses[1]
 
         init_parity = parity
         init_oddity = oddity
@@ -469,8 +463,8 @@ class agent:
             new_state_embedding = self.embedding.g2v(emb_matrix).detach()
 
             state_embedding = new_state_embedding
-            self.train_step()
-        
+            # self.train_step()
+
 
         all_rewards.append(cumulative_reward)
         # Update the target network periodically
