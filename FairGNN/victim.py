@@ -48,7 +48,7 @@ class victim:
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01, weight_decay=5e-4)
 
         # self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
-        norm_np = normalize_adjacency(self.adj_matrix).detach().numpy()
+        norm_np = normalize_adjacency(self.adj_matrix).detach().cpu().numpy()
         self.adj_norm = sp.csr_matrix(norm_np)
 
         self.G = dgl.from_scipy(self.adj_norm)
@@ -93,6 +93,7 @@ class victim:
 
         # Define training hyperparameters.
         epochs = 2000
+        epochs = 200
         acc_threshold = 0
         roc_threshold = 0
 
@@ -265,7 +266,7 @@ class victim:
 
         # Update the adj_norm correspondingly
         # self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
-        norm_np = normalize_adjacency(self.adj_matrix).detach().numpy()
+        norm_np = normalize_adjacency(self.adj_matrix).detach().cpu().numpy()
         self.adj_norm = sp.csr_matrix(norm_np)
         self.G = dgl.from_scipy(self.adj_norm)
         self.G = self.G.to(device)
@@ -279,7 +280,7 @@ class victim:
         self.adj_matrix = adj_matrix.to(device) 
         # self.adj_norm = normalize_adjacency(self.adj_matrix).detach()
 
-        norm_np = normalize_adjacency(self.adj_matrix).detach().numpy()
+        norm_np = normalize_adjacency(self.adj_matrix).detach().cpu().numpy()
         self.adj_norm = sp.csr_matrix(norm_np)
         self.G = dgl.from_scipy(self.adj_norm)
         self.G = self.G.to(device)
