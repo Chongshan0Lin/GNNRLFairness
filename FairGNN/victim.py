@@ -219,6 +219,9 @@ class victim:
             print("index set data type:",idx.dtype)
             print(idx)
             idx_list = idx.tolist()
+            print("Shape of output_test:", output_test.shape)
+            print("Index range:", min(idx_list), max(idx_list))
+
             # loss_test = F.nll_loss(output_test[idx], self.labels[idx])
             # pred_test = output_test[self.idx_test].max(1)[1]
             # acc_test  = pred_test.eq(self.labels[self.idx_test]).sum().item() / self.idx_test.size(0)

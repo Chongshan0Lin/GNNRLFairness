@@ -41,6 +41,8 @@ class FairGNN(nn.Module):
         s = self.estimator(g,x)
         z = self.GNN(g,x)
         y = self.classifier(z)
+        print("Result of classifier: ", y)
+        print("Result of estimator: ", s)
         return y,s
 
     def optimize(self,g,x,labels,idx_train,sens,idx_sens_train):
