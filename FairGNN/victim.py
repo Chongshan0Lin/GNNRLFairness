@@ -169,8 +169,8 @@ class victim:
             pred_sens = s[idx_test].max(1)[1]
             acc_sens = (pred_sens == sens[idx_test]).float().mean()
 
-            print("Accuracy item:", acc_val.item())
-            print("roc_val:", roc_val)
+            # print("Accuracy item:", acc_val.item())
+            # print("roc_val:", roc_val)
 
             # Check if the validation metrics meet the thresholds.
             if acc_val.item() > acc_threshold and roc_val > roc_threshold:
