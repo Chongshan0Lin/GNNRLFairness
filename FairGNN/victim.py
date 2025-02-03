@@ -178,8 +178,8 @@ class victim:
 
 
             # Check if the validation metrics meet the thresholds.
-            print("Accuracy item:", acc_val.item())
-            print("roc_val:", roc_val)
+            # print("Accuracy item:", acc_val.item())
+            # print("roc_val:", roc_val)
             if acc_val.item() > acc_threshold and roc_val > roc_threshold:
                 print("Validation metrics meet the thresholds.")
                 if best_fair > (parity_val + equality_val):
