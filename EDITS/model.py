@@ -36,7 +36,7 @@ class EDITS(nn.Module):
     def forward(self, A, X):
         X_de = self.x_debaising(X)
         adj_new = self.adj_renew()
-        agg_con = self.propagation_cat_new_filter(X_de.half(), adj_new.half(), layer_threshold=self.layer_threshold).half()  # A_de or A
+        agg_con = self.propagation_cat_new_filter(X_de.half(), adj_new.half(), layer_threshold=self.layer_threshold).float()
         D_pre = self.fc(agg_con)
         D_pre = self.dropout(D_pre)
         return adj_new, X_de, D_pre, D_pre, agg_con
