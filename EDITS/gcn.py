@@ -34,12 +34,6 @@ class GCN_Body(nn.Module):
         self.gc1 = GraphConv(nfeat, nhid)
 
     def forward(self, x, edge_index):
-        # print("x: ", x)
-        # print(type(x))
-        # print("edge_index: ", edge_index)
-        # print(type(edge_index))
-        print(edge_index.device)
-        print(x.device)
 
         x = self.gc1(edge_index, x)
         return x    
