@@ -107,9 +107,7 @@ class victim:
         self.model = self.model.to(device)
         optimizer = optim.Adam(self.model.parameters(), lr=1e-3, weight_decay=1e-5)
 
-
         # Train model
-
 
         t = time.time()
         self.model.train()
@@ -122,9 +120,6 @@ class victim:
         g = dgl.graph((A_coo.row, A_coo.col), num_nodes=num_nodes)
         # g = g.to(device)  # Move the graph to the appropriate device.
         g = dgl.add_self_loop(g).to(device)
-
-        # print(g.device)
-        # print(X_debiased.device)
 
         # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
         output = self.model(x=X_debiased, edge_index=g)
@@ -144,7 +139,6 @@ class victim:
         auc_roc_val = roc_auc_score(labels.cpu().numpy()[idx_val.cpu().numpy()], output.detach().cpu().numpy()[idx_val.cpu().numpy()])
         f1_val = f1_score(labels[idx_val.cpu().numpy()].cpu().numpy(), preds[idx_val.cpu().numpy()].cpu().numpy())
 
-
         pa = -1
         eq = -1
         test_auc = -1
@@ -156,13 +150,12 @@ class victim:
             val_loss = loss_val.data
             print("New val_loss:", val_loss)
             pa, eq, test_f1, test_auc = self.test(X_debiased=X_debiased, g=g)
+            print("New parity:", pa)
             # print("Parity of val: " + str(pa))
             # print("Equality of val: " + str(eq))
         return pa, eq, test_f1, val_loss, test_auc
-    
 
-
-        # Evaluate model
+    # Evaluate model
     def test(self, X_debiased, g):
         self.model.eval()
         output = self.model(x=X_debiased, edge_index=g)
@@ -228,7 +221,6 @@ class victim:
         # adj = self.sparse_mx_to_torch_sparse_tensor(self.adj_matrix)
         model = EDITS(nfeat=features.shape[1], node_num=features.shape[0], nfeat_out=int(features.shape[0]/10), adj_lambda=1e-1, nclass=2, layer_threshold=2, dropout=0.2)  # 3-nba
 
-
         model = model.to(device)
         adj = adj.to(device)
         features = features.to(device)
@@ -241,7 +233,6 @@ class victim:
         sens = self.sens.to(device)
 
         A_debiased, X_debiased = adj, features
-
 
         val_adv = []
         test_adv = []
@@ -357,7 +348,8 @@ class victim:
         shape = torch.Size(sparse_mx.shape)
         return torch.sparse.FloatTensor(indices, values, shape)
 
-    def binarize(self, A_debiased, adj_ori, threshold_proportion):
+    def binarize(self, A_debiased, adj_ori,
+     threshold_proportion):
 
         the_con1 = (A_debiased - adj_ori).A
         the_con1 = np.where(the_con1 > np.max(the_con1) * threshold_proportion, 1 + the_con1 * 0, the_con1)
