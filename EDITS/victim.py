@@ -164,7 +164,7 @@ class victim:
     def test(self, X_debiased, g):
         self.model.eval()
         output = self.model(x=X_debiased, edge_index=g)
-        
+
         features = self.feature_matrix / self.feature_matrix.norm(dim=0)
         adj_preserve = self.adj_matrix
         
@@ -333,11 +333,13 @@ class victim:
             self.adj_matrix[node1][node2] = 0
         else:
             self.adj_matrix[node1][node2] = 1
-
+        
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
-    
-    def update_adj_matrix(self, adj_matrix):
 
+    def update_adj_matrix(self, adj_matrix):
+        
+
+        print("Matrix updated")
         device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         self.adj_matrix = adj_matrix.to(device) 
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach()

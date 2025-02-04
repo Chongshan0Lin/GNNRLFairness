@@ -291,9 +291,6 @@ class agent:
                 self.change_edge(first_node, second_node)
                 victim_model.update_adj_matrix(torch.from_numpy(nx.to_numpy_array(self.graph)))
 
-                # After changing the model, retrain the victim model and calculate the new fairness value
-                # victim_model.train()
-                # parity, oddity, test_f1, val_loss, test_auc
                 new_parity, oddity, test_f1, val_loss, test_auc = victim_model.train()
                 # new_losses, new_dp, eod, cdp = victim_model.evaluate()
                 # new_parity = new_losses[0]
