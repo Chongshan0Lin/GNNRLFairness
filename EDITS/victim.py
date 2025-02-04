@@ -173,7 +173,7 @@ class victim:
 
 
 
-    def preprosessing(self, epochs=1000):
+    def preprosessing(self, epochs=200):
 
         '''
         Model preprossing part
@@ -330,6 +330,15 @@ class victim:
         return A_debiased
     
     def normalize_scipy(self, mx):
+
+        if isinstance(mx, torch.Tensor):
+            if mx.is_sparse:
+                mx = mx.to_dense()
+            mx = mx.cpu().detach().numpy()
+        
+        if not sp.isspmatrix(mx):
+            mx = sp.coo_matrix(mx)
+
         rowsum = np.array(mx.sum(1))
         r_inv = np.power(rowsum, -0.5).flatten()
         r_inv[np.isinf(r_inv)] = 0.
