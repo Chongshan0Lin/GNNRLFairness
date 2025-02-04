@@ -127,6 +127,7 @@ class victim:
 
         prob  = torch.sigmoid(output.squeeze())
         preds = (prob > 0.5).type_as(labels)
+        print("labels:", labels)
 
         loss_train = F.binary_cross_entropy_with_logits(output[idx_train], labels[idx_train].unsqueeze(1).float())
         auc_roc_train = roc_auc_score(labels.cpu().numpy()[idx_train.cpu().numpy()], output.detach().cpu().numpy()[idx_train.cpu().numpy()])
