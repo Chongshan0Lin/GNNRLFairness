@@ -240,6 +240,16 @@ class victim:
         Model training and classification part
         '''
 
+    def tensor_to_scipy_sparse(self, tensor):
+        """
+        Convert a dense PyTorch tensor to a SciPy sparse COO matrix.
+        """
+        # Ensure the tensor is on CPU and detached from the computation graph.
+        tensor = tensor.cpu().detach().numpy()
+        # Optionally, if your tensor is not binary (i.e., representing 0s and 1s),
+        # you can convert it accordingly. Here we assume the tensor represents a dense adjacency matrix.
+        sparse = sp.coo_matrix(tensor)
+        return sparse
 
     def evaluate(self):
         self.model.eval()
