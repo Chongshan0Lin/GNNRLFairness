@@ -179,7 +179,15 @@ class victim:
         '''
         features = self.feature_matrix / self.feature_matrix.norm(dim=0)
         adj_preserve = self.adj_matrix
-        adj = self.sparse_mx_to_torch_sparse_tensor(self.adj_matrix)
+        
+        if isinstance(self.adj_matrix, torch.Tensor):
+            adj_matrix_scipy = self.tensor_to_scipy_sparse(self.adj_matrix)
+        else:
+            adj_matrix_scipy = self.adj_matrix
+
+        adj = self.sparse_mx_to_torch_sparse_tensor(adj_matrix_scipy)
+
+        # adj = self.sparse_mx_to_torch_sparse_tensor(self.adj_matrix)
         model = EDITS(nfeat=features.shape[1], node_num=features.shape[0], nfeat_out=int(features.shape[0]/10), adj_lambda=1e-1, nclass=2, layer_threshold=2, dropout=0.2)  # 3-nba
 
 
