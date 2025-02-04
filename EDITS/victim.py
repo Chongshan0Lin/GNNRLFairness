@@ -210,8 +210,10 @@ class victim:
         for epoch in tqdm(range(epochs)):
             if epoch > 400:
                 lr = 0.001
+            else:
+                lr = 1e-5
             model.train()
-            model.optimize(adj, features, idx_train, sens, epoch)
+            model.optimize(adj, features, idx_train, sens, epoch, lr)
             A_debiased, X_debiased, predictor_sens, show, _ = model(adj, features)
             positive_eles = torch.masked_select(predictor_sens[idx_val].squeeze(), sens[idx_val] > 0)
             negative_eles = torch.masked_select(predictor_sens[idx_val].squeeze(), sens[idx_val] <= 0)
