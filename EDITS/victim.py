@@ -47,7 +47,10 @@ class victim:
         # print("hfeatures: ",self.hfeatures)
 
         # self.model = GCN(in_features=self.nfeatures, hidden_features = self.hfeatures, out_features=self.nclasses, dropout=0.5)
-        self.model = EDITS()
+
+        # def __init__(self,  nfeat, node_num, nclass, nfeat_out, adj_lambda, layer_threshold=2, dropout=0.1, lr = 1e-3, weight_decay=1e-5):
+
+        self.model = EDITS(nfeat=self.nfeatures, node_num=self.nnodes, nclass=self.nclasses, nfeat_out=self.nclasses, adj_lambda=1e-1)
         self.model.to(device)
 
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3, weight_decay=1e-5)
