@@ -88,7 +88,7 @@ class victim:
         metric_wd(features, A_debiased, sens, 0.9, 0)
         metric_wd(features, A_debiased, sens, 0.9, 2)
         print("****************************************************************************")
-        X_debiased = features.float()
+        X_debiased = features.float().to(device)
         # edge_index = convert.from_scipy_sparse_matrix(A_debiased)[0].cuda()
         # Ensure your sparse matrix is in COO format.
         A_coo = A_debiased.tocoo()
