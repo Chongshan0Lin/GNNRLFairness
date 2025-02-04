@@ -1,7 +1,7 @@
 
 
-import matplotlib.pyplot as plt
-import seaborn as sns
+# import matplotlib.pyplot as plt
+# import seaborn as sns
 import torch
 from scipy.stats import wasserstein_distance
 import numpy as np
@@ -38,16 +38,16 @@ def metric_wd(feature, adj_norm, flag, weakening_factor, max_hop):
     print("Sum of all Wasserstein distance value across feature dimensions: " + str(sum(emd_distances)))
     print("Average of all Wasserstein distance value across feature dimensions: " + str(np.mean(np.array(emd_distances))))
 
-    sns.distplot(np.array(emd_distances).squeeze(), rug=True, hist=True, label='EMD value distribution')
-    plt.legend()
+    # sns.distplot(np.array(emd_distances).squeeze(), rug=True, hist=True, label='EMD value distribution')
+    # plt.legend()
     # plt.show()
 
     num_list1 = emd_distances
     x = range(len(num_list1))
 
-    plt.bar(x, height=num_list1, width=0.4, alpha=0.8, label="Wasserstein distance on reachability")
-    plt.ylabel("Wasserstein distance")
-    plt.legend()
+    # plt.bar(x, height=num_list1, width=0.4, alpha=0.8, label="Wasserstein distance on reachability")
+    # plt.ylabel("Wasserstein distance")
+    # plt.legend()
     # plt.show()
 
 
