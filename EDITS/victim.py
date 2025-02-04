@@ -196,8 +196,8 @@ class victim:
         parity_test, equality_test = fair_metric(preds[idx_test.cpu().numpy()].cpu().numpy(),
                                                 labels[idx_test.cpu().numpy()].cpu().numpy(),
                                                 sens[idx_test.cpu().numpy()].cpu().numpy())
-        # print("Parity of test: " + str(parity_test))
-        # print("Equality of test: " + str(equality_test))
+        print("Parity of test: " + str(parity_test))
+        print("Equality of test: " + str(equality_test))
         return parity_test, equality_test, test_f1, test_auc
 
 
