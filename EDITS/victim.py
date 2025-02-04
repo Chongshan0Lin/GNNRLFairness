@@ -194,6 +194,7 @@ class victim:
         model = model.to(device)
         adj = adj.to(device)
         features = features.to(device)
+        features_preserve = features.clone()
         features_preserve = features_preserve.to(device)
         labels = self.labels.to(device)
         idx_train = self.idx_train.to(device)
