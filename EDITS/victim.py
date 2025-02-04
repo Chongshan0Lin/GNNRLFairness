@@ -234,6 +234,7 @@ class victim:
         # metric_wd(features1, binarize(adj1, adj_preserve, 0.012), sens.cpu(), 0.9, 0)
         # metric_wd(features1, binarize(adj1, adj_preserve, 0.012), sens.cpu(), 0.9, 2)
         # print("****************************************************************************")
+        print("Saving into dataset.")
         sp.save_npz('pre_processed/A_debiased.npz', adj1)
         torch.save(X_debiased, "pre_processed/X_debiased.pt")
         print("Preprocessed datasets saved.")
