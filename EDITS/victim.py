@@ -102,16 +102,16 @@ class victim:
 
 
 
-        model = GCN(nfeat=X_debiased.shape[1], nhid=self.hfeatures, nclass=self.labels.max().item()).float()
-        model = model.to(device)
-        optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-5)
+        self.model = GCN(nfeat=X_debiased.shape[1], nhid=self.hfeatures, nclass=self.labels.max().item()).float()
+        self.model = self.model.to(device)
+        optimizer = optim.Adam(self.model.parameters(), lr=1e-3, weight_decay=1e-5)
 
 
         # Train model
 
 
         t = time.time()
-        model.train()
+        self.model.train()
         optimizer.zero_grad()
         idx_train = self.idx_train.to(device)
         labels = self.labels.to(device)
@@ -126,7 +126,7 @@ class victim:
         # print(X_debiased.device)
 
         # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
-        output = model(x=X_debiased, edge_index=g)
+        output = self.model(x=X_debiased, edge_index=g)
         preds = (output.squeeze() > 0).type_as(labels)
         loss_train = F.binary_cross_entropy_with_logits(output[idx_train], labels[idx_train].unsqueeze(1).float())
         auc_roc_train = roc_auc_score(labels.cpu().numpy()[idx_train.cpu().numpy()], output.detach().cpu().numpy()[idx_train.cpu().numpy()])
@@ -135,9 +135,9 @@ class victim:
         optimizer.step()
         _, _ = fair_metric(preds[idx_train.cpu().numpy()].cpu().numpy(), labels[idx_train.cpu().numpy()].cpu().numpy(), sens[idx_train.cpu().numpy()].cpu().numpy())
 
-        model.eval()
+        self.model.eval()
         # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
-        output = model(x=X_debiased, edge_index=g)
+        output = self.model(x=X_debiased, edge_index=g)
         preds = (output.squeeze() > 0).type_as(labels)
         loss_val = F.binary_cross_entropy_with_logits(output[idx_val], labels[idx_val].unsqueeze(1).float())
         auc_roc_val = roc_auc_score(labels.cpu().numpy()[idx_val.cpu().numpy()], output.detach().cpu().numpy()[idx_val.cpu().numpy()])
@@ -153,24 +153,31 @@ class victim:
             return 0, 0, 0, 1e5, 0
         if loss_val < val_loss:
             val_loss = loss_val.data
-            pa, eq, test_f1, test_auc = self.test(test_f1)
+            pa, eq, test_f1, test_auc = self.test(X_debiased=X_debiased, g=g)
             # print("Parity of val: " + str(pa))
             # print("Equality of val: " + str(eq))
         return pa, eq, test_f1, val_loss, test_auc
     
 
 
-
-
-
         # Evaluate model
-    def test(self, X_debiased, edge_index, idx_test):
+    def test(self, X_debiased, g):
         self.model.eval()
+        output = self.model(x=X_debiased, edge_index=g)
+
+        adj = adj.to(device)
+        features = features.to(device)
+        features_preserve = features.clone()
+        features_preserve = features_preserve.to(device)
         labels = self.labels.to(device)
+        idx_train = self.idx_train.to(device)
+        idx_val = self.idx_val.to(device)
+        idx_test = self.idx_test.to(device)
         sens = self.sens.to(device)
-        output = self.model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
+
+
+
         preds = (output.squeeze() > 0).type_as(labels)
-        preds = preds.to(device)
         loss_test = F.binary_cross_entropy_with_logits(output[idx_test], labels[idx_test].unsqueeze(1).float())
         auc_roc_test = roc_auc_score(labels.cpu().numpy()[idx_test.cpu().numpy()], output.detach().cpu().numpy()[idx_test.cpu().numpy()])
         f1_test = f1_score(labels[idx_test.cpu().numpy()].cpu().numpy(), preds[idx_test.cpu().numpy()].cpu().numpy())
