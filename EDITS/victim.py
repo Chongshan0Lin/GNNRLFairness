@@ -8,7 +8,7 @@ import scipy.sparse as sp
 from tqdm import tqdm
 from .metrics import metric_wd
 from .model import EDITS
-from torch_geometric.utils import dropout_adj, convert
+# from torch_geometric.utils import convert
 import torch.optim as optim
 import time
 from sklearn.metrics import accuracy_score, roc_auc_score, recall_score, f1_score
@@ -79,7 +79,17 @@ class victim:
         metric_wd(features, A_debiased, sens, 0.9, 2)
         print("****************************************************************************")
         X_debiased = features.float()
-        edge_index = convert.from_scipy_sparse_matrix(A_debiased)[0].cuda()
+        # edge_index = convert.from_scipy_sparse_matrix(A_debiased)[0].cuda()
+        # Ensure your sparse matrix is in COO format.
+        A_coo = A_debiased.tocoo()
+
+        # Convert the row and column indices to torch tensors.
+        row = torch.tensor(A_coo.row, dtype=torch.long)
+        col = torch.tensor(A_coo.col, dtype=torch.long)
+
+        # Stack them into an edge_index tensor of shape [2, num_edges].
+        edge_index = torch.stack([row, col], dim=0).cuda()
+
 
 
         model = GCN(nfeat=X_debiased.shape[1], nhid=self.hfeatures, nclass=self.labels.max().item()).float()
