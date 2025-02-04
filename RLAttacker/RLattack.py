@@ -36,6 +36,7 @@ class DQN(nn.Module):
 
         return self.fc3(x)
 
+
 class Q_function:
     """
     A Q function that serves as a component the hierarchical Q network
@@ -67,7 +68,6 @@ class Q_function:
         self.target_network = DQN(self.state_size, self.action_size, hidden_layer_size=(self.state_size * 2) // 3 + self.action_size)
 
 
-
     def select_action(self, state_t):
 
         """
@@ -94,35 +94,16 @@ class Q_function:
         states, actions, rewards, next_states, dones = self.replay_buffer.sample(BATCH_SIZE)
         # states, actions, rewards, next_states, dones = self.replay_buffer.sample(1)
 
-        # states_t = torch.FloatTensor(states)
-        # actions_t = torch.LongTensor(actions).unsqueeze(1)
-        # rewards_t = torch.FloatTensor(rewards).unsqueeze(1)
-        # next_states_t = torch.FloatTensor(next_states)
-        # dones_t = torch.FloatTensor(dones).unsqueeze(1)
+
         device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
 
-        # states_t = torch.FloatTensor(torch.stack(states))
-        # actions_t = torch.LongTensor(torch.stack(actions)).unsqueeze(1)
-        # rewards_t = torch.FloatTensor(torch.stack(rewards)).unsqueeze(1)
-        # next_states_t = torch.FloatTensor(torch.stack(next_states))
-        # dones_t = torch.LongTensor(torch.stack(dones)).unsqueeze(1)
+
         states_t = torch.stack(states).to(device).float()
         actions_t = torch.stack(actions).to(device).long().unsqueeze(1)
         rewards_t = torch.stack(rewards).to(device).float().unsqueeze(1)
         next_states_t = torch.stack(next_states).to(device).float()
         dones_t = torch.stack(dones).to(device).long().unsqueeze(1)
 
-
-        # print(f"states_t shape: {states_t.shape}")          # Should be [BATCH_SIZE, state_dim]
-        # print(f"actions_t shape: {actions_t.shape}")        # Should be [BATCH_SIZE, 1]
-        # print(f"rewards_t shape: {rewards_t.shape}")        # Should be [BATCH_SIZE, 1]
-        # print(f"next_states_t shape: {next_states_t.shape}")# Should be [BATCH_SIZE, state_dim]
-        # print(f"dones_t shape: {dones_t.shape}")            # Should be [BATCH_SIZE, 1]
-
-        # approximated_q_values = self.policy_network(states_t)
-        # print(approximated_q_values)
-        # print(actions_t)
-        # q_values = self.policy_network.forward(states_t).gather(1, actions_t)
         
         q_values = self.policy_network(states_t).gather(1, actions_t)  # [BATCH_SIZE, 1]
 
@@ -132,22 +113,6 @@ class Q_function:
             max_next_q_values = self.target_network(next_states_t).max(dim=1, keepdim=True)[0]
 
             q_targets = rewards_t + max_next_q_values
-        # Q target = reward + (gamma * max_next_q_value * (1 - done))
-        # q_targets = rewards_t + (max_next_q_values * (1 - dones_t))
-        # print("Doesn_t", dones_t)
-        # print("Max next q values:", max_next_q_values)
-        # identity = torch.diagonal(torch.eye(dones_t.shape[0]))
-        # dones_t = torch.sub(identity, dones_t)
-        # mnqv = torch.diagonal(torch.mul(max_next_q_values, dones_t))
-        # # q_targets = torch.add(input=rewards_t, other = max_next_q_values, alpha=(1 - dones_t))
-        # q_targets = max_next_q_values
-
-        # Make sure the rewards_t has the correct dimension
-        # print("Q values and Q targets:")
-        # print(q_values)
-        # print(q_targets)
-        # print("Q values:", q_values)
-        # print("Q targets:", q_targets)
         loss = loss_fn(q_values, q_targets)
 
         # Backdrop
@@ -155,15 +120,6 @@ class Q_function:
         # loss.backward(retain_graph=True)
         loss.backward()
 
-        # Check if gradient is flowing
-        # print("named parameters: ",self.policy_network.named_parameters())
-        # for name, param in self.policy_network.named_parameters():
-        #     # print("param.grad:",param.grad)
-        #     if param.grad is not None:
-        #         print(f"Gradient for {name}: {param.grad.abs().sum()}")
-        # for name, param in self.embedding.named_parameters():
-        #     if param.grad is not None:
-        #         print(f"Gradient for embedding {name}: {param.grad.abs().sum()}")
 
         self.optimizer.step()
     
@@ -302,7 +258,9 @@ class agent:
 
             # Create a victim model and train
             victim_model = victim()
-            parity, oddity = victim_model.train()
+            # return pa, eq, test_f1, val_loss, test_auc
+
+            parity, oddity, test_f1, val_loss, test_auc = victim_model.train()
             if parity < 0 or oddity < 0: continue
             # fairness_losses, dp, eod, cdp = victim_model.evaluate()
             # parity = fairness_losses[0]
@@ -335,8 +293,8 @@ class agent:
 
                 # After changing the model, retrain the victim model and calculate the new fairness value
                 # victim_model.train()
-
-                new_parity, oddity = victim_model.train()
+                # parity, oddity, test_f1, val_loss, test_auc
+                new_parity, oddity, test_f1, val_loss, test_auc = victim_model.train()
                 # new_losses, new_dp, eod, cdp = victim_model.evaluate()
                 # new_parity = new_losses[0]
                 # oddity = new_losses[1]
@@ -402,24 +360,12 @@ class agent:
         # print("Episode", episode)
         # print("Exploration rate", self.Q_function1.exploration_rate)
 
-        # all_rewards = []
-        # cumulative_reward = 0
-
-        # Create a victim model and train
-        # victim_model = victim()
-        # parity, oddity = victim_model.train()
-        # if parity < 0 or oddity < 0: continue
-        # fairness_losses, dp, eod, cdp = victim_model.evaluate()
-        # parity = fairness_losses[0]
-        # oddity = fairness_losses[1]
         emb_matrix = self.embedding.n2v(self.graph)
         state_embedding = self.embedding.g2v(emb_matrix)
 
-        # print("Episode", episode)
         print("Evaluation mode, the", epoch, "th epoch")
         self.Q_function1.exploration_rate = 0.0
         self.Q_function2.exploration_rate = 0.0
-        # print("Exploration rate", self.Q_function1.exploration_rate)
 
         all_rewards = []
         cumulative_reward = 0
@@ -427,7 +373,7 @@ class agent:
         # Create a victim model and train
         victim_model = victim()
 
-        parity, oddity = victim_model.train(epochs = 200)
+        parity, oddity, test_f1, val_loss, test_auc = victim_model.train(epochs = 200)
 
         init_parity = parity
         init_oddity = oddity
@@ -457,7 +403,7 @@ class agent:
             # After changing the model, retrain the victim model and calculate the new fairness value
             # victim_model.train()
 
-            new_parity, oddity = victim_model.train()
+            new_parity, oddity, test_f1, val_loss, test_auc = victim_model.train()
             # new_losses, new_dp, eod, cdp = victim_model.evaluate()
             # new_parity = new_losses[0]
             # oddity = new_losses[1]
@@ -469,6 +415,7 @@ class agent:
             if parity < 0 or oddity < 0: 
                 # Revert the change
                 self.change_edge(first_node, second_node)
+                print("Error, parity/oddity is negative")
                 continue
 
             reward = new_parity - parity

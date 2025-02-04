@@ -113,7 +113,7 @@ class victim:
         auc_roc_val = roc_auc_score(labels.cpu().numpy()[idx_val.cpu().numpy()], output.detach().cpu().numpy()[idx_val.cpu().numpy()])
         f1_val = f1_score(labels[idx_val.cpu().numpy()].cpu().numpy(), preds[idx_val.cpu().numpy()].cpu().numpy())
 
-
+        
         pa = -1
         eq = -1
         test_auc = -1
@@ -127,7 +127,7 @@ class victim:
             # print("Parity of val: " + str(pa))
             # print("Equality of val: " + str(eq))
         return pa, eq, test_f1, val_loss, test_auc
-
+    
 
 
 
