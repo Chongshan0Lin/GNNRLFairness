@@ -14,6 +14,7 @@ import time
 from sklearn.metrics import accuracy_score, roc_auc_score, recall_score, f1_score
 import os
 import dgl
+import shutil
 
 from .utils import normalize_adjacency
 from .utils import demographic_parity, conditional_demographic_parity, equality_of_odds
@@ -273,8 +274,10 @@ class victim:
         # sp.save_npz('pre_processed/A_debiased.npz', adj1)
         # torch.save(X_debiased, "pre_processed/X_debiased.pt")
         output_dir = 'pre_processed'
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
+
+        os.makedirs(output_dir)
 
         sp.save_npz(os.path.join(output_dir, 'A_debiased.npz'), adj1)
         torch.save(X_debiased, os.path.join(output_dir, 'X_debiased.pt'))
@@ -337,11 +340,10 @@ class victim:
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
 
     def update_adj_matrix(self, adj_matrix):
-        
 
         print("Matrix updated")
         device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
-        self.adj_matrix = adj_matrix.to(device) 
+        self.adj_matrix = adj_matrix.to(device)
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach()
 
     def sparse_mx_to_torch_sparse_tensor(self, sparse_mx):
