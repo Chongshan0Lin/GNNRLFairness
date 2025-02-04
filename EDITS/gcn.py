@@ -38,6 +38,9 @@ class GCN_Body(nn.Module):
         # print(type(x))
         # print("edge_index: ", edge_index)
         # print(type(edge_index))
+        print(g.device)
+        print(X_debiased.device)
+
         x = self.gc1(edge_index, x)
         return x    
 
