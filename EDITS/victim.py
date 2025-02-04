@@ -118,8 +118,8 @@ class victim:
 
         num_nodes = A_coo.shape[0]
         g = dgl.graph((A_coo.row, A_coo.col), num_nodes=num_nodes)
-        g = g.to(device)  # Move the graph to the appropriate device.
-
+        # g = g.to(device)  # Move the graph to the appropriate device.
+        g = dgl.add_self_loop(g).to(device)
 
         # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
         output = model(x=X_debiased, edge_index=g)
