@@ -75,7 +75,7 @@ class victim:
         the_con1 = np.where(the_con1 > np.max(the_con1) * threshold_proportion, 1 + the_con1 * 0, the_con1)
         the_con1 = np.where(the_con1 < np.min(the_con1) * threshold_proportion, -1 + the_con1 * 0, the_con1)
         the_con1 = np.where(np.abs(the_con1) == 1, the_con1, the_con1 * 0)
-        A_debiased = adj_ori + sp.coo_matrix(the_con1)
+        A_debiased = adj_ori_scipy + sp.coo_matrix(the_con1)
         assert A_debiased.max() == 1
         assert A_debiased.min() == 0
         features = features[:, torch.nonzero(features.sum(axis=0)).squeeze()].detach()
