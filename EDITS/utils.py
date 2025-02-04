@@ -133,15 +133,30 @@ def fair_metric(pred, labels, sens):
     
     # return parity, equality
 # Move tensors to CPU and convert to NumPy arrays
-    pred_np = pred.detach().cpu().numpy()
-    labels_np = labels.detach().cpu().numpy()
-    sens_np = sens.detach().cpu().numpy()
+    # pred_np = pred.detach().cpu().numpy()
+    # labels_np = labels.detach().cpu().numpy()
+    # sens_np = sens.detach().cpu().numpy()
+    if isinstance(pred, torch.Tensor):
+        pred = pred.detach().cpu().numpy()
+    else:
+        pred = np.array(pred)
+
+    if isinstance(labels, torch.Tensor):
+        labels = labels.detach().cpu().numpy()
+    else:
+        labels = np.array(labels)
+
+    if isinstance(sens, torch.Tensor):
+        sens = sens.detach().cpu().numpy()
+    else:
+        sens = np.array(sens)
+
     
     # Compute boolean indices
-    idx_s0 = sens_np == 0
-    idx_s1 = sens_np == 1
-    idx_s0_y1 = np.bitwise_and(idx_s0, labels_np == 1)
-    idx_s1_y1 = np.bitwise_and(idx_s1, labels_np == 1)
+    idx_s0 = sens == 0
+    idx_s1 = sens == 1
+    idx_s0_y1 = np.bitwise_and(idx_s0, labels == 1)
+    idx_s1_y1 = np.bitwise_and(idx_s1, labels == 1)
     
     # Calculate sums with epsilon to avoid division by zero
     epsilon = 1e-8
@@ -149,10 +164,10 @@ def fair_metric(pred, labels, sens):
     sum_s1 = np.sum(idx_s1) + epsilon
     sum_s0_y1 = np.sum(idx_s0_y1) + epsilon
     sum_s1_y1 = np.sum(idx_s1_y1) + epsilon
-    
+
     # Calculate parity and equality using NumPy operations
-    parity = abs(np.sum(pred_np[idx_s0]) / sum_s0 - np.sum(pred_np[idx_s1]) / sum_s1)
-    equality = abs(np.sum(pred_np[idx_s0_y1]) / sum_s0_y1 - np.sum(pred_np[idx_s1_y1]) / sum_s1_y1)
+    parity = abs(np.sum(pred[idx_s0]) / sum_s0 - np.sum(pred[idx_s1]) / sum_s1)
+    equality = abs(np.sum(pred[idx_s0_y1]) / sum_s0_y1 - np.sum(pred[idx_s1_y1]) / sum_s1_y1)
     
     return parity, equality
 
