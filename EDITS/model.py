@@ -111,7 +111,7 @@ class EDITS(nn.Module):
 
 class EstimateAdj(nn.Module):
 
-    def __init__(self, adj, symmetric=False, device='cpu'):
+    def __init__(self, adj, symmetric=False, device=device):
         super(EstimateAdj, self).__init__()
         n = len(adj)
         self.estimated_adj = nn.Parameter(torch.FloatTensor(n, n), requires_grad=True)

@@ -121,8 +121,8 @@ class victim:
         # g = g.to(device)  # Move the graph to the appropriate device.
         g = dgl.add_self_loop(g).to(device)
 
-        print(g.device)
-        print(X_debiased.device)
+        # print(g.device)
+        # print(X_debiased.device)
 
         # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
         output = model(x=X_debiased, edge_index=g)
