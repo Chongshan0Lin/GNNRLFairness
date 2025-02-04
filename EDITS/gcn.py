@@ -4,7 +4,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 # from torch_geometric.nn import GCNConv
 from dgl.nn.pytorch import GraphConv
-import dgl
 
 
 
@@ -35,6 +34,10 @@ class GCN_Body(nn.Module):
         self.gc1 = GraphConv(nfeat, nhid)
 
     def forward(self, x, edge_index):
+        print("x: ", x)
+        print(type(x))
+        print("edge_index: ", edge_index)
+        print(type(edge_index))
         x = self.gc1(x, edge_index)
         return x    
 
