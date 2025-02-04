@@ -123,12 +123,7 @@ class victim:
 
         # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
         output = self.model(x=X_debiased, edge_index=g)
-        # preds = (output.squeeze() > 0).type_as(labels)
-
-        prob  = torch.sigmoid(output.squeeze())
-        preds = (prob > 0.5).type_as(labels)
-        print("labels:", labels)
-
+        preds = (output.squeeze() > 0).type_as(labels)
         loss_train = F.binary_cross_entropy_with_logits(output[idx_train], labels[idx_train].unsqueeze(1).float())
         auc_roc_train = roc_auc_score(labels.cpu().numpy()[idx_train.cpu().numpy()], output.detach().cpu().numpy()[idx_train.cpu().numpy()])
         f1_train = f1_score(labels[idx_train.cpu().numpy()].cpu().numpy(), preds[idx_train.cpu().numpy()].cpu().numpy())
@@ -139,11 +134,7 @@ class victim:
         self.model.eval()
         # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
         output = self.model(x=X_debiased, edge_index=g)
-        # preds = (output.squeeze() > 0).type_as(labels)
-
-        prob  = torch.sigmoid(output.squeeze())
-        preds = (prob > 0.5).type_as(labels)
-
+        preds = (output.squeeze() > 0).type_as(labels)
         loss_val = F.binary_cross_entropy_with_logits(output[idx_val], labels[idx_val].unsqueeze(1).float())
         auc_roc_val = roc_auc_score(labels.cpu().numpy()[idx_val.cpu().numpy()], output.detach().cpu().numpy()[idx_val.cpu().numpy()])
         f1_val = f1_score(labels[idx_val.cpu().numpy()].cpu().numpy(), preds[idx_val.cpu().numpy()].cpu().numpy())
@@ -190,13 +181,9 @@ class victim:
         idx_test = self.idx_test.to(device)
         sens = self.sens.to(device)
 
-    
+
         print("output:",output)
-        # preds = (output.squeeze() > 0).type_as(labels)
-
-        prob  = torch.sigmoid(output.squeeze())
-        preds = (prob > 0.5).type_as(labels)
-
+        preds = (output.squeeze() > 0).type_as(labels)
         print("Prediction:", preds)
         loss_test = F.binary_cross_entropy_with_logits(output[idx_test], labels[idx_test].unsqueeze(1).float())
         auc_roc_test = roc_auc_score(labels.cpu().numpy()[idx_test.cpu().numpy()], output.detach().cpu().numpy()[idx_test.cpu().numpy()])
