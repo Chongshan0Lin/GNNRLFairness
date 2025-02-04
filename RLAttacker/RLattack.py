@@ -273,6 +273,7 @@ class agent:
 
             print("Initial Parity:", parity)
             print("Initial Oddity:", oddity)
+            print("Accuracy:", test_auc)
             # Employ dynamic exploration rate to encourge more exploration during the previous stage
             max_dp = parity
             max_eod = oddity
@@ -298,6 +299,7 @@ class agent:
                 # Determine the difference of fairness, which is the reward
                 print("Parity:", new_parity)
                 print("Oddity:", oddity)
+                print("Accuracy:", test_auc)
                 max_dp = max(max_dp, new_parity)
                 max_eod = max(max_eod, oddity)
                 if parity < 0 or oddity < 0: 

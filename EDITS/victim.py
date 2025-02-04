@@ -82,7 +82,7 @@ class victim:
         assert A_debiased.min() == 0
         features = features[:, torch.nonzero(features.sum(axis=0)).squeeze()].detach()
         A_debiased = self.normalize_scipy(A_debiased)
-
+        
         sens = self.sens
 
         print("****************************After debiasing****************************")
@@ -213,6 +213,7 @@ class victim:
         '''
         Model preprossing part
         '''
+
         features = self.feature_matrix / self.feature_matrix.norm(dim=0)
         adj_preserve = self.adj_matrix
         
