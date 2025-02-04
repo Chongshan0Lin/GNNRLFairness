@@ -164,6 +164,17 @@ class victim:
     def test(self, X_debiased, g):
         self.model.eval()
         output = self.model(x=X_debiased, edge_index=g)
+        
+        features = self.feature_matrix / self.feature_matrix.norm(dim=0)
+        adj_preserve = self.adj_matrix
+        
+        if isinstance(self.adj_matrix, torch.Tensor):
+            adj_matrix_scipy = self.tensor_to_scipy_sparse(self.adj_matrix)
+        else:
+            adj_matrix_scipy = self.adj_matrix
+
+        adj = self.sparse_mx_to_torch_sparse_tensor(adj_matrix_scipy)
+
 
         adj = adj.to(device)
         features = features.to(device)
