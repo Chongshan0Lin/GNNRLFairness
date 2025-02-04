@@ -4,6 +4,8 @@ from torch.nn.parameter import Parameter
 import torch.optim as optim
 from deeprobust.graph.defense.pgd import PGD, prox_operators
 
+gpu_index = 2
+device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
 
 class EDITS(nn.Module):
 
@@ -138,7 +140,7 @@ class Adj_renew(nn.Module):
         self.reset_parameters()
 
     def fit(self, adj, lr):
-        estimator = EstimateAdj(adj, symmetric=False, device='cuda').to('cuda').half()
+        estimator = EstimateAdj(adj, symmetric=False, device=device).to(device).half()
         self.estimator = estimator
         self.optimizer_adj = optim.SGD(estimator.parameters(),
                               momentum=0.9, lr=lr)   # 0.005
