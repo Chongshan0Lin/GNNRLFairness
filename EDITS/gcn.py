@@ -2,7 +2,9 @@ import ipdb
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric.nn import GCNConv
+# from torch_geometric.nn import GCNConv
+from dgl.nn.pytorch import GraphConv
+
 
 
 class GCN(nn.Module):
@@ -29,7 +31,7 @@ class GCN(nn.Module):
 class GCN_Body(nn.Module):
     def __init__(self, nfeat, nhid, dropout):
         super(GCN_Body, self).__init__()
-        self.gc1 = GCNConv(nfeat, nhid)
+        self.gc1 = GraphConv(nfeat, nhid)
 
     def forward(self, x, edge_index):
         x = self.gc1(x, edge_index)
