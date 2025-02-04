@@ -23,9 +23,11 @@ def metric_wd(feature, adj_norm, flag, weakening_factor, max_hop):
             cumulation += pow(weakening_factor, i) * adj_norm.dot(feature)
 
     for i in range(feature.shape[1]):
-        flag_cpu = flag.cpu()
-        class_1 = cumulation[torch.eq(flag_cpu, 0), i].cpu().numpy()
-        class_2 = cumulation[torch.eq(flag_cpu, 1), i].cpu().numpy()
+        mask_0 = torch.eq(flag.cpu(), 0).numpy()
+        mask_1 = torch.eq(flag.cpu(), 1).numpy()
+
+        class_1 = cumulation[mask_0, i]
+        class_2 = cumulation[mask_1, i]
         emd = wasserstein_distance(class_1, class_2)
         emd_distances.append(emd)
 
