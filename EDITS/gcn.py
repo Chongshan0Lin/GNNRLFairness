@@ -38,7 +38,7 @@ class GCN_Body(nn.Module):
         print(type(x))
         print("edge_index: ", edge_index)
         print(type(edge_index))
-        x = self.gc1(x, edge_index)
+        x = self.gc1(edge_index, x)
         return x    
 
 
