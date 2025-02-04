@@ -12,6 +12,7 @@ from .model import EDITS
 import torch.optim as optim
 import time
 from sklearn.metrics import accuracy_score, roc_auc_score, recall_score, f1_score
+import os
 
 from .utils import normalize_adjacency
 from .utils import demographic_parity, conditional_demographic_parity, equality_of_odds
@@ -235,8 +236,15 @@ class victim:
         # metric_wd(features1, binarize(adj1, adj_preserve, 0.012), sens.cpu(), 0.9, 2)
         # print("****************************************************************************")
         print("Saving into dataset.")
-        sp.save_npz('pre_processed/A_debiased.npz', adj1)
-        torch.save(X_debiased, "pre_processed/X_debiased.pt")
+        # sp.save_npz('pre_processed/A_debiased.npz', adj1)
+        # torch.save(X_debiased, "pre_processed/X_debiased.pt")
+        output_dir = 'pre_processed'
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        sp.save_npz(os.path.join(output_dir, 'A_debiased.npz'), adj1)
+        torch.save(X_debiased, os.path.join(output_dir, 'X_debiased.pt'))
+
         print("Preprocessed datasets saved.")
 
 
