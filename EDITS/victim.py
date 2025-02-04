@@ -106,6 +106,7 @@ class victim:
 
         # self.model = EDITS(nfeat=self.nfeatures, node_num=self.nnodes, nclass=self.nclasses, nfeat_out=self.nclasses, adj_lambda=1e-1)
 
+        # def forward(self, A, X):
 
         self.model = EDITS(nfeat=X_debiased.shape[1], node_num=self.nnodes, nclass=self.nclasses, nfeat_out=self.nclasses, adj_lambda=1e-1).float()
         self.model = self.model.to(device)
@@ -125,8 +126,8 @@ class victim:
         # g = g.to(device)  # Move the graph to the appropriate device.
         g = dgl.add_self_loop(g).to(device)
 
-        # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
-        output = self.model(x=X_debiased, edge_index=g)
+
+        output = self.model(X=X_debiased, edge_index=g)
         preds = (output.squeeze() > 0).type_as(labels)
         loss_train = F.binary_cross_entropy_with_logits(output[idx_train], labels[idx_train].unsqueeze(1).float())
         auc_roc_train = roc_auc_score(labels.cpu().numpy()[idx_train.cpu().numpy()], output.detach().cpu().numpy()[idx_train.cpu().numpy()])

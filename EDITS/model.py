@@ -48,6 +48,7 @@ class EDITS(nn.Module):
         for param_group in self.optimizer_A.param_groups:
             param_group["lr"] = lr
 
+
         # optimize attribute debiasing module
         # *************************  attribute debiasing  *************************
         self.train()
