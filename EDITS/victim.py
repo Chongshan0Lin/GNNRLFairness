@@ -52,6 +52,7 @@ class victim:
         # self.model = GCN(in_features=self.nfeatures, hidden_features = self.hfeatures, out_features=self.nclasses, dropout=0.5)
 
         # def __init__(self,  nfeat, node_num, nclass, nfeat_out, adj_lambda, layer_threshold=2, dropout=0.1, lr = 1e-3, weight_decay=1e-5):
+        # def __init__(self,  nfeat, node_num, nclass, nfeat_out, adj_lambda, layer_threshold=2, dropout=0.1, lr = 1e-3, weight_decay=1e-5):
 
         self.model = EDITS(nfeat=self.nfeatures, node_num=self.nnodes, nclass=self.nclasses, nfeat_out=self.nclasses, adj_lambda=1e-1)
         self.model.to(device)
@@ -101,9 +102,12 @@ class victim:
         # Stack them into an edge_index tensor of shape [2, num_edges].
         edge_index = torch.stack([row, col], dim=0).cuda()
 
+        # def __init__(self,  nfeat, node_num, nclass, nfeat_out, adj_lambda, layer_threshold=2, dropout=0.1, lr = 1e-3, weight_decay=1e-5):
+
+        # self.model = EDITS(nfeat=self.nfeatures, node_num=self.nnodes, nclass=self.nclasses, nfeat_out=self.nclasses, adj_lambda=1e-1)
 
 
-        self.model = EDITS(nfeat=X_debiased.shape[1], nhid=self.hfeatures, nclass=self.labels.max().item()).float()
+        self.model = EDITS(nfeat=X_debiased.shape[1], node_num=self.nnodes, nclass=self.nclasses, nfeat_out=self.nclasses, adj_lambda=1e-1).float()
         self.model = self.model.to(device)
         optimizer = optim.Adam(self.model.parameters(), lr=1e-3, weight_decay=1e-5)
 
