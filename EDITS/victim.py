@@ -182,7 +182,7 @@ class victim:
         sens = self.sens.to(device)
 
 
-
+        print("output:",output)
         preds = (output.squeeze() > 0).type_as(labels)
         print("Prediction:", preds)
         loss_test = F.binary_cross_entropy_with_logits(output[idx_test], labels[idx_test].unsqueeze(1).float())
