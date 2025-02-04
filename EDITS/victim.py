@@ -103,6 +103,7 @@ class victim:
 
 
         model = GCN(nfeat=X_debiased.shape[1], nhid=self.hfeatures, nclass=self.labels.max().item()).float()
+        model = model.to(device)
         optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-5)
 
 
