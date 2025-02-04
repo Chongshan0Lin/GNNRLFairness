@@ -7,20 +7,20 @@ from deeprobust.graph.defense.pgd import PGD, prox_operators
 
 class EDITS(nn.Module):
 
-    def __init__(self, args, nfeat, node_num, nclass, nfeat_out, adj_lambda, layer_threshold=2, dropout=0.1):
+    def __init__(self,  nfeat, node_num, nclass, nfeat_out, adj_lambda, layer_threshold=2, dropout=0.1, lr = 1e-3, weight_decay=1e-5):
         super(EDITS, self).__init__()
         self.x_debaising = X_debaising(nfeat)
         self.layer_threshold = layer_threshold
         self.adj_renew = Adj_renew(node_num, nfeat, nfeat_out, adj_lambda)
         self.fc = nn.Linear(nfeat * (layer_threshold + 1), 1)
-        self.lr = args.lr
+        self.lr = lr
         self.optimizer_feature_l1 = PGD(self.x_debaising.parameters(),
                         proxs=[prox_operators.prox_l1],
                         lr=self.lr, alphas=[5e-6])
         self.dropout = nn.Dropout(dropout)
         G_params = list(self.x_debaising.parameters())
-        self.optimizer_G = torch.optim.RMSprop(G_params, lr=self.lr, eps=1e-04, weight_decay=args.weight_decay)
-        self.optimizer_A = torch.optim.RMSprop(self.fc.parameters(), lr=self.lr, eps=1e-04, weight_decay=args.weight_decay)
+        self.optimizer_G = torch.optim.RMSprop(G_params, lr=self.lr, eps=1e-04, weight_decay=weight_decay)
+        self.optimizer_A = torch.optim.RMSprop(self.fc.parameters(), lr=self.lr, eps=1e-04, weight_decay=weight_decay)
 
     def propagation_cat_new_filter(self, X_de, A_norm, layer_threshold):
         A_norm = A_norm.half()

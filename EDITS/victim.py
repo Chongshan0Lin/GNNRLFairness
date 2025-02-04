@@ -3,7 +3,16 @@ import networkx as nx
 import pandas as pd
 import numpy as np
 import torch
-from .model import GCN
+from .gcn import GCN
+import scipy.sparse as sp
+from tqdm import tqdm
+from .metrics import metric_wd
+from .model import EDITS
+from torch_geometric.utils import dropout_adj, convert
+import torch.optim as optim
+import time
+from sklearn.metrics import accuracy_score, roc_auc_score, recall_score, f1_score
+
 from .utils import normalize_adjacency
 from .utils import demographic_parity, conditional_demographic_parity, equality_of_odds
 from .utils import fair_metric
@@ -37,69 +46,180 @@ class victim:
         # print("nclasses: ",self.nclasses)
         # print("hfeatures: ",self.hfeatures)
 
-        self.model = GCN(in_features=self.nfeatures, hidden_features = self.hfeatures, out_features=self.nclasses, dropout=0.5)
+        # self.model = GCN(in_features=self.nfeatures, hidden_features = self.hfeatures, out_features=self.nclasses, dropout=0.5)
+        self.model = EDITS()
         self.model.to(device)
 
-        # if torch.cuda.is_available():
-        #     print("CUDA is available. PyTorch can use the GPU.")
-        #     print(f"Number of CUDA devices: {torch.cuda.device_count()}")
-        #     print(f"Current CUDA device: {torch.cuda.current_device()}")
-        #     print(f"Device name: {torch.cuda.get_device_name(torch.cuda.current_device())}")
-        # else:
-        #     print("CUDA is not available. PyTorch will use the CPU.")
-        # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-        # device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
-        # self.model.to(device)
-
-        # params = list(self.model.parameters())
-        # param_count = len(params)
-        # print(f"Total parameters in model: {param_count}")
-        # for idx, param in enumerate(params):
-        #     print(f"Parameter {idx}: Shape {param.shape}, requires_grad={param.requires_grad}")
-
-        # print("number of parameter to optimizer",self.model.parameters().__sizeof__())
-
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01, weight_decay=5e-4)
-        # print("Optimizer initialized with model parameters.")
-
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3, weight_decay=1e-5)
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
 
+    def train(self, epoch = 100, val_loss = 1e5, ):
+        self.preprosessing()
+
+        adj_ori = self.adj_matrix
+        adj = self.normalize_scipy(self.adj_matrix)
+
+        # Loading preprocessed data
+        A_debiased, features = sp.load_npz('pre_processed/A_debiased.npz'), torch.load("pre_processed/X_debiased.pt", map_location=torch.device('cpu')).cpu().float()
+        threshold_proportion = 0.015  # GCN: {credit: 0.02, german: 0.29, bail: 0.015}
+        the_con1 = (A_debiased - adj_ori).A
+        the_con1 = np.where(the_con1 > np.max(the_con1) * threshold_proportion, 1 + the_con1 * 0, the_con1)
+        the_con1 = np.where(the_con1 < np.min(the_con1) * threshold_proportion, -1 + the_con1 * 0, the_con1)
+        the_con1 = np.where(np.abs(the_con1) == 1, the_con1, the_con1 * 0)
+        A_debiased = adj_ori + sp.coo_matrix(the_con1)
+        assert A_debiased.max() == 1
+        assert A_debiased.min() == 0
+        features = features[:, torch.nonzero(features.sum(axis=0)).squeeze()].detach()
+        A_debiased = self.normalize_scipy(A_debiased)
+
+        sens = self.sens
+
+        print("****************************After debiasing****************************")
+        metric_wd(features, A_debiased, sens, 0.9, 0)
+        metric_wd(features, A_debiased, sens, 0.9, 2)
+        print("****************************************************************************")
+        X_debiased = features.float()
+        edge_index = convert.from_scipy_sparse_matrix(A_debiased)[0].cuda()
 
 
-    def train(self):
+        model = GCN(nfeat=X_debiased.shape[1], nhid=self.hfeatures, nclass=self.labels.max().item()).float()
+        optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-5)
 
-        self.model.train()
-        for epoch in range(EPOCH):
 
-            self.optimizer.zero_grad()
-            # print(feature_matrix.shape)
-            # print(feature_matrix.shape[0])
-            # print(feature_matrix.shape[1])
-            output = self.model(self.feature_matrix, self.adj_norm)
+        # Train model
 
-            # Compute loss only over training nodes
-            loss_train = F.nll_loss(output[self.idx_train], self.labels[self.idx_train])
-            loss_train.backward()
-            self.optimizer.step()
 
-            # Optional: monitor validation accuracy
-            with torch.no_grad():
-                self.model.eval()
-                output_val = self.model(self.feature_matrix, self.adj_norm)
-                loss_val = F.nll_loss(output_val[self.idx_val], self.labels[self.idx_val])
-                pred_val = output_val[self.idx_val].max(1)[1]
-                acc_val  = pred_val.eq(self.labels[self.idx_val]).sum().item() / self.idx_val.size(0)
-                self.model.train()
-            # print("Episode")
-            if (epoch+1) % 100 == 0:
-                print(
-                    f"Epoch: {epoch:03d}, "
-                    f"Train Loss: {loss_train.item():.4f}, "
-                    f"Val Loss: {loss_val.item():.4f}, "
-                    f"Val Acc: {acc_val:.4f}"
-                )
-    
+        t = time.time()
+        model.train()
+        optimizer.zero_grad()
+        idx_train = self.idx_train.to(device)
+        labels = self.labels.to(device)
+        idx_val =self.idx_val.to(device)
+
+
+        output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
+        preds = (output.squeeze() > 0).type_as(labels)
+        loss_train = F.binary_cross_entropy_with_logits(output[idx_train], labels[idx_train].unsqueeze(1).float())
+        auc_roc_train = roc_auc_score(labels.cpu().numpy()[idx_train.cpu().numpy()], output.detach().cpu().numpy()[idx_train.cpu().numpy()])
+        f1_train = f1_score(labels[idx_train.cpu().numpy()].cpu().numpy(), preds[idx_train.cpu().numpy()].cpu().numpy())
+        loss_train.backward()
+        optimizer.step()
+        _, _ = fair_metric(preds[idx_train.cpu().numpy()].cpu().numpy(), labels[idx_train.cpu().numpy()].cpu().numpy(), sens[idx_train.cpu().numpy()].cpu().numpy())
+
+        model.eval()
+        output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
+        preds = (output.squeeze() > 0).type_as(labels)
+        loss_val = F.binary_cross_entropy_with_logits(output[idx_val], labels[idx_val].unsqueeze(1).float())
+        auc_roc_val = roc_auc_score(labels.cpu().numpy()[idx_val.cpu().numpy()], output.detach().cpu().numpy()[idx_val.cpu().numpy()])
+        f1_val = f1_score(labels[idx_val.cpu().numpy()].cpu().numpy(), preds[idx_val.cpu().numpy()].cpu().numpy())
+
+
+        pa = -1
+        eq = -1
+        test_auc = -1
+        test_f1 = -1
+
+        if epoch < 15:
+            return 0, 0, 0, 1e5, 0
+        if loss_val < val_loss:
+            val_loss = loss_val.data
+            pa, eq, test_f1, test_auc = self.test(test_f1)
+            # print("Parity of val: " + str(pa))
+            # print("Equality of val: " + str(eq))
+        return pa, eq, test_f1, val_loss, test_auc
+
+
+
+
+
+
+        # Evaluate model
+    def test(self, X_debiased, edge_index, idx_test):
+        self.model.eval()
+        labels = self.labels.to(device)
+        sens = self.sens.to(device)
+        output = self.model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
+        preds = (output.squeeze() > 0).type_as(labels)
+        preds = preds.to(device)
+        loss_test = F.binary_cross_entropy_with_logits(output[idx_test], labels[idx_test].unsqueeze(1).float())
+        auc_roc_test = roc_auc_score(labels.cpu().numpy()[idx_test.cpu().numpy()], output.detach().cpu().numpy()[idx_test.cpu().numpy()])
+        f1_test = f1_score(labels[idx_test.cpu().numpy()].cpu().numpy(), preds[idx_test.cpu().numpy()].cpu().numpy())
+        test_auc = auc_roc_test
+        test_f1 = f1_test
+        # print("Test set results:",
+        #       "loss= {:.4f}".format(loss_test.item()),
+        #       "F1_test= {:.4f}".format(test_f1),
+        #       "AUC_test= {:.4f}".format(test_auc))
+        parity_test, equality_test = fair_metric(preds[idx_test.cpu().numpy()].cpu().numpy(),
+                                                labels[idx_test.cpu().numpy()].cpu().numpy(),
+                                                sens[idx_test.cpu().numpy()].cpu().numpy())
+        # print("Parity of test: " + str(parity_test))
+        # print("Equality of test: " + str(equality_test))
+        return parity_test, equality_test, test_f1, test_auc
+
+
+
+    def preprosessing(self, epochs=1000):
+
+        '''
+        Model preprossing part
+        '''
+        features = self.feature_matrix / self.feature_matrix.norm(dim=0)
+        adj_preserve = self.adj_matrix
+        adj = self.sparse_mx_to_torch_sparse_tensor(self.adj_matrix)
+        model = EDITS(nfeat=features.shape[1], node_num=features.shape[0], nfeat_out=int(features.shape[0]/10), adj_lambda=1e-1, nclass=2, layer_threshold=2, dropout=0.2)  # 3-nba
+
+
+        model = model.to(device)
+        adj = adj.to(device)
+        features = features.to(device)
+        features_preserve = features_preserve.to(device)
+        labels = self.labels.to(device)
+        idx_train = self.idx_train.to(device)
+        idx_val = self.idx_val.to(device)
+        idx_test = self.idx_test.to(device)
+        sens = self.sens.to(device)
+
+        A_debiased, X_debiased = adj, features
+
+
+        val_adv = []
+        test_adv = []
+        for epoch in tqdm(range(epochs)):
+            if epoch > 400:
+                lr = 0.001
+            model.train()
+            model.optimize(adj, features, idx_train, sens, epoch)
+            A_debiased, X_debiased, predictor_sens, show, _ = model(adj, features)
+            positive_eles = torch.masked_select(predictor_sens[idx_val].squeeze(), sens[idx_val] > 0)
+            negative_eles = torch.masked_select(predictor_sens[idx_val].squeeze(), sens[idx_val] <= 0)
+            loss_val = - (torch.mean(positive_eles) - torch.mean(negative_eles))
+            val_adv.append(loss_val.data)
+
+        param = model.state_dict()
+
+        indices = torch.argsort(param["x_debaising.s"])[:4]
+        for i in indices:
+            features_preserve[:, i] = torch.zeros_like(features_preserve[:, i])
+        X_debiased = features_preserve
+        adj1 = sp.csr_matrix(A_debiased.detach().cpu().numpy())
+        # print("****************************After debiasing****************************")  # threshold_proportion for GCN: {credit: 0.02, german: 0.25, bail: 0.012}
+        # features1 = X_debiased.cpu().float()[:, torch.nonzero(features.sum(axis=0)).squeeze()].detach()
+        # if args.dataset != 'german':
+        #     features1 = feature_norm(features1)
+        # metric_wd(features1, binarize(adj1, adj_preserve, 0.012), sens.cpu(), 0.9, 0)
+        # metric_wd(features1, binarize(adj1, adj_preserve, 0.012), sens.cpu(), 0.9, 2)
+        # print("****************************************************************************")
+        sp.save_npz('pre_processed/A_debiased.npz', adj1)
+        torch.save(X_debiased, "pre_processed/X_debiased.pt")
+        print("Preprocessed datasets saved.")
+
+
+        '''
+        Model training and classification part
+        '''
+
+
     def evaluate(self):
         self.model.eval()
         with torch.no_grad():
@@ -134,18 +254,43 @@ class victim:
         else:
             self.adj_matrix[node1][node2] = 1
 
-        # Update the adj_norm correspondingly
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
     
     def update_adj_matrix(self, adj_matrix):
-        # self.adj_matrix = adj_matrix
-        # self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
 
         device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
         self.adj_matrix = adj_matrix.to(device) 
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach()
 
+    def sparse_mx_to_torch_sparse_tensor(self, sparse_mx):
+        """Convert a scipy sparse matrix to a torch sparse tensor."""
+        sparse_mx = sparse_mx.tocoo().astype(np.float32)
+        indices = torch.from_numpy(
+            np.vstack((sparse_mx.row, sparse_mx.col)).astype(np.int64))
+        values = torch.from_numpy(sparse_mx.data)
+        shape = torch.Size(sparse_mx.shape)
+        return torch.sparse.FloatTensor(indices, values, shape)
 
-s = victim()
-s.train()
-s.evaluate()
+    def binarize(self, A_debiased, adj_ori, threshold_proportion):
+
+        the_con1 = (A_debiased - adj_ori).A
+        the_con1 = np.where(the_con1 > np.max(the_con1) * threshold_proportion, 1 + the_con1 * 0, the_con1)
+        the_con1 = np.where(the_con1 < np.min(the_con1) * threshold_proportion, -1 + the_con1 * 0, the_con1)
+        the_con1 = np.where(np.abs(the_con1) == 1, the_con1, the_con1 * 0)
+        A_debiased = adj_ori + sp.coo_matrix(the_con1)
+        assert A_debiased.max() == 1
+        assert A_debiased.min() == 0
+        A_debiased = self.normalize_scipy(A_debiased)
+        return A_debiased
+    
+    def normalize_scipy(self, mx):
+        rowsum = np.array(mx.sum(1))
+        r_inv = np.power(rowsum, -0.5).flatten()
+        r_inv[np.isinf(r_inv)] = 0.
+        r_mat_inv = sp.diags(r_inv)
+        mx = r_mat_inv.dot(mx).dot(r_mat_inv)
+        return mx
+
+# s = victim()
+# s.train()
+# s.evaluate()
