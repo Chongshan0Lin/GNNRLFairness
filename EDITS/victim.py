@@ -13,6 +13,7 @@ import torch.optim as optim
 import time
 from sklearn.metrics import accuracy_score, roc_auc_score, recall_score, f1_score
 import os
+import dgl
 
 from .utils import normalize_adjacency
 from .utils import demographic_parity, conditional_demographic_parity, equality_of_odds
@@ -115,8 +116,13 @@ class victim:
         labels = self.labels.to(device)
         idx_val =self.idx_val.to(device)
 
+        num_nodes = A_coo.shape[0]
+        g = dgl.graph((A_coo.row, A_coo.col), num_nodes=num_nodes)
+        g = g.to(device)  # Move the graph to the appropriate device.
 
-        output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
+
+        # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
+        output = model(x=X_debiased, edge_index=g)
         preds = (output.squeeze() > 0).type_as(labels)
         loss_train = F.binary_cross_entropy_with_logits(output[idx_train], labels[idx_train].unsqueeze(1).float())
         auc_roc_train = roc_auc_score(labels.cpu().numpy()[idx_train.cpu().numpy()], output.detach().cpu().numpy()[idx_train.cpu().numpy()])
@@ -126,7 +132,8 @@ class victim:
         _, _ = fair_metric(preds[idx_train.cpu().numpy()].cpu().numpy(), labels[idx_train.cpu().numpy()].cpu().numpy(), sens[idx_train.cpu().numpy()].cpu().numpy())
 
         model.eval()
-        output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
+        # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
+        output = model(x=X_debiased, edge_index=g)
         preds = (output.squeeze() > 0).type_as(labels)
         loss_val = F.binary_cross_entropy_with_logits(output[idx_val], labels[idx_val].unsqueeze(1).float())
         auc_roc_val = roc_auc_score(labels.cpu().numpy()[idx_val.cpu().numpy()], output.detach().cpu().numpy()[idx_val.cpu().numpy()])
