@@ -82,7 +82,7 @@ class victim:
         assert A_debiased.min() == 0
         features = features[:, torch.nonzero(features.sum(axis=0)).squeeze()].detach()
         A_debiased = self.normalize_scipy(A_debiased)
-        
+
         sens = self.sens
 
         print("****************************After debiasing****************************")
@@ -144,7 +144,7 @@ class victim:
         auc_roc_val = roc_auc_score(labels.cpu().numpy()[idx_val.cpu().numpy()], output.detach().cpu().numpy()[idx_val.cpu().numpy()])
         f1_val = f1_score(labels[idx_val.cpu().numpy()].cpu().numpy(), preds[idx_val.cpu().numpy()].cpu().numpy())
 
-        
+
         pa = -1
         eq = -1
         test_auc = -1
@@ -154,6 +154,7 @@ class victim:
             return 0, 0, 0, 1e5, 0
         if loss_val < val_loss:
             val_loss = loss_val.data
+            print("New val_loss:", val_loss)
             pa, eq, test_f1, test_auc = self.test(X_debiased=X_debiased, g=g)
             # print("Parity of val: " + str(pa))
             # print("Equality of val: " + str(eq))

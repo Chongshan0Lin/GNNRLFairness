@@ -273,7 +273,7 @@ class agent:
 
             print("Initial Parity:", parity)
             print("Initial Oddity:", oddity)
-            print("Accuracy:", test_auc)
+            print("Initial Accuracy:", test_auc)
             # Employ dynamic exploration rate to encourge more exploration during the previous stage
             max_dp = parity
             max_eod = oddity
