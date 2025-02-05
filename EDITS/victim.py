@@ -49,20 +49,21 @@ class victim:
         # print("nclasses: ",self.nclasses)
         # print("hfeatures: ",self.hfeatures)
 
-        # self.model = GCN(in_features=self.nfeatures, hidden_features = self.hfeatures, out_features=self.nclasses, dropout=0.5)
+        self.model = GCN(in_features=self.nfeatures, hidden_features = self.hfeatures, out_features=self.nclasses, dropout=0.5)
 
         # def __init__(self,  nfeat, node_num, nclass, nfeat_out, adj_lambda, layer_threshold=2, dropout=0.1, lr = 1e-3, weight_decay=1e-5):
 
         # self.model = EDITS(nfeat=self.nfeatures, node_num=self.nnodes, nclass=self.nclasses, nfeat_out=self.nclasses, adj_lambda=1e-1)
-        # self.model.to(device)
+        self.model.to(device)
+        self.optimizer = optim.Adam(self.model.parameters(), lr=1e-3, weight_decay=1e-5)
 
         # self.optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3, weight_decay=1e-5)
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
 
     def train(self, pa = -1, eq = -1, test_f1 = -1, test_auc = -1, epoch = 100, val_loss = 1e5):
         best_val = val_loss
-        self.preprosessing()
-
+        # self.preprosessing()
+        self.optimizer.zero_grad()
         adj_ori = self.adj_matrix
         if isinstance(adj_ori, torch.Tensor):
             adj_ori_scipy = self.tensor_to_scipy_sparse(adj_ori)
@@ -104,15 +105,14 @@ class victim:
 
 
 
-        model = GCN(nfeat=X_debiased.shape[1], nhid=self.hfeatures, nclass=self.labels.max().item()).float()
-        model = model.to(device)
-        optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-5)
+        # model = GCN(nfeat=X_debiased.shape[1], nhid=self.hfeatures, nclass=self.labels.max().item()).float()
+        # model = model.to(device)
 
         # Train model
 
         t = time.time()
-        model.train()
-        optimizer.zero_grad()
+        self.model.train()
+        self.optimizer.zero_grad()
         idx_train = self.idx_train.to(device)
         labels = self.labels.to(device)
         idx_val =self.idx_val.to(device)
@@ -123,17 +123,17 @@ class victim:
         g = dgl.add_self_loop(g).to(device)
 
         # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
-        output = model(x=X_debiased, edge_index=g)
+        output = self.model(x=X_debiased, edge_index=g)
         preds = (output.squeeze() > 0).type_as(labels)
         loss_train = F.binary_cross_entropy_with_logits(output[idx_train], labels[idx_train].unsqueeze(1).float())
         
         loss_train.backward()
-        optimizer.step()
+        self.optimizer.step()
         _, _ = fair_metric(preds[idx_train.cpu().numpy()].cpu().numpy(), labels[idx_train.cpu().numpy()].cpu().numpy(), sens[idx_train.cpu().numpy()].cpu().numpy())
 
-        model.eval()
+        self.model.eval()
         # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
-        output = model(x=X_debiased, edge_index=g)
+        output = self.model(x=X_debiased, edge_index=g)
         preds = (output.squeeze() > 0).type_as(labels)
         loss_val = F.binary_cross_entropy_with_logits(output[idx_val], labels[idx_val].unsqueeze(1).float())
 
@@ -141,21 +141,21 @@ class victim:
         if loss_val <= best_val:
             best_val = loss_val
 
-        
-        # if loss_val < val_loss:
+
+        # if loss_val < valsloss:
             # The problem might be here: it always takes the minimal loss_val
             val_loss = loss_val.data
             # print("New val_loss:", val_loss)
-            pa, eq, test_f1, test_auc = self.test(model=model, X_debiased=X_debiased, g=g)
+            pa, eq, test_f1, test_auc = self.test( X_debiased=X_debiased, g=g)
             print("New parity:", pa)
             # print("Parity of val: " + str(pa))
             # print("Equality of val: " + str(eq))
         return pa, eq, test_f1, val_loss, test_auc
 
     # Evaluate model
-    def test(self, model, X_debiased, g):
-        model.eval()
-        output = model(x=X_debiased, edge_index=g)
+    def test(self, X_debiased, g):
+        self.model.eval()
+        output = self.model(x=X_debiased, edge_index=g)
 
         features = self.feature_matrix / self.feature_matrix.norm(dim=0)
         adj_preserve = self.adj_matrix
