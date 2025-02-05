@@ -129,7 +129,7 @@ class victim:
         # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
         output = self.model(x=X_debiased, edge_index=g)
         preds = (output.squeeze() > 0).type_as(labels)
-        loss_train = F.binary_cross_entropy_with_logits(output[idx_train], labels[idx_train].unsqueeze(1).float())
+        loss_train = F.cross_entropy(output[idx_train], labels[idx_train].unsqueeze(1).float())
         
         loss_train.backward()
         self.optimizer.step()
@@ -139,7 +139,7 @@ class victim:
         # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
         output = self.model(x=X_debiased, edge_index=g)
         preds = (output.squeeze() > 0).type_as(labels)
-        loss_val = F.binary_cross_entropy_with_logits(output[idx_val], labels[idx_val].unsqueeze(1).float())
+        loss_val = F.cross_entropy(output[idx_val], labels[idx_val].unsqueeze(1).float())
 
         print("Val_loss:", loss_val)
         if loss_val <= best_val:
@@ -186,7 +186,7 @@ class victim:
         print("output:",output)
         preds = (output.squeeze() > 0).type_as(labels)
         print("Prediction:", preds)
-        loss_test = F.binary_cross_entropy_with_logits(output[idx_test], labels[idx_test].unsqueeze(1).float())
+        # loss_test = F.binary_cross_entropy_with_logits(output[idx_test], labels[idx_test].unsqueeze(1).float())
         auc_roc_test = roc_auc_score(labels.cpu().numpy()[idx_test.cpu().numpy()], output.detach().cpu().numpy()[idx_test.cpu().numpy()])
         f1_test = f1_score(labels[idx_test.cpu().numpy()].cpu().numpy(), preds[idx_test.cpu().numpy()].cpu().numpy())
         test_auc = auc_roc_test
