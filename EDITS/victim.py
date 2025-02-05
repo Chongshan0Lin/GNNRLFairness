@@ -35,6 +35,7 @@ class victim:
 
         self.preprosessing()
         A_debiased, features = sp.load_npz('pre_processed/A_debiased.npz'), torch.load("pre_processed/X_debiased.pt", map_location=torch.device('cpu')).cpu().float()
+        features = features[:, torch.nonzero(features.sum(axis=0)).squeeze()].detach()
         X_debiased = features.float().to(device)
 
 
