@@ -59,7 +59,7 @@ class victim:
         # self.optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3, weight_decay=1e-5)
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
 
-    def train(self, epoch = 100, val_loss = 1e5):
+    def train(self, pa = -1, eq = -1, test_f1 = -1, test_auc = -1, epoch = 100, val_loss = 1e5):
         self.preprosessing()
 
         adj_ori = self.adj_matrix
@@ -139,13 +139,12 @@ class victim:
         auc_roc_val = roc_auc_score(labels.cpu().numpy()[idx_val.cpu().numpy()], output.detach().cpu().numpy()[idx_val.cpu().numpy()])
         f1_val = f1_score(labels[idx_val.cpu().numpy()].cpu().numpy(), preds[idx_val.cpu().numpy()].cpu().numpy())
 
-        pa = -1
-        eq = -1
-        test_auc = -1
-        test_f1 = -1
+        # pa = -1
+        # eq = -1
+        # test_auc = -1
+        # test_f1 = -1
 
-        # if epoch < 15:
-        #     return 0, 0, 0, 1e5, 0
+
         print("Val_loss:", val_loss)
         if loss_val < val_loss:
             # The problem might be here: it always takes the minimal loss_val

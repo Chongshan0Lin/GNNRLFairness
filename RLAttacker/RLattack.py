@@ -261,6 +261,7 @@ class agent:
             # return pa, eq, test_f1, val_loss, test_auc
 
             parity, oddity, test_f1, val_loss, test_auc = victim_model.train()
+            # ma_val_loss = val_loss
             if parity < 0 or oddity < 0: continue
             # fairness_losses, dp, eod, cdp = victim_model.evaluate()
             # parity = fairness_losses[0]
@@ -292,7 +293,7 @@ class agent:
                 self.change_edge(first_node, second_node)
                 victim_model.update_adj_matrix(torch.from_numpy(nx.to_numpy_array(self.graph)))
 
-                new_parity, oddity, test_f1, val_loss, test_auc = victim_model.train()
+                new_parity, oddity, test_f1, val_loss, test_auc = victim_model.train(pa=parity, eq = oddity, test_f1=test_f1, test_auc = test_auc ,val_loss=val_loss)
                 # new_losses, new_dp, eod, cdp = victim_model.evaluate()
                 # new_parity = new_losses[0]
                 # oddity = new_losses[1]
