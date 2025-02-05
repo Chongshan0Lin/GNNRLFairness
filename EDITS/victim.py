@@ -146,6 +146,7 @@ class victim:
 
         # if epoch < 15:
         #     return 0, 0, 0, 1e5, 0
+        print("Val_loss:", val_loss)
         if loss_val < val_loss:
             # The problem might be here: it always takes the minimal loss_val
             val_loss = loss_val.data
