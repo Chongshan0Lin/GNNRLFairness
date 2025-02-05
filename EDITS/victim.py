@@ -129,7 +129,7 @@ class victim:
         # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
         output = self.model(x=X_debiased, edge_index=g)
         preds = (output.squeeze() > 0).type_as(labels)
-        loss_train = F.cross_entropy(output[idx_train], labels[idx_train].unsqueeze(1).float())
+        loss_train = F.cross_entropy(output[idx_train], labels[idx_train].long())
         
         loss_train.backward()
         self.optimizer.step()
@@ -139,7 +139,7 @@ class victim:
         # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
         output = self.model(x=X_debiased, edge_index=g)
         preds = (output.squeeze() > 0).type_as(labels)
-        loss_val = F.cross_entropy(output[idx_val], labels[idx_val].unsqueeze(1).float())
+        loss_val = F.cross_entropy(output[idx_train], labels[idx_train].long())
 
         print("Val_loss:", loss_val)
         if loss_val <= best_val:
