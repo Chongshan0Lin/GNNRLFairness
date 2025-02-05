@@ -34,6 +34,8 @@ class victim:
         self.hfeatures = int((self.nfeatures * 2) // 3 + self.nclasses)
 
         self.preprosessing()
+
+        self.X_debiased, self.A_coo = self.data_loading()
         A_debiased, features = sp.load_npz('pre_processed/A_debiased.npz'), torch.load("pre_processed/X_debiased.pt", map_location=torch.device('cpu')).cpu().float()
         features = features[:, torch.nonzero(features.sum(axis=0)).squeeze()].detach()
         X_debiased = features.float().to(device)
@@ -65,18 +67,15 @@ class victim:
 
         # self.optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3, weight_decay=1e-5)
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
+    
+    def data_loading(self):
 
-    def train(self, pa = -1, eq = -1, test_f1 = -1, test_auc = -1, epoch = 100, val_loss = 1e5):
-        best_val = val_loss
         adj_ori = self.adj_matrix
         if isinstance(adj_ori, torch.Tensor):
             adj_ori_scipy = self.tensor_to_scipy_sparse(adj_ori)
         else:
             adj_ori_scipy = adj_ori
 
-        adj = self.normalize_scipy(self.adj_matrix)
-
-        # Loading preprocessed data
         A_debiased, features = sp.load_npz('pre_processed/A_debiased.npz'), torch.load("pre_processed/X_debiased.pt", map_location=torch.device('cpu')).cpu().float()
         threshold_proportion = 0.015  # GCN: {credit: 0.02, german: 0.29, bail: 0.015}
         the_con1 = (A_debiased - adj_ori_scipy).A
@@ -100,6 +99,20 @@ class victim:
         # Ensure your sparse matrix is in COO format.
         A_coo = A_debiased.tocoo()
 
+        return X_debiased, A_coo
+
+
+    def train(self, pa = -1, eq = -1, test_f1 = -1, test_auc = -1, epoch = 100, val_loss = 1e5):
+        best_val = val_loss
+        adj_ori = self.adj_matrix
+        if isinstance(adj_ori, torch.Tensor):
+            adj_ori_scipy = self.tensor_to_scipy_sparse(adj_ori)
+        else:
+            adj_ori_scipy = adj_ori
+
+        adj = self.normalize_scipy(self.adj_matrix)
+        # Loading preprocessed data
+        X_debiased, A_coo = self.X_debiased, self.A_coo
         # Convert the row and column indices to torch tensors.
         row = torch.tensor(A_coo.row, dtype=torch.long)
         col = torch.tensor(A_coo.col, dtype=torch.long)
