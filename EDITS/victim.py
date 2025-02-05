@@ -184,7 +184,9 @@ class victim:
 
 
         print("output:",output)
-        preds = (output.squeeze() > 0).type_as(labels)
+        # preds = (output.squeeze() > 0).type_as(labels)
+        preds = output.argmax(dim=1)
+
         print("Prediction:", preds)
         # loss_test = F.binary_cross_entropy_with_logits(output[idx_test], labels[idx_test].unsqueeze(1).float())
         # auc_roc_test = roc_auc_score(labels.cpu().numpy()[idx_test.cpu().numpy()], output.detach().cpu().numpy()[idx_test.cpu().numpy()])
