@@ -159,7 +159,7 @@ class victim:
     # Evaluate model
     def test(self, model, X_debiased, g):
         model.eval()
-        output = self.model(x=X_debiased, edge_index=g)
+        output = model(x=X_debiased, edge_index=g)
 
         features = self.feature_matrix / self.feature_matrix.norm(dim=0)
         adj_preserve = self.adj_matrix
