@@ -259,8 +259,9 @@ class agent:
             # Create a victim model and train
             victim_model = victim()
             # return pa, eq, test_f1, val_loss, test_auc
+            for _ in (range(200)):
+                parity, oddity, test_f1, val_loss, test_auc = victim_model.train()
 
-            parity, oddity, test_f1, val_loss, test_auc = victim_model.train()
             # ma_val_loss = val_loss
             if parity < 0 or oddity < 0: continue
             # fairness_losses, dp, eod, cdp = victim_model.evaluate()

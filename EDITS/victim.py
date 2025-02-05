@@ -33,6 +33,10 @@ class victim:
         self.nclasses = int(self.labels.max() + 1)
         self.hfeatures = int((self.nfeatures * 2) // 3 + self.nclasses)
 
+        self.preprosessing()
+        A_debiased, features = sp.load_npz('pre_processed/A_debiased.npz'), torch.load("pre_processed/X_debiased.pt", map_location=torch.device('cpu')).cpu().float()
+        X_debiased = features.float().to(device)
+
 
         self.labels = self.labels.to(device)
         self.sens = self.sens.to(device)
@@ -50,7 +54,7 @@ class victim:
         # print("hfeatures: ",self.hfeatures)
         # def __init__(self, nfeat, nhid, nclass, dropout = 0.5):
 
-        self.model = GCN(nfeat=self.nfeatures, nhid = self.hfeatures, nclass=self.nclasses, dropout=0.5)
+        self.model = GCN(nfeat=X_debiased.shape[1], nhid = self.hfeatures, nclass=self.nclasses, dropout=0.5)
 
         # def __init__(self,  nfeat, node_num, nclass, nfeat_out, adj_lambda, layer_threshold=2, dropout=0.1, lr = 1e-3, weight_decay=1e-5):
 
@@ -63,8 +67,6 @@ class victim:
 
     def train(self, pa = -1, eq = -1, test_f1 = -1, test_auc = -1, epoch = 100, val_loss = 1e5):
         best_val = val_loss
-        # self.preprosessing()
-        self.optimizer.zero_grad()
         adj_ori = self.adj_matrix
         if isinstance(adj_ori, torch.Tensor):
             adj_ori_scipy = self.tensor_to_scipy_sparse(adj_ori)
@@ -85,7 +87,7 @@ class victim:
         assert A_debiased.min() == 0
         features = features[:, torch.nonzero(features.sum(axis=0)).squeeze()].detach()
         A_debiased = self.normalize_scipy(A_debiased)
-
+        
         sens = self.sens
 
         print("****************************After debiasing****************************")
