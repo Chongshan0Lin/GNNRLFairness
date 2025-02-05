@@ -374,7 +374,7 @@ class agent:
         # Create a victim model and train
         victim_model = victim()
 
-        parity, oddity, test_f1, val_loss, test_auc = victim_model.train(epochs = 200)
+        parity, oddity, test_f1, val_loss, test_auc = victim_model.train(pa=parity, eq = oddity, test_f1=test_f1, test_auc = test_auc ,val_loss=val_loss)
 
         init_parity = parity
         init_oddity = oddity
@@ -404,13 +404,14 @@ class agent:
             # After changing the model, retrain the victim model and calculate the new fairness value
             # victim_model.train()
 
-            new_parity, oddity, test_f1, val_loss, test_auc = victim_model.train()
+            new_parity, oddity, test_f1, val_loss, test_auc = victim_model.train(pa=parity, eq = oddity, test_f1=test_f1, test_auc = test_auc ,val_loss=val_loss)
             # new_losses, new_dp, eod, cdp = victim_model.evaluate()
             # new_parity = new_losses[0]
             # oddity = new_losses[1]
             # Determine the difference of fairness, which is the reward
             print("Parity:", new_parity)
             print("Oddity:", oddity)
+            print("test_auc:", test_auc)
             max_dp = max(max_dp, new_parity)
             max_eod = max(max_eod, oddity)
             if parity < 0 or oddity < 0: 
