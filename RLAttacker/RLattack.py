@@ -374,7 +374,7 @@ class agent:
         # Create a victim model and train
         victim_model = victim()
 
-        parity, oddity, test_f1, val_loss, test_auc = victim_model.train(pa=parity, eq = oddity, test_f1=test_f1, test_auc = test_auc ,val_loss=val_loss)
+        parity, oddity, test_f1, val_loss, test_auc = victim_model.train()
 
         init_parity = parity
         init_oddity = oddity
