@@ -48,8 +48,9 @@ class victim:
         # print("nnodes: ",self.nnodes)
         # print("nclasses: ",self.nclasses)
         # print("hfeatures: ",self.hfeatures)
+        # def __init__(self, nfeat, nhid, nclass, dropout = 0.5):
 
-        self.model = GCN(in_features=self.nfeatures, hidden_features = self.hfeatures, out_features=self.nclasses, dropout=0.5)
+        self.model = GCN(nfeat=self.nfeatures, nhid = self.hfeatures, nclass=self.nclasses, dropout=0.5)
 
         # def __init__(self,  nfeat, node_num, nclass, nfeat_out, adj_lambda, layer_threshold=2, dropout=0.1, lr = 1e-3, weight_decay=1e-5):
 
