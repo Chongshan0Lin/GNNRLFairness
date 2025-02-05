@@ -52,12 +52,11 @@ class victim:
         # self.model = GCN(in_features=self.nfeatures, hidden_features = self.hfeatures, out_features=self.nclasses, dropout=0.5)
 
         # def __init__(self,  nfeat, node_num, nclass, nfeat_out, adj_lambda, layer_threshold=2, dropout=0.1, lr = 1e-3, weight_decay=1e-5):
-        # def __init__(self,  nfeat, node_num, nclass, nfeat_out, adj_lambda, layer_threshold=2, dropout=0.1, lr = 1e-3, weight_decay=1e-5):
 
-        self.model = EDITS(nfeat=self.nfeatures, node_num=self.nnodes, nclass=self.nclasses, nfeat_out=self.nclasses, adj_lambda=1e-1)
-        self.model.to(device)
+        # self.model = EDITS(nfeat=self.nfeatures, node_num=self.nnodes, nclass=self.nclasses, nfeat_out=self.nclasses, adj_lambda=1e-1)
+        # self.model.to(device)
 
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3, weight_decay=1e-5)
+        # self.optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3, weight_decay=1e-5)
         self.adj_norm = normalize_adjacency(self.adj_matrix).detach().numpy()
 
     def train(self, epoch = 100, val_loss = 1e5):
@@ -102,20 +101,16 @@ class victim:
         # Stack them into an edge_index tensor of shape [2, num_edges].
         edge_index = torch.stack([row, col], dim=0).cuda()
 
-        # def __init__(self,  nfeat, node_num, nclass, nfeat_out, adj_lambda, layer_threshold=2, dropout=0.1, lr = 1e-3, weight_decay=1e-5):
 
-        # self.model = EDITS(nfeat=self.nfeatures, node_num=self.nnodes, nclass=self.nclasses, nfeat_out=self.nclasses, adj_lambda=1e-1)
 
-        # def forward(self, A, X):
-
-        self.model = EDITS(nfeat=X_debiased.shape[1], node_num=self.nnodes, nclass=self.nclasses, nfeat_out=self.nclasses, adj_lambda=1e-1).float()
-        self.model = self.model.to(device)
-        optimizer = optim.Adam(self.model.parameters(), lr=1e-3, weight_decay=1e-5)
+        model = GCN(nfeat=X_debiased.shape[1], nhid=self.hfeatures, nclass=self.labels.max().item()).float()
+        model = model.to(device)
+        optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-5)
 
         # Train model
 
         t = time.time()
-        self.model.train()
+        model.train()
         optimizer.zero_grad()
         idx_train = self.idx_train.to(device)
         labels = self.labels.to(device)
@@ -126,8 +121,8 @@ class victim:
         # g = g.to(device)  # Move the graph to the appropriate device.
         g = dgl.add_self_loop(g).to(device)
 
-
-        output = self.model(X=X_debiased, edge_index=g)
+        # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
+        output = model(x=X_debiased, edge_index=g)
         preds = (output.squeeze() > 0).type_as(labels)
         loss_train = F.binary_cross_entropy_with_logits(output[idx_train], labels[idx_train].unsqueeze(1).float())
         auc_roc_train = roc_auc_score(labels.cpu().numpy()[idx_train.cpu().numpy()], output.detach().cpu().numpy()[idx_train.cpu().numpy()])
@@ -136,9 +131,9 @@ class victim:
         optimizer.step()
         _, _ = fair_metric(preds[idx_train.cpu().numpy()].cpu().numpy(), labels[idx_train.cpu().numpy()].cpu().numpy(), sens[idx_train.cpu().numpy()].cpu().numpy())
 
-        self.model.eval()
+        model.eval()
         # output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
-        output = self.model(x=X_debiased, edge_index=g)
+        output = model(x=X_debiased, edge_index=g)
         preds = (output.squeeze() > 0).type_as(labels)
         loss_val = F.binary_cross_entropy_with_logits(output[idx_val], labels[idx_val].unsqueeze(1).float())
         auc_roc_val = roc_auc_score(labels.cpu().numpy()[idx_val.cpu().numpy()], output.detach().cpu().numpy()[idx_val.cpu().numpy()])
@@ -149,25 +144,26 @@ class victim:
         test_auc = -1
         test_f1 = -1
 
-        if epoch < 15:
-            return 0, 0, 0, 1e5, 0
+        # if epoch < 15:
+        #     return 0, 0, 0, 1e5, 0
         if loss_val < val_loss:
+            # The problem might be here: it always takes the minimal loss_val
             val_loss = loss_val.data
             print("New val_loss:", val_loss)
-            pa, eq, test_f1, test_auc = self.test(X_debiased=X_debiased, g=g)
+            pa, eq, test_f1, test_auc = self.test(model=model, X_debiased=X_debiased, g=g)
             print("New parity:", pa)
             # print("Parity of val: " + str(pa))
             # print("Equality of val: " + str(eq))
         return pa, eq, test_f1, val_loss, test_auc
 
     # Evaluate model
-    def test(self, X_debiased, g):
-        self.model.eval()
+    def test(self, model, X_debiased, g):
+        model.eval()
         output = self.model(x=X_debiased, edge_index=g)
 
         features = self.feature_matrix / self.feature_matrix.norm(dim=0)
         adj_preserve = self.adj_matrix
-        
+
         if isinstance(self.adj_matrix, torch.Tensor):
             adj_matrix_scipy = self.tensor_to_scipy_sparse(self.adj_matrix)
         else:
@@ -302,26 +298,26 @@ class victim:
         sparse = sp.coo_matrix(tensor)
         return sparse
 
-    def evaluate(self):
-        self.model.eval()
-        with torch.no_grad():
-            output_test = self.model(self.feature_matrix, self.adj_norm)
-            loss_test = F.nll_loss(output_test[self.idx_test], self.labels[self.idx_test])
-            pred_test = output_test[self.idx_test].max(1)[1]
-            acc_test  = pred_test.eq(self.labels[self.idx_test]).sum().item() / self.idx_test.size(0)
+    # def evaluate(self):
+    #     self.model.eval()
+    #     with torch.no_grad():
+    #         output_test = self.model(self.feature_matrix, self.adj_norm)
+    #         loss_test = F.nll_loss(output_test[self.idx_test], self.labels[self.idx_test])
+    #         pred_test = output_test[self.idx_test].max(1)[1]
+    #         acc_test  = pred_test.eq(self.labels[self.idx_test]).sum().item() / self.idx_test.size(0)
 
-        print(f"Test Loss: {loss_test.item():.4f}, Test Accuracy: {acc_test:.4f}")
+    #     print(f"Test Loss: {loss_test.item():.4f}, Test Accuracy: {acc_test:.4f}")
 
-        """
-        Fairness Evauation
-        """
+    #     """
+    #     Fairness Evauation
+    #     """
 
-        DP = demographic_parity(predictions=pred_test, sens=self.sens[self.idx_test])
-        EOd = equality_of_odds(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
-        CDP = conditional_demographic_parity(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
-        surrogate = fair_metric(pred_test, self.labels[self.idx_test], self.sens[self.idx_test])
-        print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}, Conditional DP: {CDP:.4f}")
-        return surrogate, DP.item(), EOd.item(), CDP.item()
+    #     DP = demographic_parity(predictions=pred_test, sens=self.sens[self.idx_test])
+    #     EOd = equality_of_odds(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
+    #     CDP = conditional_demographic_parity(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
+    #     surrogate = fair_metric(pred_test, self.labels[self.idx_test], self.sens[self.idx_test])
+    #     print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}, Conditional DP: {CDP:.4f}")
+    #     return surrogate, DP.item(), EOd.item(), CDP.item()
 
 
     def change_edge(self, node1, node2):
