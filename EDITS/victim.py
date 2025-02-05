@@ -113,6 +113,7 @@ class victim:
         adj = self.normalize_scipy(self.adj_matrix)
         # Loading preprocessed data
         X_debiased, A_coo = self.X_debiased, self.A_coo
+        sens = self.sens
         # Convert the row and column indices to torch tensors.
         row = torch.tensor(A_coo.row, dtype=torch.long)
         col = torch.tensor(A_coo.col, dtype=torch.long)
