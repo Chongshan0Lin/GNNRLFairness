@@ -279,7 +279,7 @@ class agent:
         The agent runs until it runs out of the budget or successfully achieves the goal
         """
 
-        # n_episodes = 200
+        n_episodes = 200
         print("Number of episodes", n_episodes)
 
         min_exploration_rate = self.Q_function1.exploration_rate
@@ -309,8 +309,6 @@ class agent:
             init_parity = parity
             init_oddity = oddity
 
-            print("Initial Parity:", parity)
-            print("Initial Oddity:", oddity)
 
             max_parity = init_parity
             max_oddity = init_oddity
@@ -364,7 +362,8 @@ class agent:
             if episode % 2 == 0:
                 self.Q_function1.target_network.load_state_dict(self.Q_function1.policy_network.state_dict())
                 self.Q_function2.target_network.load_state_dict(self.Q_function2.policy_network.state_dict())
-
+            print("Initial Parity:", parity)
+            print("Initial Oddity:", oddity)
             print("Change of parity:", parity - init_parity)
             print("Change of oddity:", oddity - init_oddity)
             print("Max parity:", max_parity)
