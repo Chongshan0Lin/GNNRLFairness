@@ -176,7 +176,7 @@ class victim:
                 roc_test = roc_auc_score(labels[idx_test].cpu().numpy(), output[idx_test].detach().cpu().numpy())
             except Exception as e:
                 roc_test = 0.0
-            parity, equality = fair_metric_new(output, idx_test, labels, sens)
+            parity, equality, eod_val = fair_metric_new(output, idx_test, labels, sens)
 
             # Compute the sensitive attribute prediction accuracy (from the adversary output `s`).
             pred_sens = s[idx_test].max(1)[1]
