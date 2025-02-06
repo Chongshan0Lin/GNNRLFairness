@@ -111,13 +111,14 @@ class victim:
             eps = 1e-8
             parity = abs((sum(pred_y[idx_s0]) / (sum(idx_s0) + eps)) - (sum(pred_y[idx_s1]) / (sum(idx_s1) + eps)))
             equality = abs((sum(pred_y[idx_s0_y1]) / (sum(idx_s0_y1) + eps)) - (sum(pred_y[idx_s1_y1]) / (sum(idx_s1_y1) + eps)))
-            return parity, equality
+            eod = equality_of_odds(predictions=pred_y, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
+            return parity, equality, eod
 
         self.model.eval()
         output, s = self.model(self.G, features)
 
-        parity_val, equality_val = fair_metric_new(output, idx_val, labels, sens)
-        parity, equality = fair_metric_new(output, idx_test, labels, sens)
+        parity_val, equality_val, eod_val = fair_metric_new(output, idx_val, labels, sens)
+        parity, equality,_ = fair_metric_new(output, idx_test, labels, sens)
         EOd = equality_of_odds(predictions=output, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
 
         best_fair = parity_val + equality_val
@@ -125,7 +126,7 @@ class victim:
         best_result['roc'] = -1
         best_result['parity'] = parity
         best_result['equality'] = equality
-        best_result['eod'] = EOd
+        best_result['eod'] = eod_val
         print("Current result:", best_result)
 
         # --- Training loop ---
@@ -160,7 +161,7 @@ class victim:
                 roc_val = 0.0
 
             # Compute fairness metrics on the validation set.
-            parity_val, equality_val = fair_metric_new(output, idx_val, labels, sens)
+            parity_val, equality_val, eod_val = fair_metric_new(output, idx_val, labels, sens)
 
             # Compute test set metrics.
             pred_test = output[idx_test].max(1)[1]
@@ -179,7 +180,7 @@ class victim:
             # print("roc_val:", roc_val)
 
             # DP = demographic_parity(predictions=pred_test, sens=self.sens[self.idx_test])
-            EOd = equality_of_odds(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
+            # EOd = equality_of_odds(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
             # CDP = conditional_demographic_parity(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
             # print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}, Conditional DP: {CDP:.4f}")
 
@@ -194,7 +195,7 @@ class victim:
                     best_result['roc'] = roc_test
                     best_result['parity'] = parity
                     best_result['equality'] = equality
-                    best_result['eod'] = EOd
+                    best_result['eod'] = eod_val
             # else:
             #     break
                 # print("=================================")
