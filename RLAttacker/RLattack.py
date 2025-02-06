@@ -98,7 +98,6 @@ class Q_function:
         # next_states_t = torch.FloatTensor(next_states)
         # dones_t = torch.FloatTensor(dones).unsqueeze(1)
         device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
-        print(device)
         # states_t = torch.FloatTensor(torch.stack(states))
         # actions_t = torch.LongTensor(torch.stack(actions)).unsqueeze(1)
         # rewards_t = torch.FloatTensor(torch.stack(rewards)).unsqueeze(1)

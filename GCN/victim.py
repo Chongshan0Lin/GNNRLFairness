@@ -21,6 +21,7 @@ class victim:
         self.nclasses = int(self.labels.max() + 1)
         self.hfeatures = int((self.nfeatures * 2) // 3 + self.nclasses)
 
+        print(device)
 
         self.labels = self.labels.to(device)
         self.sens = self.sens.to(device)
