@@ -64,7 +64,7 @@ class victim:
         self.model.reset_parameters()
         self.G = dgl.from_scipy(self.adj_norm)
         self.G = self.G.to(device)
-        print(self.G)
+        # print(self.G)
         # self.model.intialize
         # Get the data from self.
         features = self.feature_matrix.to(device)
