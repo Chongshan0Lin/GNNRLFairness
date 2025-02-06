@@ -114,9 +114,9 @@ class victim:
             pre = output.cpu().detach().numpy().astype(int).T[0]
             lbl = labels.cpu().numpy().astype(int)
             senss = sens.cpu().numpy().astype(int)
-            print("pre:", pre)
-            print("lbl:", lbl)
-            print("senss:", senss)
+            # print("pre:", pre)
+            # print("lbl:", lbl)
+            # print("senss:", senss)
             eod = equality_of_odds(predictions=pre, labels=lbl, sens=senss)
             return parity, equality, eod
 
