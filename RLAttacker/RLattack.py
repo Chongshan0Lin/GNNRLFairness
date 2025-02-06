@@ -311,6 +311,9 @@ class agent:
 
             print("Initial Parity:", parity)
             print("Initial Oddity:", oddity)
+
+            max_parity = init_parity
+            max_oddity = init_oddity
             # Employ dynamic exploration rate to encourge more exploration during the previous stage
 
             for i in range(self.budegt):
@@ -337,6 +340,8 @@ class agent:
                 # Determine the difference of fairness, which is the reward
                 print("Parity:", new_parity)
                 print("Oddity:", oddity)
+                max_parity = max(max_parity, new_parity)
+                max_oddity = max(max_oddity, oddity)
                 reward = new_parity - parity
                 cumulative_reward += reward
                 parity = new_parity
@@ -362,6 +367,8 @@ class agent:
 
             print("Change of parity:", parity - init_parity)
             print("Change of oddity:", oddity - init_oddity)
+            print("Max parity:", max_parity)
+            print("Max oddity:", max_oddity)
 
         avg_reward = np.mean(all_rewards[-10:])
         print(f"Episode {episode}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
@@ -404,6 +411,8 @@ class agent:
 
         print("Initial Parity:", parity)
         print("Initial Oddity:", oddity)
+        max_parity = init_parity
+        max_oddity = init_oddity
 
         # Employ dynamic exploration rate to encourge more exploration during the previous stage
 
@@ -428,6 +437,9 @@ class agent:
             new_losses, new_dp, eod, cdp = victim_model.evaluate()
             new_parity = new_losses[0]
             oddity = new_losses[1]
+            max_parity = max(max_parity, new_parity)
+            max_oddity = max(max_oddity, oddity)
+
             # Determine the difference of fairness, which is the reward
             print("Parity:", new_parity)
             print("Oddity:", new_losses[1])
@@ -458,6 +470,8 @@ class agent:
 
         print("Change of parity:", parity - init_parity)
         print("Change of oddity:", oddity - init_oddity)
+        print("Max parity:", max_parity)
+        print("Max oddity:", max_oddity)
 
         avg_reward = np.mean(all_rewards[:])
         print(f"epoch {epoch}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
