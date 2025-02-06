@@ -111,7 +111,7 @@ class victim:
             eps = 1e-8
             parity = abs((sum(pred_y[idx_s0]) / (sum(idx_s0) + eps)) - (sum(pred_y[idx_s1]) / (sum(idx_s1) + eps)))
             equality = abs((sum(pred_y[idx_s0_y1]) / (sum(idx_s0_y1) + eps)) - (sum(pred_y[idx_s1_y1]) / (sum(idx_s1_y1) + eps)))
-            eod = equality_of_odds(predictions=pred_y, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
+            eod = equality_of_odds(predictions=pred_y, labels=labels.cpu().numpy(), sens=sens.cpu().numpy())
             return parity, equality, eod
 
         self.model.eval()
