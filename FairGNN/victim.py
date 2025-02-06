@@ -308,8 +308,10 @@ class victim:
 
         norm_np = normalize_adjacency(self.adj_matrix).detach().cpu().numpy()
         self.adj_norm = sp.csr_matrix(norm_np)
-        # self.G = dgl.from_scipy(self.adj_norm)
-        # self.G = self.G.to(device)
+
+        self.G = dgl.from_scipy(self.adj_norm)
+        self.G = self.G.to(device)
+        print(self.G)
 
     def accuracy(self, output, labels):
         output = output.squeeze()
