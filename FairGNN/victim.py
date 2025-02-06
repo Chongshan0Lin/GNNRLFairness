@@ -85,7 +85,7 @@ class victim:
         best_result = {}
         best_fair = float('inf')
         t_total = time.time()
-        # self.model
+
 
         # --- Define a local fairness-metric function ---
         def fair_metric_new(output, idx, labels, sens):
@@ -125,7 +125,7 @@ class victim:
 
         parity_val, equality_val, eod_val = fair_metric_new(output, idx_val, labels, sens)
         parity, equality,_ = fair_metric_new(output, idx_test, labels, sens)
-        EOd = equality_of_odds(predictions=output, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
+        # EOd = equality_of_odds(predictions=output, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
 
         best_fair = parity_val + equality_val
         best_result['acc'] = -1
