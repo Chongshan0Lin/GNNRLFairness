@@ -80,7 +80,8 @@ def equality_of_odds(predictions, labels, sens):
     ma_pos_false = ma_pos & ground_truth_false
     mi_pos_true = mi_pos & ground_truth_true
     mi_pos_false = mi_pos & ground_truth_false
-    print(majority)
+    # print(majority)
+    print(ground_truth_true)
     print("Ma pos:", ma_pos)
     print(ma_pos_true)
     print("sum:",sum(ma_pos_true))
