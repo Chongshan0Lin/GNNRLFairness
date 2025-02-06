@@ -176,6 +176,10 @@ class victim:
             # print("Accuracy item:", acc_val.item())
             # print("roc_val:", roc_val)
 
+            DP = demographic_parity(predictions=pred_test, sens=self.sens[self.idx_test])
+            EOd = equality_of_odds(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
+            CDP = conditional_demographic_parity(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
+            print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}, Conditional DP: {CDP:.4f}")
 
             # Check if the validation metrics meet the thresholds.
             # print("Accuracy item:", acc_val.item())
