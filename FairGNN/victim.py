@@ -118,12 +118,14 @@ class victim:
 
         parity_val, equality_val = fair_metric_new(output, idx_val, labels, sens)
         parity, equality = fair_metric_new(output, idx_test, labels, sens)
+        EOd = equality_of_odds(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
 
         best_fair = parity_val + equality_val
         best_result['acc'] = -1
         best_result['roc'] = -1
         best_result['parity'] = parity
         best_result['equality'] = equality
+        best_result['eod'] = EOd
         print("Current result:", best_result)
 
         # --- Training loop ---
@@ -176,10 +178,10 @@ class victim:
             # print("Accuracy item:", acc_val.item())
             # print("roc_val:", roc_val)
 
-            DP = demographic_parity(predictions=pred_test, sens=self.sens[self.idx_test])
+            # DP = demographic_parity(predictions=pred_test, sens=self.sens[self.idx_test])
             EOd = equality_of_odds(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
-            CDP = conditional_demographic_parity(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
-            print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}, Conditional DP: {CDP:.4f}")
+            # CDP = conditional_demographic_parity(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
+            # print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}, Conditional DP: {CDP:.4f}")
 
             # Check if the validation metrics meet the thresholds.
             # print("Accuracy item:", acc_val.item())
@@ -192,6 +194,7 @@ class victim:
                     best_result['roc'] = roc_test
                     best_result['parity'] = parity
                     best_result['equality'] = equality
+                    best_result['eod'] = EOd
             # else:
             #     break
                 # print("=================================")
@@ -218,7 +221,8 @@ class victim:
                   "roc: {:.4f}".format(best_result['roc']),
                   "acc_sens: {:.4f}".format(acc_sens.item()),
                   "parity: {:.4f}".format(best_result['parity']),
-                  "equality: {:.4f}".format(best_result['equality']))
+                  "equality: {:.4f}".format(best_result['equality']),
+                  "eod: {:.4f}".format(best_result['eod']))
             parity = best_result['parity']
             equality = best_result['equality']
             return parity, equality
