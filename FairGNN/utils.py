@@ -80,6 +80,7 @@ def equality_of_odds(predictions, labels, sens):
     ma_pos_false = ma_pos & ground_truth_false
     mi_pos_true = mi_pos & ground_truth_true
     mi_pos_false = mi_pos & ground_truth_false
+    print(ma_pos_true)
     print("sum:",sum(ma_pos_true))
     # print(abs(sum(ma_pos_true) / sum(ma_true) - sum(mi_pos_true) / sum(mi_true)))
     EOd = abs(sum(ma_pos_true) / sum(ma_true) - sum(mi_pos_true) / sum(mi_true)) + abs(sum(ma_pos_false) / sum(ma_false) - sum(mi_pos_false) / sum(mi_false))
