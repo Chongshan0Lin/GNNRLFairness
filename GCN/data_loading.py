@@ -184,6 +184,14 @@ def load_pokec(dataset, label_number=1000):  # 1000
     # idx_train = torch.LongTensor(idx_train)
     # idx_val = torch.LongTensor(idx_val)
     # idx_test = torch.LongTensor(idx_test)
+    features = torch.FloatTensor(feats)
+    sens = torch.FloatTensor(sens)
+    idx_train = torch.LongTensor(idx_train)
+    idx_val = torch.LongTensor(idx_val)
+    idx_test = torch.LongTensor(idx_test)
+    labels = torch.LongTensor(labels)
+    features=torch.cat([features,sens.unsqueeze(-1)],-1)
+    adj = mx_to_torch_sparse_tensor(adj,return_tensor_sparse=return_tensor_sparse)
 
     return adj, features, labels, idx_train, idx_val, idx_test, sens
 
