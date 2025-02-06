@@ -197,7 +197,6 @@ class victim:
             if acc_val.item() > acc_threshold and roc_val > roc_threshold:
                 print("Validation metrics meet the thresholds.")
                 if best_fair > (parity_val + equality_val):
-                    print(eod_val)
                     best_fair = parity_val + equality_val
                     best_result['acc'] = acc_test.item()
                     best_result['roc'] = roc_test
