@@ -177,6 +177,7 @@ class victim:
             except Exception as e:
                 roc_test = 0.0
             parity, equality, eod_val = fair_metric_new(output, idx_test, labels, sens)
+            print(eod_val)
 
             # Compute the sensitive attribute prediction accuracy (from the adversary output `s`).
             pred_sens = s[idx_test].max(1)[1]
