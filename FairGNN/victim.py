@@ -177,7 +177,7 @@ class victim:
             except Exception as e:
                 roc_test = 0.0
             parity, equality, eod_val = fair_metric_new(output, idx_test, labels, sens)
-            print(eod_val)
+            # print(eod_val)
 
             # Compute the sensitive attribute prediction accuracy (from the adversary output `s`).
             pred_sens = s[idx_test].max(1)[1]
@@ -197,6 +197,7 @@ class victim:
             if acc_val.item() > acc_threshold and roc_val > roc_threshold:
                 print("Validation metrics meet the thresholds.")
                 if best_fair > (parity_val + equality_val):
+                    print(eod_val)
                     best_fair = parity_val + equality_val
                     best_result['acc'] = acc_test.item()
                     best_result['roc'] = roc_test
