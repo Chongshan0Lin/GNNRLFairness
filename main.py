@@ -1,4 +1,4 @@
-from GCN.victim import victim
+from FairGNN.victim import victim
 from RLAttacker.RLattack import agent
 import networkx as nx
 import torch
