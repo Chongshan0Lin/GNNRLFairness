@@ -118,7 +118,7 @@ class victim:
 
         parity_val, equality_val = fair_metric_new(output, idx_val, labels, sens)
         parity, equality = fair_metric_new(output, idx_test, labels, sens)
-        EOd = equality_of_odds(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
+        EOd = equality_of_odds(predictions=output, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
 
         best_fair = parity_val + equality_val
         best_result['acc'] = -1
