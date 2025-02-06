@@ -337,7 +337,7 @@ class agent:
                 oddity = new_losses[1]
                 # Determine the difference of fairness, which is the reward
                 print("Parity:", new_parity)
-                print("Oddity:", new_losses[1])
+                print("Oddity:", oddity)
                 reward = new_parity - parity
                 cumulative_reward += reward
                 parity = new_parity
