@@ -273,9 +273,6 @@ class agent:
             init_parity = parity
             init_oddity = oddity
 
-            print("Initial Parity:", parity)
-            print("Initial Oddity:", oddity)
-            print("Initial Accuracy:", test_auc)
             # Employ dynamic exploration rate to encourge more exploration during the previous stage
             max_dp = parity
             max_eod = oddity
@@ -324,7 +321,7 @@ class agent:
                 self.Q_function1.exploration_rate = min_exploration_rate
                 self.Q_function2.exploration_rate = min_exploration_rate
                 self.train_step()
-            
+
 
             all_rewards.append(cumulative_reward)
             # Update the target network periodically
@@ -332,6 +329,10 @@ class agent:
                 self.Q_function1.target_network.load_state_dict(self.Q_function1.policy_network.state_dict())
                 self.Q_function2.target_network.load_state_dict(self.Q_function2.policy_network.state_dict())
 
+
+            print("Initial Parity:", parity)
+            print("Initial Oddity:", oddity)
+            print("Initial Accuracy:", test_auc)
             print("Change of parity:", parity - init_parity)
             print("Change of oddity:", oddity - init_oddity)
             print("Max DP:", max_dp)
