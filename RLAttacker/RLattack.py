@@ -276,6 +276,8 @@ class agent:
             # Employ dynamic exploration rate to encourge more exploration during the previous stage
             max_dp = parity
             max_eod = oddity
+            init_auc = test_auc
+            new_acc = test_auc
             for i in range(self.budegt):
 
                 print(i,"th iteration")
@@ -301,6 +303,8 @@ class agent:
                 print("Accuracy:", test_auc)
                 max_dp = max(max_dp, new_parity)
                 max_eod = max(max_eod, oddity)
+                if(max_dp == new_parity):
+                    new_acc = test_auc
                 if parity < 0 or oddity < 0: 
                     # Revert the change
                     self.change_edge(first_node, second_node)
@@ -332,11 +336,12 @@ class agent:
 
             print("Initial Parity:", parity)
             print("Initial Oddity:", oddity)
-            print("Initial Accuracy:", test_auc)
+            print("Initial Accuracy:", init_auc)
             print("Change of parity:", parity - init_parity)
             print("Change of oddity:", oddity - init_oddity)
             print("Max DP:", max_dp)
             print("Max EOD:", max_eod)
+            print("Acc:", test_auc)
             print("Max Change of DP:", max_dp - init_parity)
             print("Max Change of EOD:", max_eod - init_oddity)
 
