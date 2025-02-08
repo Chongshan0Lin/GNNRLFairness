@@ -202,7 +202,7 @@ def load_credit(dataset, sens_attr="Age", predict_attr="NoDefaultNextMonth", pat
     from scipy.spatial import distance_matrix
 
     # print('Loading {} dataset from {}'.format(dataset, path))
-    idx_features_labels = pd.read_csv(os.path.join(path, "{}.csv".format(dataset)))
+    idx_features_labels = pd.read_csv(os.path.join(path, "credit.csv".format(dataset)))
     header = list(idx_features_labels.columns)
     header.remove(predict_attr)
     header.remove('Single')
