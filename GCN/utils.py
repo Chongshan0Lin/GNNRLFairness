@@ -157,3 +157,62 @@ def fair_metric(pred, labels, sens):
     
     return parity, equality
 
+def feature_norm(features):
+    min_values = features.min(0)
+    max_values = features.max(0)
+    return 2 * (features - min_values) / (max_values - min_values) - 1
+
+def load_credit(dataset, sens_attr="Age", predict_attr="NoDefaultNextMonth", path="./dataset/credit/",
+                label_number=6000):
+    from scipy.spatial import distance_matrix
+
+    # print('Loading {} dataset from {}'.format(dataset, path))
+    idx_features_labels = pd.read_csv(os.path.join(path, "{}.csv".format(dataset)))
+    header = list(idx_features_labels.columns)
+    header.remove(predict_attr)
+    header.remove('Single')
+
+    # build relationship
+    edges_unordered = np.genfromtxt(f'{path}/{dataset}_edges.txt').astype('int')
+
+    features = sp.csr_matrix(idx_features_labels[header], dtype=np.float32)
+    labels = idx_features_labels[predict_attr].values
+    idx = np.arange(features.shape[0])
+    idx_map = {j: i for i, j in enumerate(idx)}
+    edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
+                        dtype=int).reshape(edges_unordered.shape)
+
+    print(len(edges))
+
+    adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
+                        shape=(labels.shape[0], labels.shape[0]),
+                        dtype=np.float32)
+
+    # build symmetric adjacency matrix
+    adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
+    # adj = adj + sp.eye(adj.shape[0])
+
+    features = np.array(features.todense())
+    # features = torch.FloatTensor(np.array(features.todense()))
+    # labels = torch.LongTensor(labels)
+
+    import random
+    random.seed(20)
+    label_idx_0 = np.where(labels == 0)[0]
+    label_idx_1 = np.where(labels == 1)[0]
+    random.shuffle(label_idx_0)
+    random.shuffle(label_idx_1)
+
+    idx_train = np.append(label_idx_0[:min(int(0.5 * len(label_idx_0)), label_number // 2)],
+                            label_idx_1[:min(int(0.5 * len(label_idx_1)), label_number // 2)])
+    idx_val = np.append(label_idx_0[int(0.5 * len(label_idx_0)):int(0.7 * len(label_idx_0))],
+                        label_idx_1[int(0.5 * len(label_idx_1)):int(0.7 * len(label_idx_1))])
+    idx_test = np.append(label_idx_0[int(0.7 * len(label_idx_0)):], label_idx_1[int(0.7 * len(label_idx_1)):])
+
+    sens = idx_features_labels[sens_attr].values.astype(int)
+    # sens = torch.FloatTensor(sens)
+    # idx_train = torch.LongTensor(idx_train)
+    # idx_val = torch.LongTensor(idx_val)
+    # idx_test = torch.LongTensor(idx_test)
+
+    return adj, feature_norm(features), labels, edges, sens, idx_train, idx_val, idx_test

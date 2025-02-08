@@ -1,4 +1,4 @@
-from .data_loading import graph_loading, feature_loading, label_loading, loading_facebook_dataset, load_pokec
+from .data_loading import graph_loading, feature_loading, label_loading, loading_facebook_dataset, load_pokec, load_credit
 import networkx as nx
 import pandas as pd
 import numpy as np
@@ -8,14 +8,14 @@ from .utils import normalize_adjacency
 from .utils import demographic_parity, conditional_demographic_parity, equality_of_odds
 from .utils import fair_metric
 import torch.nn.functional as F
-EPOCH = 100
+EPOCH = 200
 gpu_index = 2
 device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
 
 class victim:
 
     def __init__(self):
-        self.adj_matrix, self.feature_matrix, self.labels, self.idx_train, self.idx_val, self.idx_test, self.sens = load_pokec(dataset = 1)
+        self.adj_matrix, self.feature_matrix, self.labels, self.idx_train, self.idx_val, self.idx_test, self.sens = load_credit(dataset = 1)
         self.nnodes = self.feature_matrix.shape[0]
         self.nfeatures = self.feature_matrix.shape[1]
         self.nclasses = int(self.labels.max() + 1)

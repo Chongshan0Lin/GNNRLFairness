@@ -271,7 +271,7 @@ class agent:
             self.graph.add_edge(node1, node2)
 
 
-    def train(self, n_episodes =1000):
+    def train(self, n_episodes =200):
         """
         Train the two agent hierarchically.
         First Q function gives the first node, second Q function gives the second node.
@@ -368,6 +368,8 @@ class agent:
             print("Change of oddity:", oddity - init_oddity)
             print("Max parity:", max_parity)
             print("Max oddity:", max_oddity)
+            print("Max Change of parity:", max_parity - init_parity)
+            print("Max Change of oddity:", max_oddity - init_oddity)
 
         avg_reward = np.mean(all_rewards[-10:])
         print(f"Episode {episode}, Average Reward: {avg_reward:.2f}, Cumulative Reward: {cumulative_reward:.2f}")
