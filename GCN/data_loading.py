@@ -250,8 +250,17 @@ def load_credit(dataset, sens_attr="Age", predict_attr="NoDefaultNextMonth", pat
     # idx_val = torch.LongTensor(idx_val)
     # idx_test = torch.LongTensor(idx_test)
     # self.adj_matrix, self.feature_matrix, self.labels, self.idx_train, self.idx_val, self.idx_test, self.sens = load_credit(dataset = "credit")
+    features = feature_norm(features)
+    features = torch.FloatTensor(features)
+    sens = torch.FloatTensor(sens)
+    idx_train = torch.LongTensor(idx_train)
+    idx_val = torch.LongTensor(idx_val)
+    idx_test = torch.LongTensor(idx_test)
+    labels = torch.LongTensor(labels)
+    features=torch.cat([features,sens.unsqueeze(-1)],-1)
+    adj = mx_to_torch_sparse_tensor(adj,return_tensor_sparse=True)
 
-    return adj, feature_norm(features), labels, idx_train, idx_val, idx_test, sens
+    return adj, features, labels, idx_train, idx_val, idx_test, sens
 
 
 
