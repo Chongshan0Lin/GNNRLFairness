@@ -249,8 +249,9 @@ def load_credit(dataset, sens_attr="Age", predict_attr="NoDefaultNextMonth", pat
     # idx_train = torch.LongTensor(idx_train)
     # idx_val = torch.LongTensor(idx_val)
     # idx_test = torch.LongTensor(idx_test)
+    # self.adj_matrix, self.feature_matrix, self.labels, self.idx_train, self.idx_val, self.idx_test, self.sens = load_credit(dataset = "credit")
 
-    return adj, feature_norm(features), labels, edges, sens, idx_train, idx_val, idx_test
+    return adj, feature_norm(features), labels, idx_train, idx_val, idx_test, sens
 
 
 
