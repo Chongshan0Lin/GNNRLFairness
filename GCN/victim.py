@@ -15,7 +15,7 @@ device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu"
 class victim:
 
     def __init__(self):
-        self.adj_matrix, self.feature_matrix, self.labels, self.idx_train, self.idx_val, self.idx_test, self.sens = load_credit(dataset = 1)
+        self.adj_matrix, self.feature_matrix, self.labels, self.idx_train, self.idx_val, self.idx_test, self.sens = load_credit(dataset = "credit")
         self.nnodes = self.feature_matrix.shape[0]
         self.nfeatures = self.feature_matrix.shape[1]
         self.nclasses = int(self.labels.max() + 1)

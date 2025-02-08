@@ -202,7 +202,7 @@ def load_credit(dataset, sens_attr="Age", predict_attr="NoDefaultNextMonth", pat
     from scipy.spatial import distance_matrix
 
     # print('Loading {} dataset from {}'.format(dataset, path))
-    idx_features_labels = pd.read_csv(os.path.join(path, "credit.csv".format(dataset)))
+    idx_features_labels = pd.read_csv(os.path.join(path, "{}.csv".format(dataset)))
     header = list(idx_features_labels.columns)
     header.remove(predict_attr)
     header.remove('Single')
@@ -251,5 +251,12 @@ def load_credit(dataset, sens_attr="Age", predict_attr="NoDefaultNextMonth", pat
     # idx_test = torch.LongTensor(idx_test)
 
     return adj, feature_norm(features), labels, edges, sens, idx_train, idx_val, idx_test
+
+
+
+def feature_norm(features):
+    min_values = features.min(0)
+    max_values = features.max(0)
+    return 2 * (features - min_values) / (max_values - min_values) - 1
 
 # loading_facebook_dataset()
