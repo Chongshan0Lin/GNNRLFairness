@@ -387,9 +387,9 @@ class agent:
 
         for _ in (range(200)):
             victim_model.train()
-            surrogate, test_auc = victim_model.evaluate()
             parity, oddity = surrogate[0], surrogate[1]
 
+        surrogate, test_auc = victim_model.evaluate()
         init_parity = parity
         init_oddity = oddity
 
@@ -415,7 +415,7 @@ class agent:
 
             # After changing the model, retrain the victim model and calculate the new fairness value
             # victim_model.train()
-
+            
             victim_model.train()
             surrogate, test_auc = victim_model.evaluate()
             new_parity, oddity = surrogate[0], surrogate[1]
