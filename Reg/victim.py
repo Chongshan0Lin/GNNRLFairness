@@ -37,7 +37,7 @@ class victim:
         # print("nclasses: ",self.nclasses)
         # print("hfeatures: ",self.hfeatures)
 
-        self.model = GCN(in_features=self.nfeatures, hidden_features = self.hfeatures, out_features=self.nclasses, dropout=0.5)
+        self.model = GCN(in_features=self.nfeatures, hidden_features=self.hfeatures, out_features=1, dropout=0.5)
         self.model.to(device)
 
         # if torch.cuda.is_available():
@@ -80,7 +80,7 @@ class victim:
             # output_test = self.model(self.feature_matrix, self.adj_norm)
 
             # Compute loss only over training nodes
-            loss_train = F.mse_loss(output[self.idx_train], self.labels[self.idx_train])
+            loss_train = F.mse_loss(output[self.idx_train].view(-1), self.labels[self.idx_train])
 
             loss_train.backward()
             self.optimizer.step()
