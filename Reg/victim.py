@@ -109,17 +109,16 @@ class victim:
             pred_test = output_test[self.idx_test].view(-1)
             acc_test  = pred_test.eq(self.labels[self.idx_test]).sum().item() / self.idx_test.size(0)
             mae_test = F.l1_loss(output_test[self.idx_test].view(-1), self.labels[self.idx_test].view(-1))
+            correct = pred_test.eq(self.labels[self.idx_test].view(-1)).sum().item()
+            acc_test = correct / self.idx_test.size(0)
 
-        print(f"Test MSE: {loss_test.item():.4f}, Test MAE: {mae_test.item():.4f}")
+        print(f"Test MSE: {loss_test.item():.4f}, Test MAE: {mae_test.item():.4f}, Test Accuracy: {acc_test:.4f}")
 
         """
         Fairness Evauation
         """
         # print(pred_test)
 
-        DP = demographic_parity(predictions=pred_test, sens=self.sens[self.idx_test])
-        EOd = equality_of_odds(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
-        CDP = conditional_demographic_parity(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
         surrogate = fair_metric(pred_test, self.labels[self.idx_test], self.sens[self.idx_test])
 
         # print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}, Conditional DP: {CDP:.4f}")
