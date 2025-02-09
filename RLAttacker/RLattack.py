@@ -262,9 +262,9 @@ class agent:
             # return pa, eq, test_f1, val_loss, test_auc
             for _ in (range(200)):
                 victim_model.train()
-                surrogate, test_auc = victim_model.evaluate()
-                parity, oddity = surrogate[0], surrogate[1]
 
+            surrogate, test_auc = victim_model.evaluate()
+            parity, oddity = surrogate[0], surrogate[1]
             # ma_val_loss = val_loss
             if parity < 0 or oddity < 0: continue
             # fairness_losses, dp, eod, cdp = victim_model.evaluate()
@@ -387,9 +387,10 @@ class agent:
 
         for _ in (range(200)):
             victim_model.train()
-            parity, oddity = surrogate[0], surrogate[1]
-
+            # parity, oddity = surrogate[0], surrogate[1]
         surrogate, test_auc = victim_model.evaluate()
+        parity, oddity = surrogate[0], surrogate[1]
+
         init_parity = parity
         init_oddity = oddity
 
