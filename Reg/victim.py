@@ -8,7 +8,7 @@ from .utils import normalize_adjacency
 from .utils import demographic_parity, conditional_demographic_parity, equality_of_odds
 from .utils import fair_metric
 import torch.nn.functional as F
-EPOCH =  250
+EPOCH = 100
 gpu_index = 2
 device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
 
