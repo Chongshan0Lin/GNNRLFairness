@@ -140,6 +140,59 @@ def loading_facebook_dataset(return_tensor_sparse=True):
 
 
 
+def load_pokec(dataset=1, label_number=1000):  # 1000
+    """Load data"""
 
+    if dataset == 1:
+        edges = np.load('dataset/pokec_dataset/region_job_1_edges.npy')
+        features = np.load('dataset/pokec_dataset/region_job_1_features.npy')
+        labels = np.load('dataset/pokec_dataset/region_job_1_labels.npy')
+        sens = np.load('dataset/pokec_dataset/region_job_1_sens.npy')
+    else:
+        edges = np.load('dataset/pokec_dataset/region_job_2_2_edges.npy')
+        features = np.load('dataset/pokec_dataset/region_job_2_2_features.npy')
+        labels = np.load('dataset/pokec_dataset/region_job_2_2_labels.npy')
+        sens = np.load('dataset/pokec_dataset/region_job_2_2_sens.npy')
 
-loading_facebook_dataset()
+    adj = sp.coo_matrix((np.ones(edges.shape[1]), (edges[0, :], edges[1, :])),
+                        shape=(labels.shape[0], labels.shape[0]),
+                        dtype=np.float32)
+    print(adj.sum())
+    # build symmetric adjacency matrix
+    adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
+    # adj = adj + sp.eye(adj.shape[0])
+    print(adj.sum())
+
+    import random
+    random.seed(20)
+    label_idx_0 = np.where(labels == 0)[0]
+    label_idx_1 = np.where(labels == 1)[0]
+    print("Ratio observations:")
+    print(label_idx_0.shape)
+    print(label_idx_1.shape)
+    random.shuffle(label_idx_0)
+    random.shuffle(label_idx_1)
+
+    idx_train = np.append(label_idx_0[:min(int(0.5 * len(label_idx_0)), label_number // 2)],
+                          label_idx_1[:min(int(0.5 * len(label_idx_1)), label_number // 2)])
+    idx_val = np.append(label_idx_0[int(0.5 * len(label_idx_0)):int(0.75 * len(label_idx_0))],
+                        label_idx_1[int(0.5 * len(label_idx_1)):int(0.75 * len(label_idx_1))])
+    idx_test = np.append(label_idx_0[int(0.75 * len(label_idx_0)):], label_idx_1[int(0.75 * len(label_idx_1)):])
+
+    # features = torch.FloatTensor(np.array(features))
+    # labels = torch.LongTensor(labels)
+    # sens = torch.LongTensor(sens)
+    # idx_train = torch.LongTensor(idx_train)
+    # idx_val = torch.LongTensor(idx_val)
+    # idx_test = torch.LongTensor(idx_test)
+    features = torch.FloatTensor(features)
+    sens = torch.FloatTensor(sens)
+    idx_train = torch.LongTensor(idx_train)
+    idx_val = torch.LongTensor(idx_val)
+    idx_test = torch.LongTensor(idx_test)
+    labels = torch.LongTensor(labels)
+    features=torch.cat([features,sens.unsqueeze(-1)],-1)
+    adj = mx_to_torch_sparse_tensor(adj,return_tensor_sparse=True)
+
+    return adj, features, labels, idx_train, idx_val, idx_test, sens
+
