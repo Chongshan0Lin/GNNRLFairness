@@ -115,7 +115,7 @@ class victim:
         """
         Fairness Evauation
         """
-        print(pred_test)
+        # print(pred_test)
 
         DP = demographic_parity(predictions=pred_test, sens=self.sens[self.idx_test])
         EOd = equality_of_odds(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
