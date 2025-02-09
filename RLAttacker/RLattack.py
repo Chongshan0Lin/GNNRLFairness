@@ -9,7 +9,8 @@ from collections import deque
 import torch.optim as optim
 from database import MetricsLogger
 # from FairGNN.victim import victim
-from EDITS.victim import victim
+# from EDITS.victim import victim
+from Reg.victim import victim
 # import tensor
 gpu_index = 2
 
