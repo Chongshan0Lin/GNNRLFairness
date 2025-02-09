@@ -91,15 +91,14 @@ class victim:
                 output_val = self.model(self.feature_matrix, self.adj_norm)
                 loss_val = F.mse_loss(output_val[self.idx_val].view(-1), self.labels[self.idx_val].view(-1))
                 pred_val = output_val[self.idx_val].max(1)[1]
-                acc_val  = pred_val.eq(self.labels[self.idx_val]).sum().item() / self.idx_val.size(0)
+                # acc_val  = pred_val.eq(self.labels[self.idx_val]).sum().item() / self.idx_val.size(0)
                 self.model.train()
             # print("Episode")
             if (epoch+1) % 100 == 0:
                 print(
                     f"Epoch: {epoch:03d}, "
                     f"Train Loss: {loss_train.item():.4f}, "
-                    f"Val Loss: {loss_val.item():.4f}, "
-                    f"Val Acc: {acc_val:.4f}"
+                    f"Val Loss: {loss_val.item():.4f}"
                 )
 
     def evaluate(self):
@@ -107,7 +106,7 @@ class victim:
         with torch.no_grad():
             output_test = self.model(self.feature_matrix, self.adj_norm)
             loss_test = F.mse_loss(output_test[self.idx_test].view(-1), self.labels[self.idx_test].view(-1))
-            pred_test = output_test[self.idx_test].max(1)[1]
+            pred_test = output_test[self.idx_test].view(-1)
             acc_test  = pred_test.eq(self.labels[self.idx_test]).sum().item() / self.idx_test.size(0)
             mae_test = F.l1_loss(output_test[self.idx_test].view(-1), self.labels[self.idx_test].view(-1))
 
@@ -116,12 +115,12 @@ class victim:
         """
         Fairness Evauation
         """
+        print(pred_test)
 
         DP = demographic_parity(predictions=pred_test, sens=self.sens[self.idx_test])
         EOd = equality_of_odds(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
         CDP = conditional_demographic_parity(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
         surrogate = fair_metric(pred_test, self.labels[self.idx_test], self.sens[self.idx_test])
-        print(pred_test)
 
         # print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}, Conditional DP: {CDP:.4f}")
         print(f"Parity: {surrogate[0]:.4f}, Equaty: {surrogate[1]:.4f}")
