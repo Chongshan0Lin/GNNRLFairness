@@ -89,7 +89,7 @@ class victim:
             with torch.no_grad():
                 self.model.eval()
                 output_val = self.model(self.feature_matrix, self.adj_norm)
-                loss_val = F.nll_loss(output_val[self.idx_val], self.labels[self.idx_val])
+                loss_val = F.mse_loss(output_val[self.idx_val].view(-1), self.labels[self.idx_val].view(-1))
                 pred_val = output_val[self.idx_val].max(1)[1]
                 acc_val  = pred_val.eq(self.labels[self.idx_val]).sum().item() / self.idx_val.size(0)
                 self.model.train()
