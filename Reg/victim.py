@@ -80,7 +80,7 @@ class victim:
             # output_test = self.model(self.feature_matrix, self.adj_norm)
 
             # Compute loss only over training nodes
-            loss_train = F.mse_loss(output[self.idx_train], self.labels[self.idx_train].float())
+            loss_train = F.mse_loss(output[self.idx_train].view(-1), self.labels[self.idx_train].view(-1))
 
             loss_train.backward()
             self.optimizer.step()
@@ -106,10 +106,10 @@ class victim:
         self.model.eval()
         with torch.no_grad():
             output_test = self.model(self.feature_matrix, self.adj_norm)
-            loss_test = F.nll_loss(output_test[self.idx_test], self.labels[self.idx_test])
+            loss_test = F.mse_loss(output_test[self.idx_test].view(-1), self.labels[self.idx_test].view(-1))
             pred_test = output_test[self.idx_test].max(1)[1]
             acc_test  = pred_test.eq(self.labels[self.idx_test]).sum().item() / self.idx_test.size(0)
-            mae_test = F.l1_loss(output_test[self.idx_test].view(-1), self.labels[self.idx_test].float())
+            mae_test = F.l1_loss(output_test[self.idx_test].view(-1), self.labels[self.idx_test].view(-1))
 
         print(f"Test MSE: {loss_test.item():.4f}, Test MAE: {mae_test.item():.4f}")
 
