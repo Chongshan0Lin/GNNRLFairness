@@ -8,7 +8,7 @@ from .utils import normalize_adjacency
 from .utils import demographic_parity, conditional_demographic_parity, equality_of_odds
 from .utils import fair_metric
 import torch.nn.functional as F
-EPOCH = 100
+EPOCH =  250
 gpu_index = 2
 device = torch.device(f"cuda:{gpu_index}"if torch.cuda.is_available() else "cpu")
 
@@ -101,7 +101,7 @@ class victim:
                     f"Val Loss: {loss_val.item():.4f}, "
                     f"Val Acc: {acc_val:.4f}"
                 )
-    
+
     def evaluate(self):
         self.model.eval()
         with torch.no_grad():
