@@ -260,8 +260,8 @@ class agent:
             # Create a victim model and train
             victim_model = victim()
             # return pa, eq, test_f1, val_loss, test_auc
-            for _ in (range(200)):
-                victim_model.train()
+            # for _ in (range(200)):
+            victim_model.train()
 
             surrogate, test_auc = victim_model.evaluate()
             parity, oddity = surrogate[0], surrogate[1]
