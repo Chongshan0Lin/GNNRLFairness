@@ -261,7 +261,9 @@ class agent:
             victim_model = victim()
             # return pa, eq, test_f1, val_loss, test_auc
             for _ in (range(200)):
-                parity, oddity, test_f1, val_loss, test_auc = victim_model.train()
+                victim_model.train()
+                surrogate, test_auc = victim_model.evaluate()
+                parity, oddity = surrogate[0], surrogate[1]
 
             # ma_val_loss = val_loss
             if parity < 0 or oddity < 0: continue
@@ -294,7 +296,9 @@ class agent:
                 self.change_edge(first_node, second_node)
                 victim_model.update_adj_matrix(torch.from_numpy(nx.to_numpy_array(self.graph)))
 
-                new_parity, oddity, test_f1, val_loss, test_auc = victim_model.train(pa=parity, eq = oddity, test_f1=test_f1, test_auc = test_auc ,val_loss=val_loss)
+                victim_model.train()
+                surrogate, test_auc = victim_model.evaluate()
+                new_parity, oddity = surrogate[0], surrogate[1]
                 # new_losses, new_dp, eod, cdp = victim_model.evaluate()
                 # new_parity = new_losses[0]
                 # oddity = new_losses[1]
@@ -382,13 +386,13 @@ class agent:
         victim_model = victim()
 
         for _ in (range(200)):
-            parity, oddity, test_f1, val_loss, test_auc = victim_model.train()
+            victim_model.train()
+            surrogate, test_auc = victim_model.evaluate()
+            parity, oddity = surrogate[0], surrogate[1]
 
         init_parity = parity
         init_oddity = oddity
 
-        print("Initial Parity:", parity)
-        print("Initial Oddity:", oddity)
 
         # Employ dynamic exploration rate to encourge more exploration during the previous stage
         max_dp = parity
@@ -412,7 +416,9 @@ class agent:
             # After changing the model, retrain the victim model and calculate the new fairness value
             # victim_model.train()
 
-            new_parity, oddity, test_f1, val_loss, test_auc = victim_model.train(pa=parity, eq = oddity, test_f1=test_f1, test_auc = test_auc ,val_loss=val_loss)
+            victim_model.train()
+            surrogate, test_auc = victim_model.evaluate()
+            new_parity, oddity = surrogate[0], surrogate[1]
             # new_losses, new_dp, eod, cdp = victim_model.evaluate()
             # new_parity = new_losses[0]
             # oddity = new_losses[1]
@@ -443,7 +449,8 @@ class agent:
 
         all_rewards.append(cumulative_reward)
         # Update the target network periodically
-
+        print("Initial Parity:", init_parity)
+        print("Initial Oddity:", init_oddity)
         print("Change of parity:", parity - init_parity)
         print("Change of oddity:", oddity - init_oddity)
         print("Max DP:", max_dp)

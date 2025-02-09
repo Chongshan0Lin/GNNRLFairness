@@ -122,7 +122,7 @@ class victim:
         CDP = conditional_demographic_parity(predictions=pred_test, labels=self.labels[self.idx_test], sens=self.sens[self.idx_test])
         surrogate = fair_metric(pred_test, self.labels[self.idx_test], self.sens[self.idx_test])
         print(f"Demographic Parity: {DP:.4f}, Equality of Odds: {EOd:.4f}, Conditional DP: {CDP:.4f}")
-        return surrogate, DP.item(), EOd.item(), CDP.item()
+        return surrogate, loss_test.item()
 
 
     def change_edge(self, node1, node2):
