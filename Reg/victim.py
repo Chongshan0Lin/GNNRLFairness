@@ -19,10 +19,10 @@ class victim:
         self.nnodes = self.feature_matrix.shape[0]
         self.nfeatures = self.feature_matrix.shape[1]
         self.nclasses = int(self.labels.max() + 1)
-        self.hfeatures = int((self.nfeatures * 2) // 3 + self.nclasses)
+        self.hfeatures = int((self.nfeatures * 2) // 3 + 1)
 
 
-        self.labels = self.labels.to(device)
+        self.labels = self.labels.float().to(device)
         self.sens = self.sens.to(device)
         if isinstance(self.idx_train, torch.Tensor):
             self.idx_train = self.idx_train.to(device)
