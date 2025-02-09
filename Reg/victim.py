@@ -80,7 +80,7 @@ class victim:
             # output_test = self.model(self.feature_matrix, self.adj_norm)
 
             # Compute loss only over training nodes
-            loss_train = F.mse_loss(output[self.idx_train].view(-1), self.labels[self.idx_train])
+            loss_train = F.mse_loss(output[self.idx_train], self.labels[self.idx_train].float())
 
             loss_train.backward()
             self.optimizer.step()
